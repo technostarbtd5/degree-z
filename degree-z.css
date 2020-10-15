@@ -1,0 +1,11 @@
+.header {
+    padding: 40px;
+    text-align: left;
+    background: red;
+    color: white;
+    font-size: 30px;
+}
+
+.background {
+    color: red;
+}
