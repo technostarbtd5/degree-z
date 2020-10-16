@@ -7,47 +7,6 @@ body {
 	margin: 0;
 }
 
-.navbar {
-	margin: 0;
-    padding: 0;
-    text-align: right;
-    background: #D60021;
-    color: white;
-    font-size: 30px;
-    display: flex;
-    justify-content: right;
-    flex-direction: row-reverse;
-}
-
-.nav-item {
-	list-style: none;
-	padding: 20px 10px 10px 10px;
-	opacity: 0.75;
-}
-
-.nav-item a {
-	text-decoration: none;
-	color: #DEDEDE;
-}
-
-.nav-item a:hover {
-	color: #FFFFFF;
-	opacity: 1;
-}
-
-#nav-home {
-	order: 4;
-}
-#nav-logo {
-	order: 5;
-	margin-right: auto;
-	opacity: 1;
-}
-#nav-logo a {
-	text-decoration: none;
-	font-size: 35px;
-}
-
 .current {
 	opacity: 1;
 }
@@ -63,5 +22,5 @@ body {
 
 #alignright {
     text-align: right;
-    margin: 10px, 100px;
+    margin-right:100px;
 }
