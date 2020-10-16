@@ -1,11 +1,55 @@
-.header {
-    padding: 40px;
-    text-align: left;
-    background: red;
+/*
+Color suggestions:
+	red: #D60021
+*/
+
+body {
+	margin: 0;
+}
+
+.navbar {
+	margin: 0;
+    padding: 0;
+    text-align: right;
+    background: #D60021;
     color: white;
     font-size: 30px;
+    display: flex;
+    justify-content: flex-end;
+    flex-direction: row;
+}
+
+.nav-item {
+	list-style: none;
+	padding: 20px 10px 10px 10px;
+}
+
+.nav-item a {
+	text-decoration: none;
+}
+
+.nav-item a:hover {
+	opacity: 0.5;
+}
+
+#nav-catalog {
+	order: -1;
 }
 
 .background {
     color: red;
+}
+
+#link {
+    padding: 10px;
+    text-align: right;
+}
+
+#alignright {
+    text-align: right;
+    margin: 10px, 100px;
+}
+
+#button {
+    margin-top: -500px;
 }
