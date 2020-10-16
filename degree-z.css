@@ -9,3 +9,17 @@
 .background {
     color: red;
 }
+
+#link {
+    padding: 10px;
+    text-align: right;
+}
+
+#alignright {
+    text-align: right;
+    margin: 10px, 100px;
+}
+
+#button {
+    margin-top: -500px;
+}
