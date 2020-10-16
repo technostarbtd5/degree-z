@@ -83,12 +83,9 @@ function getCourseObject(subject, course) {
 
 function getCourseHTML(subject, course, tileID) {
   const courseObject = getCourseObject(subject, course);
-  // console.log(`${subject} ${course} JSON:`);
-  // console.log(JSON.stringify(courseObject));
   return `<div class="fsp-course" id="${tileID}">
-    <!-- div class="fsp-course-code">${subject} ${course}</div -->
-    <details class="fsp-course-details">
-      <summary class="fsp-course-code">${subject} ${course}</summary>
+    <div class="fsp-course-code">${subject} ${course} <div class="fsp-direction-indicator">&#x25b6;</div></div>
+    <div class="fsp-course-details">
       <div class="fsp-course-title">${courseObject.title}</div>
       ${"credits" in courseObject ? `<div class="fsp-course-details-credits">Credits: ${courseObject.credits}</div>` : ""}
       ${"offered" in courseObject ? `<div class="fsp-course-details-offered">Offered in: ${
@@ -100,7 +97,7 @@ function getCourseHTML(subject, course, tileID) {
       ${"corequisites" in courseObject ? `<div class="fsp-course-details-corequisites">Corequisites: ${
         courseObject.corequisites.map(coreq => `${coreq.subject} ${coreq.course}`).join(", ")
       }</div>` : ""}
-    </details>
+    </div>
   </div>
   `
 }
@@ -160,8 +157,29 @@ class Planner {
       return accumulator;
     }, {});
 
-    Object.values(dataByTileID).forEach(tile => {
-      tile.jquery.css({left: tile.x, top: tile.y});
+    Object.entries(dataByTileID).forEach(([tileID, tile]) => {
+      // TODO: Set course color by major
+      const courseColors = {"CSCI": "#fb9", "ITWS": "#9f9", "other": "#9ff"};
+      const courseColor = tile.courseObject.subject in courseColors ? courseColors[tile.courseObject.subject] : courseColors["other"];
+      
+      tile.jquery.css({left: tile.x, top: tile.y, "background-color": courseColor});
+
+      // Add details toggle
+      $(`#${tileID} .fsp-course-details`).hide();
+      tile.jquery.click(() => {
+        const isVisible = $(`#${tileID} .fsp-course-details`).is(":visible");
+        $(`.fsp-course-details`).hide(0);
+        $(`.fsp-course`).css({"z-index": 0});
+        $(`.fsp-direction-indicator`).html("&#x25b6;");
+        if (isVisible) {
+          $(`#${tileID} .fsp-course-details`).hide(0);
+          $(`#${tileID} .fsp-course-code .fsp-direction-indicator`).html("&#x25b6;");
+        } else {
+          $(`#${tileID} .fsp-course-details`).show(0);
+          $(`#${tileID}`).css({"z-index": 2});
+          $(`#${tileID} .fsp-course-code .fsp-direction-indicator`).html("&#x25bc;");
+        }
+      })
     })
 
 
