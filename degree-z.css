@@ -15,25 +15,41 @@ body {
     color: white;
     font-size: 30px;
     display: flex;
-    justify-content: flex-end;
-    flex-direction: row;
+    justify-content: right;
+    flex-direction: row-reverse;
 }
 
 .nav-item {
 	list-style: none;
 	padding: 20px 10px 10px 10px;
+	opacity: 0.75;
 }
 
 .nav-item a {
 	text-decoration: none;
+	color: #DEDEDE;
 }
 
 .nav-item a:hover {
-	opacity: 0.5;
+	color: #FFFFFF;
+	opacity: 1;
 }
 
-#nav-catalog {
-	order: -1;
+#nav-home {
+	order: 4;
+}
+#nav-logo {
+	order: 5;
+	margin-right: auto;
+	opacity: 1;
+}
+#nav-logo a {
+	text-decoration: none;
+	font-size: 35px;
+}
+
+.current {
+	opacity: 1;
 }
 
 .background {
@@ -48,8 +64,4 @@ body {
 #alignright {
     text-align: right;
     margin: 10px, 100px;
-}
-
-#button {
-    margin-top: -500px;
 }
