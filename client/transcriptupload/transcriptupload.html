@@ -51,7 +51,7 @@
             margin-left:5px;
         }
         #plist li{
-            border: 2px solid red;
+            border: 2px solid #FF737D;
             
         }
 
@@ -74,7 +74,26 @@
             fill: red;
             margin:5px;
         }
-       
+       #uploadsection {
+
+        width:50%;
+        margin-top:50px;
+        margin-bottom:50px;
+        margin-left: auto;
+        margin-right: auto;
+       }
+
+       #uploadsection h2 {
+        text-align: center;
+       }
+
+       #uploadsection form {
+        width:60%;
+        margin-left: auto;
+        margin-right: auto;
+       }
+
+    </style>
     </style>
   </head>
 
@@ -83,10 +102,33 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
     
+    <nav class="navbar navbar-expand-lg navbar-light" style="background-color: #FF737D;">
+        <a class="navbar-brand" href="#">DegreeZ</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav">
+            <li class="nav-item">
+              <a class="nav-link" href="#">Home </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">Degree</a>
+            </li>
+            <li class="nav-item active">
+              <a class="nav-link" href="#">Transcript</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">Planner</a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+
     <div id="bodyBlock">
 
         <main>
-            <section>
+            <section id="uploadsection">
                 <h2>Upload Transcript</h2>
                 <form onsubmit="return parseTranscript(this);">
                     <input name="transcript" id="transcript" type="file">
