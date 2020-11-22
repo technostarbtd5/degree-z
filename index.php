@@ -1,5 +1,6 @@
 <?php
 
+include(__DIR__ . "/server/db/dbinit.php");
 // Router script
 $request = $_SERVER['REQUEST_URI'];
 
