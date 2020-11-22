@@ -1,0 +1,1 @@
+How to use: Ensure that this project is in a folder inside xampp\htdocs. Boot up XAMPP.
