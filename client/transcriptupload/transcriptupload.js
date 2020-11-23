@@ -1,4 +1,14 @@
+$(document).ready(() => {
+    $("#transcript_nav").addClass("active");
 
+    document.getElementById("transcript-input").onchange = function() {
+        i = this.value.length-1;
+        while (i >= 0 && this.value.charAt(i) != '\\') i--;
+        var text = document.getElementById("filename").innerHTML;
+        document.getElementById("filename").innerHTML =
+            `Transcript: ${this.value.substring(i+1)} <input type="submit" value="Parse!" />`;
+    }
+})
 
 function action(obj){
     console.log(obj.parentElement)
