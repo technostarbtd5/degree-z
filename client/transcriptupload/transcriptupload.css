@@ -78,8 +78,50 @@ h1 {
     display: none;
 }
 
+#new-upload {
+    text-decoration: underline;
+    width: 25%;
+    height: 30px;
+}
+
+#new-upload:hover {
+    color: #999;
+}
+
 #new-input {
     display: none;
+}
+
+#infosection {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.sectiontitle {
+    text-align: center;
+}
+
+#userinfo {
+    width: 100%;
+    order: 1;
+    display: none;
+}
+
+#current-filename {
+    margin-bottom: 1px;
+}
+
+#courseMap {
+    width: 50%;
+    order: 2;
+    padding: 10px;
+}
+
+#courseProgress{
+    width: 50%;
+    order: 3;
+    padding: 10px;
 }
 
 
@@ -90,11 +132,6 @@ table, th, td {
     text-align: left;
 }
 
-#courseMap {
-    width: 50%;
-    float: left;
-}
-
 .tablecontainer{
     width:100%;
     display: flex;
@@ -102,10 +139,6 @@ table, th, td {
 }
 .semtable{
     margin:5px;
-    width:40%;
-}
-#courseProgress{
-    float:left;
     width:40%;
 }
 
@@ -123,7 +156,7 @@ table, th, td {
 }
 #plist li{
     border: 2px solid #FF737D;
-
+    padding-left: 5px;
 }
 
 .dropbutton{

@@ -14,7 +14,7 @@
     </head>
 
     <body>
-        <h1>Transcript</h1>
+        <h1 id="header">Welcome!</h1>
         <div id="transcriptBlock">
             <section id="uploadsection">
                 <button id="close-button">
@@ -31,11 +31,17 @@
                 </form>
             </section>
 
-            <section id="userinfo">
-            </section>
-            <section id="courseMap">
-            </section>
-            <section id="courseProgress">
+            <section id="infosection">
+                <section id="userinfo">
+                    <p id="current-filename"></p>
+                    <label class="file-upload" id="new-upload">
+                        <input name="new-transcript" id="new-input" type="file" />
+                        <b>Upload a new transcript</b>
+                    </label>
+                    <h3 class="sectiontitle">My Degree</h3>
+                </section>
+                <section id="courseMap"></section>
+                <section id="courseProgress"></section>
             </section>
         </div>
     </body>
