@@ -103,10 +103,18 @@ function getCourseHTML(subject, course, tileID) {
 }
 
 class Planner {
-  schedule = SCHEDULE_EXAMPLE_JSON;
-
+  schedule = JSON.parse(JSON.stringify(SCHEDULE_EXAMPLE_JSON));
+  potentialToSemesters = new Set();
+  // mouse = {x: 0, y: 0};
+  // isDragging = false;
   constructor() {
-
+    console.log(this.schedule);
+    this.renderPlanner();
+    // $(document).mousemove(e => {
+    //   this.mouse.x = e.pageX;
+    //   this.mouse.y = e.pageY;
+    //   console.log(`Mouse move: ${JSON.stringify(this.mouse)}; Dragging? ${this.isDragging}`);
+    // })
   }
 
   /**
@@ -121,34 +129,77 @@ class Planner {
 
     const canvas = document.getElementById("fsp-canvas").getContext("2d");
     const fsp = $("#fsp-content");
-
+    fsp.html("");
+    this.potentialToSemesters = new Set();
     let id = 0;
     const coursesWithTileIDs = Object.entries(this.schedule.semesters).reduce((semesterWithTileIDs, [semester, courses]) => {
       semesterWithTileIDs[semester] = courses.map(course => ({subject: course.subject, course: course.course, tileID: `course-tile-${id++}`}));
       return semesterWithTileIDs;
     }, {});
-    semesterList.forEach(semester => {
+    semesterList.forEach((semester, index) => {
       const semesterClasses = coursesWithTileIDs[semester];
-      const innerHTML = `<div class="fsp-row ${!semesterClasses ? "no-classes" : ""}" id="fsp-row-${semester}">
+      // console.log(semesterClasses);
+      // const innerHTML = `<div class="fsp-row ${!semesterClasses ? "no-classes" : ""}" id="fsp-row-${semester}">
+      //   <div class="fsp-semester-name">${semester}</div>
+      //   <div class="fsp-semester-classes">${
+      //     semesterClasses ?
+      //     semesterClasses.map(course => getCourseHTML(course.subject, course.course, course.tileID)).join("") :
+      //     `<div class="fsp-semester-no-courses">No courses</div>`
+      //   }</div>
+      // </div>`;
+      const innerHTML = `<div class="fsp-row ${!semesterClasses || semesterClasses.length == 0 ? "no-classes" : ""}" id="fsp-row-${index}">
         <div class="fsp-semester-name">${semester}</div>
-        <div class="fsp-semester-classes">${
-          semesterClasses ?
-          semesterClasses.map(course => getCourseHTML(course.subject, course.course, course.tileID)).join("") :
-          `<div class="fsp-semester-no-courses">No courses</div>`
-        }</div>
+        <div class="fsp-semester-classes" id="semester-${index}-classes"></div>
       </div>`;
       fsp.append(innerHTML);
+      // const isDragging = this.isDragging;
+      // $(`#fsp-row-${index}`).mousemove(function(e){
+      //   const positionInElement = {
+      //     x: e.pageX - this.offsetLeft,
+      //     y: e.pageY - this.offsetTop,
+      //   };
+      //   const isMouseInElement = positionInElement.x < $(`#fsp-row-${index}`).width() &&
+      //     positionInElement.y < $(`#fsp-row-${index}`).height();
+      //   console.log(`For row ${index}: Position in element:${JSON.stringify(positionInElement)}; Element size: ${$(`#fsp-row-${index}`).width()}, ${$(`#fsp-row-${index}`).height()}; is in element: ${isMouseInElement}; is dragging: ${isDragging}`);
+      //   if (isDragging && isMouseInElement) {
+      //     $(`#fsp-row-${index}`).addClass("fsp-row-active");
+      //   } else {
+      //     $(`#fsp-row-${index}`).removeClass("fsp-row-active");
+      //   }
+      // })
+      // $(document).mousemove
+      $(`#fsp-row-${index}`).droppable({
+        tolerance: "pointer",
+        over: () => {
+          $(`#fsp-row-${index}`).addClass("fsp-row-active");
+          this.potentialToSemesters.add(semester);
+        },
+        out: () => {
+          $(`#fsp-row-${index}`).removeClass("fsp-row-active");
+          this.potentialToSemesters.delete(semester);
+        },
+      });
+      if(semesterClasses && semesterClasses.length > 0) {
+        semesterClasses.forEach(course => {
+          $(`#semester-${index}-classes`).append(getCourseHTML(course.subject, course.course, course.tileID));
+        });
+      } else {
+        $(`#semester-${index}-classes`).append(`<div class="fsp-semester-no-courses">No courses</div>`);
+      }
     });
+
+    console.log(semesterList);
+    console.log(coursesWithTileIDs);
 
     // Set position of tiles
     let yOffset = 10;
     const dataByTileID = semesterList.reduce((accumulator, semester) => {
       const semesterCourses = coursesWithTileIDs[semester];
-      if (semesterCourses) {
+      if (semesterCourses && semesterCourses.length > 0) {
         semesterCourses.forEach((course, index) => {
           // TODO: Create better xOffset algorithm
           const xOffset = 130 + index * 140;
-          accumulator[course.tileID] = {courseObject: course, x: xOffset, y: yOffset, jquery: $(`#${course.tileID}`)};
+          accumulator[course.tileID] = {courseObject: course, x: xOffset, y: yOffset, jquery: $(`#${course.tileID}`), semester};
         })
         yOffset += 120;
       } else {
@@ -157,16 +208,50 @@ class Planner {
       return accumulator;
     }, {});
 
+    console.log(dataByTileID);
+
     Object.entries(dataByTileID).forEach(([tileID, tile]) => {
       // TODO: Set course color by major
       const courseColors = {"CSCI": "#fb9", "ITWS": "#9f9", "other": "#9ff"};
       const courseColor = tile.courseObject.subject in courseColors ? courseColors[tile.courseObject.subject] : courseColors["other"];
-      
+      $(`#${tileID}`).draggable({
+        // addClasses: false,
+        // drag: () => {
+        //   semesterList.forEach((semester, index) => {
+        //     const mouseInElement = {
+        //       x: 
+        //     }
+        //     if ($(`#fsp-row-${index}:hover`).length != 0) {
+        //       $(`#fsp-row-${index}`).addClass("fsp-row-active");
+        //     } else {
+        //       $(`#fsp-row-${index}`).removeClass("fsp-row-active");
+        //     }
+        //   })
+        // },
+        // start: () => {
+        //   this.isDragging = true;
+        //   console.log("Start drag");
+        // },
+        // stop: () => {
+        //   this.isDragging = false;
+        //   console.log("Stop drag");
+        // },
+        stop: () => {
+          const course = {
+            subject: tile.courseObject.subject,
+            course: tile.courseObject.course
+          };
+          const fromSemester = tile.semester;
+          const potentialTo = [...this.potentialToSemesters];
+          const toSemester = potentialTo.length > 0 ? potentialTo[0] : fromSemester;
+          this.moveCourse(course, fromSemester, toSemester);
+        },
+      });
       tile.jquery.css({left: tile.x, top: tile.y, "background-color": courseColor});
 
       // Add details toggle
       $(`#${tileID} .fsp-course-details`).hide();
-      tile.jquery.click(() => {
+      $(`#${tileID} .fsp-course-code`).click(() => {
         const isVisible = $(`#${tileID} .fsp-course-details`).is(":visible");
         $(`.fsp-course-details`).hide(0);
         $(`.fsp-course`).css({"z-index": 0});
@@ -179,8 +264,9 @@ class Planner {
           $(`#${tileID}`).css({"z-index": 2});
           $(`#${tileID} .fsp-course-code .fsp-direction-indicator`).html("&#x25bc;");
         }
-      })
-    })
+      });
+
+    });
 
 
 
@@ -193,6 +279,14 @@ class Planner {
   getSchedule() {
     return this.schedule;
   }
+
+  moveCourse(course, fromSemester, toSemester) {
+    const sourceIndex = this.schedule.semesters[fromSemester].findIndex(element => element.subject == course.subject && element.course == course.course);
+    this.schedule.semesters[fromSemester].splice(sourceIndex, 1);
+    if (!(toSemester in this.schedule.semesters)) this.schedule.semesters[toSemester] = [];
+    this.schedule.semesters[toSemester].push(course);
+    this.renderPlanner();
+  }
 }
 
 // console.log("Script loaded");
@@ -202,5 +296,5 @@ $(document).ready(() => {
   const SCHEDULE_SEMESTERS = Object.keys(SCHEDULE_EXAMPLE_JSON.semesters);
   console.log(getSemesterRange(SCHEDULE_SEMESTERS));
   const planner = new Planner();
-  planner.renderPlanner();
+  // planner.renderPlanner();
 });
