@@ -1,4 +1,50 @@
+$(document).ready(() => {
+    $("#transcript_nav").addClass("active");
 
+    document.getElementById("transcript-input").onchange = function() {
+        if (this.placeholder == "") this.placeholder = getFilename(this.value);
+        $("#filename").html(`Transcript: ${this.placeholder}<br> <input type="submit" value="Parse!" />`);
+        $("#filename").css("display", "block");
+
+        $(".file-upload p").html("<b>Upload new transcript</b>");
+    }
+
+    document.getElementById("close-button").addEventListener("click", hideUpload);
+})
+
+function getFilename(path) {
+    var i = path.length-1;
+    while (i >= 0 && path.charAt(i) != '\\') i--;
+
+    return path.substring(i+1);
+}
+
+function showUpload() {
+    $("#uploadsection").css("display", "flex");
+}
+
+function hideUpload() {
+    $("#uploadsection").css("display", "none");
+}
+
+function styleFilename() {
+    hideUpload();
+    userInfo = document.getElementById("userinfo");
+    transcriptInput = document.getElementById("transcript-input");
+    userInfo.innerHTML = `<p>Current transcript: ${transcriptInput.placeholder} <br> \
+                            <label class="file-upload">
+                                <input name="transcript" id="new-input" type="file" />
+                                <b>Upload a new transcript</b>
+                            </label>
+                            </p>`;
+
+    document.getElementById("new-input").onchange = function() {
+        showUpload();
+        transcriptInput.placeholder = getFilename(this.value);
+        transcriptInput.onchange();
+        $("#close-button").css("display", "block");
+    }
+}
 
 function action(obj){
     console.log(obj.parentElement)
@@ -13,6 +59,7 @@ function action(obj){
 
 
 function parseTranscript(formObj) {
+    styleFilename();
     var parser = new DOMParser();
 
     //var tFile = formobj.trascriptFile.value;
@@ -26,7 +73,7 @@ function parseTranscript(formObj) {
             console.log(doc)
             //console.log(doc.getElementById("headerinfo").innerHTML)
             //document.getElementById("userinfo").append(doc.getElementById("headerinfo"))
-            document.getElementById("courseMap").append( parser.parseFromString("<section class=\"tablecontainer\"> \
+            document.getElementById("courseMap").append(parser.parseFromString("<section class=\"tablecontainer\"> \
                 <div class=\"semtable\" id=\"1semest\"> \
                     <h2>Fall 2018</h2> \
                     <table> \
@@ -102,8 +149,7 @@ function parseTranscript(formObj) {
                         </tr> \
                     </table> \
                 </div>\
-            </section>","text/html").body.childNodes[0]
-                );
+            </section>","text/html").body.childNodes[0]);
 
 
             const dropbutton ="<svg onclick=\"action(this)\" class=\"dropbutton\" width=\"1em\" height=\"1em\" viewBox=\"0 0 16 16\" class=\"bi bi-caret-down-square\" fill=\"currentColor\" xmlns=\"http://www.w3.org/2000/svg\"> \
