@@ -17,6 +17,9 @@
         <h1>Transcript</h1>
         <div id="transcriptBlock">
             <section id="uploadsection">
+                <button id="close-button">
+                    <img src="/client/transcriptupload/close.png" alt="Close" id="close-image">
+                </button>
                 <form onsubmit="return parseTranscript(this);" id="transcript-form">
                     <div id="input-box">
                         <label class="file-upload">
@@ -24,7 +27,7 @@
                             <p><b>Upload your transcript!</b></p>
                         </label>
                     </div>
-                    <p id="filename">Transcript: <input type="submit" value="Parse!" /></p>
+                    <p id="filename"></p>
                 </form>
             </section>
 
