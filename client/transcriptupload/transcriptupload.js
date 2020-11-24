@@ -1,13 +1,22 @@
+hasTranscript = false;
+
 $(document).ready(() => {
     $("#transcript_nav").addClass("active");
 
-    document.getElementById("transcript-input").onchange = function() {
+    document.getElementById("transcript-input").addEventListener("change", function() {
         if (this.placeholder == "") this.placeholder = getFilename(this.value);
         $("#filename").html(`Transcript: ${this.placeholder}<br> <input type="submit" value="Parse!" />`);
         $("#filename").css("display", "block");
 
         $(".file-upload p").html("<b>Upload new transcript</b>");
-    }
+    });
+
+    document.getElementById("new-input").addEventListener("change", function() {
+        showUpload();
+        transcriptInput.placeholder = getFilename(this.value);
+        transcriptInput.dispatchEvent(new Event("change"));
+        $("#close-button").css("display", "block");
+    });
 
     document.getElementById("close-button").addEventListener("click", hideUpload);
 })
@@ -29,21 +38,23 @@ function hideUpload() {
 
 function styleFilename() {
     hideUpload();
-    userInfo = document.getElementById("userinfo");
+    $("#userinfo").css("display", "block");
     transcriptInput = document.getElementById("transcript-input");
-    userInfo.innerHTML = `<p>Current transcript: ${transcriptInput.placeholder} <br> \
-                            <label class="file-upload">
-                                <input name="transcript" id="new-input" type="file" />
-                                <b>Upload a new transcript</b>
-                            </label>
-                            </p>`;
+    document.getElementById("current-filename").innerHTML = `Current transcript: ${transcriptInput.placeholder}`;
+}
 
-    document.getElementById("new-input").onchange = function() {
-        showUpload();
-        transcriptInput.placeholder = getFilename(this.value);
-        transcriptInput.onchange();
-        $("#close-button").css("display", "block");
-    }
+function styleSections() {
+    mapSection = document.getElementById("courseMap");
+    progressSection = document.getElementById("courseProgress");
+    $("#courseMap").css({
+        "border-top": "1px solid #ccc",
+        "border-right": "1px solid #ccc",
+        "padding": "10px"
+    });
+    $("#courseProgress").css({
+        "border-top": "1px solid #ccc",
+        "padding": "10px"
+    });
 }
 
 function action(obj){
@@ -59,13 +70,15 @@ function action(obj){
 
 
 function parseTranscript(formObj) {
+    $("#header").html("Your Transcript");
     styleFilename();
+
     var parser = new DOMParser();
 
     //var tFile = formobj.trascriptFile.value;
 
     //console.log(tFile)
-    console.log(formObj.transcript.files[0])
+    //console.log(formObj.transcript.files[0])
 
     var stream = formObj.transcript.files[0].text().then(
         function(result){
@@ -73,6 +86,7 @@ function parseTranscript(formObj) {
             console.log(doc)
             //console.log(doc.getElementById("headerinfo").innerHTML)
             //document.getElementById("userinfo").append(doc.getElementById("headerinfo"))
+            document.getElementById("courseMap").innerHTML = "<h4 class=\"sectiontitle\">Courses Taken</h4>";
             document.getElementById("courseMap").append(parser.parseFromString("<section class=\"tablecontainer\"> \
                 <div class=\"semtable\" id=\"1semest\"> \
                     <h2>Fall 2018</h2> \
@@ -165,9 +179,9 @@ function parseTranscript(formObj) {
             <path fill-rule=\"evenodd\" d=\"M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z\"/>\
             <path fill-rule=\"evenodd\" d=\"M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z\"/>\
           </svg>";
-            document.getElementById("courseProgress").innerHTML = "\
+            document.getElementById("courseProgress").innerHTML = "<h4 class=\"sectiontitle\">Progress</h4>\
             <ul id=\"plist\" > \
-                <li>Course Progress 48/128 Credits"+ dropbutton + "\
+                <li>Degree Progress 48/128 Credits"+ dropbutton + "\
                     <ul>\
                         <li>Core Major Requirements  "+ dropbutton + " \
                             <ul> \
@@ -207,7 +221,7 @@ function parseTranscript(formObj) {
         }
     )
     
-    
+    styleSections();
     alert("transcript parsed");
     return false;
 }
