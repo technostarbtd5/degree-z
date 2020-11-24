@@ -1,0 +1,24 @@
+{
+    "Data": [{
+            "Name": "Alex Mednikova",
+            "Major": "ITWS",
+            "Minor": "N/A",
+            "Concentration": "Data Science"
+        },
+
+        {
+            "Name": "Mark Mednikov",
+            "Major": "Computer Science",
+            "Minor": "N/A",
+            "Concentration": "N/A"
+        },
+
+        {
+            "Name": "John Smith",
+            "Major": "Biology",
+            "Minor": "N/A",
+            "Concentration": "N/A"
+        }
+
+    ]
+}
