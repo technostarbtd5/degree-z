@@ -114,15 +114,16 @@ h1 {
 
 #courseMap {
     width: 50%;
+    flex-grow: 2;
     order: 2;
     padding: 10px;
 }
 
-#courseProgress{
+/*#courseProgress{
     width: 50%;
     order: 3;
     padding: 10px;
-}
+}*/
 
 
 /* Daniel's styling */
