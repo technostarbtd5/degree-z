@@ -4,11 +4,11 @@ Color suggestions:
 */
 
 body {
-	margin: 0;
+    margin: 0;
 }
 
 .current {
-	opacity: 1;
+    opacity: 1;
 }
 
 .background {
@@ -22,5 +22,18 @@ body {
 
 #alignright {
     text-align: right;
-    margin-right:100px;
+    margin-right: 100px;
+}
+
+table,
+th,
+td {
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+
+th,
+td {
+    padding: 5px;
+    text-align: left;
 }
