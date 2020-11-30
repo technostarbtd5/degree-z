@@ -106,6 +106,7 @@ h1 {
     width: 100%;
     order: 1;
     display: none;
+    padding: 10px;
 }
 
 #current-filename {
