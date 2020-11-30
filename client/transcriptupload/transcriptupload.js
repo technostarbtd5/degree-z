@@ -41,6 +41,14 @@ function styleFilename() {
 	$("#userinfo").css("display", "block");
 	transcriptInput = document.getElementById("transcript-input");
 	document.getElementById("current-filename").innerHTML = `Current transcript: ${transcriptInput.placeholder}`;
+	document.getElementById("goto-links").innerHTML = ` \
+		<b>Go To: \
+			<a href="#student-title" class="goto">My Degree</a> \
+			<a href="#transfer-title" class="goto">Accepted Transfer Courses</a> \
+			<a href="#grades-title" class="goto">Courses Taken</a> \
+			<a href="#total-title" class="goto">Total Info</a> \
+			<a href="#progress-title" class="goto">Courses in Progress</a> \
+		</b>`;
 }
 
 function styleSections() {
@@ -109,13 +117,11 @@ class Course {
 	get toHTML() {
 		var result = ` \
 		<section class="course">
-			Subject: ${this.subject} \
-			Course: ${this.course_num}
-			${this.level == "" ? "" : "Level: " + this.level} \
-			Name: ${this.name} \
-			${this.grade == "" ? "" : "Grade: " + this.grade} \
-			# of Credits: ${this.credits} \
-			${this.status == "" ? "" : "Status: " + this.status} \
+			<p class="full-line course-name center">${this.subject} ${this.course_num}:<br>${this.name}</p> \
+			${this.level == "" ? "" : `<p class="half-line center">Level: ${this.level}</p>`} \
+			${this.grade == "" ? "" : `<p class="half-line center">Grade: ${this.grade}</p>`} \
+			<p class="half-line center">${this.credits} Credits</p> \
+			${this.status == "" ? "" : `<p class="half-line center">Status: ${this.status}</p>`} \
 		</section>`;
 		return result;
 	}
@@ -179,32 +185,38 @@ class Term {
 
 	get toHTML() {
 		var result = ` \
-		<section class="term"> \
-			Semester: ${this.semester} \
-			${this.name == "" ? "" : "Name: " + this.name}`;
-		for (var i = 0; i < this.courses.length; i++) {
-			result += `\nCourse${i+1}: ${this.courses[i].toHTML}`;
-		}
-		result += ` \
+		<section class="term">
+			<h5 class="full-line center term-title">${this.semester}</h5>
+			${this.name == "" ? "" : `<p class="full-line${this.hasSubtext ? " subtext" : ""}">${this.name}</p>`} \
 			${this.hasSubtext ? ` \
-				Major: ${this.subtext.major} \
-				${this.subtext.academic == "" ? "" : "Academic Standing: " + this.subtext.academic} \
-				${this.subtext.additional == "" ? "" : "Additional Standing: " + this.subtext.additional}` : ""
-			}`;
-		result += ` \
-			${this.hasCumulativeData ? ` \
-				Cumulative Data: \
-				Attempted: ${this.cumulativeData.attempted} \
-				Passed: ${this.cumulativeData.passed} \
-				GPA: ${this.cumulativeData.gpa}` : ""
-			}`;
-		result += ` \
+				<p class="full-line${this.subtext.academic == "" ? "" : " subtext"}">Major: ${this.subtext.major}</p> \
+				${this.subtext.academic == "" ? "" : ` \
+				<p class="full-line${this.subtext.additional == "" ? "" : " subtext"}"> \
+					Academic Standing: ${this.subtext.academic} \
+				</p>`} \
+				${this.subtext.additional == "" ? "" : ` \
+				<p class="full-line"> \
+					Additional Standing: ${this.subtext.additional} \
+				</p>`}` : ""
+			}
+			<div class="courses">`;
+
+		for (var i = 0; i < this.courses.length; i++) {
+			result += this.courses[i].toHTML;
+		}			
+		result += `</div> \
 			${this.hasTermData ? ` \
 				Term Data: \
 				Attempted: ${this.termData.attempted} \
 				Passed: ${this.termData.passed} \
 				GPA: ${this.termData.gpa}` : ""
 			} \
+			${this.hasCumulativeData ? ` \
+				Cumulative Data: \
+				Attempted: ${this.cumulativeData.attempted} \
+				Passed: ${this.cumulativeData.passed} \
+				GPA: ${this.cumulativeData.gpa}` : ""
+			}
 		</section>`;
 		return result;
 	}
@@ -215,6 +227,7 @@ class Transcript {
 
 	studentData = {
 		name: "",
+		program: "",
 		college: "",
 		majors: [],
 		departments: [],
@@ -248,6 +261,7 @@ class Transcript {
 
 
 		// Create student data
+		console.log(studentInfo);
 		this.studentData.name = getSubstring(studentInfo, studentInfo.indexOf("Name"), ':', '\n');
 		this.studentData.college = getSubstring(studentInfo, studentInfo.indexOf("College"), ':', '\n');
 
@@ -341,8 +355,6 @@ class Transcript {
 		var hasLevel = 1;
 		var hasGrade = 1;
 		offset = gradeInfo.indexOf("-Top-") + 4;
-		console.log(num_terms);
-		console.log(gradeInfo);
 		for (var terms_i = 0; terms_i < num_terms; terms_i++) {
 			var semester = getSubstring(gradeInfo, gradeInfo.indexOf("Term", offset), ':', '\n')
 			var major = getSubstring(gradeInfo, gradeInfo.indexOf("Major", offset), ':', '\n');
@@ -493,28 +505,29 @@ class Transcript {
 			case "Student":
 				result = `\
 				<section id="student"> \
-					Name: ${this.studentData.name} \
-					College: ${this.studentData.college} \
-					Major${this.studentData.majors.length > 1 ? "1" : ""}: ${this.studentData.majors[0]} \
-					Department${this.studentData.departments.length > 1 ? "1" : ""}: ${this.studentData.departments[0]}`;
+					<h5 class="full-line" id="student-name">${this.studentData.name}</h5> \
+					<p class="full-line">College: ${this.studentData.college}</p> \
+					<p class="half-line">Major${this.studentData.majors.length > 1 ? " #1" : ""}: \
+					${this.studentData.majors[0]}, ${this.studentData.departments[0]} Dept.`;
 				for (var i = 1; i < this.studentData.majors.length; i++) {
 					result += ` \
-					Major${i+1}: ${this.studentData.majors[i]} \
-					Department${i+1}: ${this.studentData.departments[i]}`;
+					<p class="half-line"> \
+						Major #${i+1}: ${this.studentData.majors[i]}, ${this.studentData.departments[i]} Dept. \
+					</p>`;
 				}
 				if (this.studentData.minors.length > 0) {
 					result += ` \
-						Minor${this.studentData.minors.length > 1 ? "s" : ""}: `;
+						<p class="full-line">Minor${this.studentData.minors.length > 1 ? "s" : ""}: `;
 					for (var i = 0; i < this.studentData.minors.length-1; i++) {
 						result += `${this.studentData.minors[i]}, `;
 					}
-					result += this.studentData.minors[this.studentData.minors.length-1];
+					result += this.studentData.minors[this.studentData.minors.length-1] + "</p>";
 				}
 				result += ` \
 				</section>`;
 				break;
 			case "Total":
-				result = `\
+				result = `<h4 class="sectiontitle" id="total-title">Total Info</h4> \
 				<section id="total"> \
 					Attempted: ${this.totalData.attempted} \
 					Passed: ${this.totalData.passed} \
@@ -522,22 +535,24 @@ class Transcript {
 				</section>`;
 				break;
 			case "Transfer":
-				result = `<section id="transfer">`;
+				result = `<h4 class="sectiontitle" id="transfer-title">Accepted Transfer Course</h4> \
+				<section id="transfer">`;
 				for (var i = 0; i < this.transferTerms.length; i++) {
 					result += this.transferTerms[i].toHTML + "\n";
 				}
 				result += "</section>";
 				break;
 			case "Grades":
-				result = `<section id="grades">`;
+				result = `<h4 class="sectiontitle" id="grades-title">Courses Taken</h4> \
+				<section id="grades">`;
 				for (var i = 0; i < this.gradeTerms.length; i++) {
 					result += this.gradeTerms[i].toHTML + "\n";
 				}
 				result += "</section>";
 				break;
 			case "Progress":
-				result = ` \
-				<section id="transfer"> \
+				result = `<h4 class="sectiontitle" id="progress-title">Courses in Progress</h4> \
+				<section id="progress"> \
 					${this.progressTerm.toHTML + "\n"} \
 				</section>`;
 				break;
@@ -557,26 +572,18 @@ function parseTranscript(formObj) {
 	var stream = formObj.transcript.files[0].text().then(
 		function(result){
 			// No info in head, so only extract body from html
-			var transcriptBody = parser.parseFromString(result, "text/html").body;
-			var transcriptInfo = transcriptBody.getElementsByClassName("pagebodydiv")[0].getElementsByClassName("datadisplaytable")[0];
-			var separators = transcriptInfo.getElementsByClassName("ddseparator");
-			var num_tables = ((separators.length - 5) / 2) + 1;
-			var transcriptText = transcriptInfo.innerText;
-			
+			var transcriptBody = parser.parseFromString(result, "text/html").body;			
 			var transcript = new Transcript(transcriptBody);
-			
-			// .pagebodydiv .datadisplaytable contains all transcript data
-			// .ddseparator indicates next table
-			// # of tables = ((count(.ddseparator)-5)/2)+1
 
+			// Figure out how to avoid repetition of student info
+			document.getElementById("userinfo").append(parser.parseFromString(transcript.toHTML("Student"),"text/html").body);
 
-			document.getElementById("userinfo").append(parser.parseFromString(transcript.toHTML("Student"),"text/html").documentElement);
-			document.getElementById("courseMap").innerHTML = "<h4 class=\"sectiontitle\">Courses Taken</h4>";
-			document.getElementById("courseMap").append(parser.parseFromString(transcript.toHTML("Total"), "text/html").documentElement);
-			document.getElementById("courseMap").append(parser.parseFromString(transcript.toHTML("Transfer"), "text/html").documentElement);
-			document.getElementById("courseMap").append(parser.parseFromString(transcript.toHTML("Grades"), "text/html").documentElement);
-			document.getElementById("courseMap").append(parser.parseFromString(transcript.toHTML("Progress"), "text/html").documentElement);
-			console.log(parser.parseFromString(transcriptText,"text/html").documentElement);
+			document.getElementById("courseMap").innerHTML = "";
+			document.getElementById("courseMap").append(parser.parseFromString(transcript.toHTML("Transfer"), "text/html").body);
+			document.getElementById("courseMap").append(parser.parseFromString(transcript.toHTML("Grades"), "text/html").body);
+			document.getElementById("courseMap").append(parser.parseFromString(transcript.toHTML("Total"), "text/html").body);
+			document.getElementById("courseMap").append(parser.parseFromString(transcript.toHTML("Progress"), "text/html").body);
+			console.log(parser.parseFromString(transcript.toHTML("Student"),"text/html"));
 			
 		}
 	)

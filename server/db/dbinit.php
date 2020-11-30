@@ -77,6 +77,9 @@ if ($mysqli->select_db($nameDB) === false) {
   );";
   
   */
+
+  // Transcript tables
+  //$student_sql = "CREATE TABLE `student`"
 }
 
 
