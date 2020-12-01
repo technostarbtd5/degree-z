@@ -2,7 +2,7 @@
 	$dbConnect = false;
 	$dbUser = 'root';
 	$dbPass = '';
-	$dbSelect = 'test2';
+	$dbSelect = 'degreeZ';
 	@ $db = new mysqli('localhost', $dbUser, $dbPass, $dbSelect);
 
 	if ($db->connect_error) {
@@ -12,7 +12,7 @@
 		$dbConnect = true;
     }
 
-    $sql = "SELECT Major, Minor, Concentration, GPA, Person FROM testing";
+    $sql = "SELECT Major, Minor, Concentration, GPA, Person FROM persondata";
     $result = $db->query($sql);
     ?>
 
@@ -28,34 +28,11 @@
 <script src="home.js"></script>
 
 <script src="/client/common/header.js"></script>
-<link rel="stylesheet" href="../degree-z.css">
+<link rel="stylesheet" href="/degree-z.css">
 <title>Home</title>
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light" style="background-color: #FF737D;">
-        <a class="navbar-brand" href="#">DegreeZ</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav">
-                <li class="nav-item active">
-                    <a class="nav-link" href="home.html">Home </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="course-major-info.html">Degree</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="transcriptupload/transcriptupload.html">Transcript</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="future-semester-planner/future-semester-planner.html">Planner</a>
-                </li>
-            </ul>
-        </div>
-    </nav>
-
     <h1 class="header">Rensselaer</h1>
 
     

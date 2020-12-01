@@ -62,30 +62,33 @@ if ($mysqli->select_db($nameDB) === false) {
     `Major` varchar(255),
     `Minor` varchar(255),
     `Concentration` varchar(255),
-    `GPA` decimal(60),
+    `GPA` decimal(60)
   );";
   
   $mysqli->query($data_sql);
 
-$courses_sql = "CREATE TABLE `courses` (
-  `taken` varchar(255),
-);";
+  $courses_sql = "CREATE TABLE `classes` (
+    `taken` varchar(255)
+  );";
 
-$mysqli->query($courses_sql);
+  $mysqli->query($courses_sql);
 
-$sql1 = "INSERT INTO `persondata` (`taken`) VALUES
-('Alexandra Mednikova', 'Information Technology and Web Science', 'N/A','Data Science', '3.5')";
+  $sql1 = "INSERT INTO `persondata` VALUES
+  ('Alexandra Mednikova', 'Information Technology and Web Science', 'N/A','Data Science', '3.5')";
 
 
-$sq2 = "INSERT INTO `classes` (`taken`) VALUES
-('Calculus I'),
-('Introduction to Management'),
-('Business Law and Ethics'),
-('Computer Science I'),
-('Introduction to Information Technology and Web Science'),
-('Calculus II'),
-('Physics I'),
-('IT and Society')";
+  $sq2 = "INSERT INTO `classes` VALUES
+  ('Calculus I'),
+  ('Introduction to Management'),
+  ('Business Law and Ethics'),
+  ('Computer Science I'),
+  ('Introduction to Information Technology and Web Science'),
+  ('Calculus II'),
+  ('Physics I'),
+  ('IT and Society')";
+
+  $mysqli->query($sql1);
+  $mysqli->query($sq2);
 
 
   // TODO: ADD FOREIGN KEY
@@ -110,6 +113,9 @@ $sq2 = "INSERT INTO `classes` (`taken`) VALUES
   );";
   
   */
+
+  // Transcript tables
+  //$student_sql = "CREATE TABLE `student`"
 }
 
 
