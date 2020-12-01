@@ -61,6 +61,7 @@ function nextSemester(currentSemester) {
  * @returns {string[]} An array of all semesters occuring in the range of present semesters
  */
 function getSemesterRange(semesters) {
+  console.log(semesters);
   const semestersToParse = semesters.filter(isValidSemester);
   const firstSemester = semestersToParse.reduce((earliest, semester) => {
     if (numericSemester(semester) < numericSemester(earliest)) return semester;
@@ -134,9 +135,10 @@ function getCourseHTML(subject, course, tileID) {
 const CSCourses = getCoursesInMajor("Computer Science");
 
 class CourseComponent {
-  static numCourseItems = 0;
+  static numComponents = 0;
   constructor (subject, course, semester) {
-    this.tileID = `course-tile-${CourseComponent.numCourseItems++}`;
+    this.id = CourseComponent.numComponents++;
+    this.tileID = `course-tile-${this.id}`;
     this.subject = subject;
     this.course = course;
     this.semester = semester || "unscheduled";
@@ -153,6 +155,17 @@ class CourseComponent {
     $(`#${tileID}`).css({"background-color": courseColor});
 
     $(`#${tileID}`).draggable({
+      start: () => {
+        $(`#${tileID}`).css({"z-index": 5});
+        $(`#fsp-course-drag`).offset($(`#${tileID}`).offset());
+        $(`#fsp-course-drag`).append($(`#${tileID}`));
+        this.isDragging = true;
+      },
+      // drag: () => {
+      //   $(`#${tileID}`).css({"position": "absolute"});
+      // },
+      // zIndex: 5,
+      // stack: "#fsp-requirements-list, .fsp-content, .fsp-canvas, .fsp-row",
       stop: () => {
         const courseObject = {subject, course};
         const fromSemester = this.semester;
@@ -160,6 +173,10 @@ class CourseComponent {
         const toSemester = potentialTo.length > 0 ? potentialTo[0] : fromSemester;
         planner.moveCourse(courseObject, fromSemester, toSemester);
       },
+      drag: () => {
+        planner.renderMinorChanges();
+      },
+      scroll: false,
     });
 
     // Add details toggle
@@ -168,40 +185,64 @@ class CourseComponent {
     $(`#${tileID} .fsp-course-code`).click(() => {
       const isVisible = $(`#${tileID} .fsp-course-details`).is(":visible");
       $(`.fsp-course-details`).hide(0);
-      $(`.fsp-course`).css({"z-index": 0});
+      $(`.fsp-course`).css({"z-index": 2});
       $(`.fsp-direction-indicator`).html("&#x25b6;");
       if (isVisible) {
         $(`#${tileID} .fsp-course-details`).hide(0);
         $(`#${tileID} .fsp-course-code .fsp-direction-indicator`).html("&#x25b6;");
       } else {
-        $(`#${tileID}-container`).css({"max-height": $(`#${tileID}-container`).height()});
+        $(`#${tileID}-container`).css({"max-height": $(`#${tileID}-container`).outerHeight()});
         $(`#${tileID} .fsp-course-details`).show(0);
-        $(`#${tileID}`).css({"z-index": 2});
+        $(`#${tileID}`).css({"z-index": 3});
         $(`#${tileID} .fsp-course-code .fsp-direction-indicator`).html("&#x25bc;");
       }
     });
+
+    $(`#${tileID}`).hover(() => {planner.renderMinorChanges()}, () => {planner.renderMinorChanges()});
 
     return this;
   }
 
   addPrereqWarning(unfilledPrereqs) {
     if (unfilledPrereqs.length > 0) {
+      this.prereqWarning = true;
       $(`#${this.tileID}`).css({"box-shadow": "0px 0px 10px red", "border-color": "red", "borer-width": "3px"});
       $(`#${this.tileID}`).tooltip({content: `Missing prerequisites: ${unfilledPrereqs.join(", ")}`});
     }
   }
 
   static resetItems() {
-    this.numCourseItems = 0;
+    CourseComponent.numComponents = 0;
+  }
+}
+
+class SemesterDeleteComponent {
+  static numComponents = 0;
+  constructor (semester) {
+    this.id = SemesterDeleteComponent.numComponents++;
+    this.semester = semester;
+  }
+
+  render (planner, parentElement) {
+    parentElement.append(`<div class="fsp-semester-delete" id="fsp-semester-delete-${this.id}">-</div>`);
+    $(`#fsp-semester-delete-${this.id}`).click(() => {
+      console.log(`Deleting ${this.semester}`);
+      // delete planner.schedule.semesters[this.semester];
+      planner.dropSemester(this.semester);
+    });
+  }
+
+  static resetItems() {
+    SemesterDeleteComponent.numComponents = 0;
   }
 }
 
 class SemesterRowComponent {
-  static numRowItems = 0;
+  static numComponents = 0;
   courseComponents = [];
 
   constructor (semester, schedule, semesterList) {
-    this.id = SemesterRowComponent.numRowItems++;
+    this.id = SemesterRowComponent.numComponents++;
     this.rowID = `fsp-row-${this.id}`;
     this.classesID = `semester-${this.id}-classes`
     this.semester = semester;
@@ -238,9 +279,11 @@ class SemesterRowComponent {
     const {rowID, classesID, schedule, semester} = this;
     const semesterClasses = schedule.semesters[semester]
     parentElement.append(`<div class="fsp-row ${!semesterClasses || semesterClasses.length == 0 ? "no-classes" : ""}" id="${rowID}">
-      <div class="fsp-semester-name">${semester}</div>
+      <div class="fsp-semester-name"><div class="fsp-name-container" id="${rowID}-semester-name">${semester}</div></div>
       <div class="fsp-semester-classes" id="${classesID}"></div>
     </div>`);
+    
+    (new SemesterDeleteComponent(semester)).render(planner, $(`#${rowID}-semester-name`));
 
     $(`#${rowID}`).droppable({
       tolerance: "pointer",
@@ -271,7 +314,7 @@ class SemesterRowComponent {
   }
 
   static resetItems() {
-    this.numRowItems = 0;
+    SemesterRowComponent.numComponents = 0;
   }
 }
 
@@ -298,6 +341,386 @@ class MajorNavbarComponent {
   }
 }
 
+class MajorRequirementComponent {
+  static numComponents = 0;
+  constructor (requirementName, requirements, validCourses) {
+    this.id = MajorRequirementComponent.numComponents++;
+    this.requirementName = requirementName;
+    this.requirements = requirements;
+    this.validCourses = validCourses;
+    this.render.bind(this);
+  }
+
+  render(planner, parentElement) {
+    const {id, requirementName, requirements, validCourses} = this;
+    const titleID = `fsp-list-title-${id}`
+    const segmentID = `fsp-list-segment-${id}`
+    parentElement.append(`<div class="fsp-list-title" id="${titleID}">${requirementName}<div class="fsp-direction-indicator">&#x25bc;</div></div>
+    <div class="fsp-list-segment" id="${segmentID}"></div>`);
+    console.log(requirements);
+    requirements.forEach(requirement => {
+      if ("subject" in requirement && "course" in requirement) {
+        // return `${requirement.subject} ${requirement.course}`
+        const {subject, course} = requirement;
+        // console.log(`Rendering ${subject} ${course}`);
+        if (validCourses.has(`${subject} ${course}`)) {
+          // console.log("Confirmed");
+          // const containerID = MajorRequirementComponent.courseContainerID++;
+          // $(`#${segmentID}`).append(`<div class="requirement-course-container" id="course-container-${containerID}"></div>`);
+          (new CourseComponent(requirement.subject, requirement.course)).render(planner, $(`#${segmentID}`));
+        }
+      } else if ("subject" in requirement && "minLevel" in requirement) {
+        console.log(Object.keys(COURSES_EXAMPLE_JSON[requirement.subject]).filter(course => course >= requirement.minLevel));
+        const newRequirements = Object.keys(COURSES_EXAMPLE_JSON[requirement.subject])
+            .filter(course => course >= requirement.minLevel)
+            .map(course => ({subject: requirement.subject, course}));
+        console.log(newRequirements);
+        (new MajorRequirementComponent(`${requirement.subject} course above level ${requirement.minLevel}:`, newRequirements, validCourses))
+            .render(planner, $(`#${segmentID}`));
+        // return Object.keys(COURSES_EXAMPLE_JSON[requirement.subject])
+        //     .filter(course => course >= requirement.minLevel)
+        //     .map(course => `${requirement.subject} ${course}`);
+      } else if ("n of" in requirement || "one of" in requirement) {
+        // return getCoursesInArray(requirement["n of"] || requirement["one of"]);
+        const newRequirements = requirement["n of"] || requirement["one of"];
+        const newRequirementName = "n of" in requirement ? `${requirement.amount} of:` : "One of:";
+        (new MajorRequirementComponent(newRequirementName, newRequirements, validCourses))
+            .render(planner, $(`#${segmentID}`));
+      }
+    });
+    
+    // Add visibility toggle
+    $(`#${titleID}`).click(() => {
+      const isVisible = $(`#${segmentID}`).is(":visible");
+      if (isVisible) {
+        $(`#${segmentID}`).hide(0);
+        $(`#${titleID} .fsp-direction-indicator`).html("&#x25b6;");
+      } else {
+        $(`#${segmentID}`).show(0);
+        $(`#${titleID} .fsp-direction-indicator`).html("&#x25bc;");
+      }
+    })
+  }
+
+  static resetItems() {
+    MajorRequirementComponent.numComponents = 0;
+  }
+}
+
+class MajorListComponent {
+  constructor (selectedMajor, allCourses, existingCourses, unscheduledCourses) {
+    this.selectedMajor = selectedMajor;
+    this.allCourses = allCourses;
+    this.existingCourses = existingCourses;
+    this.unscheduledCourses = unscheduledCourses;
+    this.render.bind(this);
+  }
+
+  render (planner, parentElement) {
+    parentElement.append(`<div id="fsp-requirements-list"></div>`);
+    if (this.selectedMajor == "Electives") {
+      // unscheduledCoursesTileIDs.forEach(course => {
+      //   // $(`#fsp-list-segment-0`).append(getCourseHTML(course.subject, course.course, course.tileID));
+      // })
+      const electiveOptions = [...this.unscheduledCourses].map(courseString => {
+        const [subject, course] = courseString.split(" ");
+        return {subject, course};
+      });
+      (new MajorRequirementComponent("Electives:", electiveOptions, this.unscheduledCourses))
+          .render(planner, $("#fsp-requirements-list"));
+    } else if (this.selectedMajor == "Repeat Courses") {
+      // Object.values(coursesWithTileIDs).flat().forEach(course => {
+      //   // $(`#fsp-list-segment-0`).append(getCourseHTML(course.subject, course.course, course.tileID));
+      // });
+      const repeatOptions = [...this.existingCourses].map(courseString => {
+        const [subject, course] = courseString.split(" ");
+        return {subject, course};
+      });
+      (new MajorRequirementComponent("Repeat Courses:", repeatOptions, this.existingCourses))
+          .render(planner, $("#fsp-requirements-list"));
+    } else {
+      
+      (new MajorRequirementComponent("Requirements:", MAJORS_EXAMPLE_JSON[this.selectedMajor] ? MAJORS_EXAMPLE_JSON[this.selectedMajor].requirements : [], this.unscheduledCourses))
+          .render(planner, $("#fsp-requirements-list"));
+      // const appendCourses = (requirements, parentID) => {
+      //   requirements.forEach(courseElement => {
+      //     if ("subject" in courseElement && "course" in courseElement) {
+      //       // return `${courseElement.subject} ${courseElement.course}`
+      //       // $(`#fsp-list-segment-0`).append(getCourseHTML(course.subject, course.course, course.tileID));
+      //     } else if ("subject" in courseElement && "minLevel" in courseElement) {
+      //       // return Object.keys(COURSES_EXAMPLE_JSON[courseElement.subject])
+      //       //     .filter(course => course >= courseElement.minLevel)
+      //       //     .map(course => `${courseElement.subject} ${course}`);
+      //     } else if ("n of" in courseElement || "one of" in courseElement) {
+      //       // return getCoursesInArray(courseElement["n of"] || courseElement["one of"]);
+      //     }
+      //   })
+      // }
+    }
+
+    $(`#fsp-classes-list`).droppable({
+      tolerance: "pointer",
+      over: () => {
+        $(`#fsp-requirements-list`).addClass("fsp-row-active");
+        // $(`.fsp-list-title, .fsp-list-segment`).css({"border-color": "#999"});
+        $(`.fsp-list-title, .fsp-list-segment`).addClass("fsp-list-active");
+        planner.potentialToSemesters.add("unscheduled");
+      },
+      out: () => {
+        $(`#fsp-requirements-list`).removeClass("fsp-row-active");
+        // $(`.fsp-list-title, .fsp-list-segment`).css({"border-color": "#ddd"})
+        $(`.fsp-list-title, .fsp-list-segment`).removeClass("fsp-list-active");
+        planner.potentialToSemesters.delete("unscheduled");
+      },
+    });
+  }
+}
+
+class AddSemeseterComponent {
+  constructor(newSemester) {
+    this.newSemester = newSemester;
+    this.render.bind(this);
+  }
+
+  render (planner, parentElement) {
+    parentElement.append(`<div class="fsp-add-sem-container"><div id="fsp-planner-add-semester">+</div></div>`);
+    $("#fsp-planner-add-semester").droppable({
+      over: () => {
+        $(`#fsp-planner-add-semester`).addClass("fsp-row-active");
+        planner.potentialToSemesters.add(this.newSemester);
+      },
+      out: () => {
+        $(`#fsp-planner-add-semester`).removeClass("fsp-row-active");
+        planner.potentialToSemesters.delete(this.newSemester);
+      },
+    });
+    $("#fsp-planner-add-semester").click(() => {
+      planner.schedule.semesters[this.newSemester] = [];
+      planner.renderPlanner();
+    });
+  }
+}
+
+class CanvasComponent {
+  connectionVerticalOffsets = {};
+
+  constructor (semesterRows, canvas) {
+    this.semesterRows = semesterRows;
+    this.canvas = canvas;
+    this.draw.bind(this);
+    this.getPaths.bind(this);
+    this.getCourseCanvasLocation.bind(this);
+    this.drawCanvasLine.bind(this);
+    this.drawConnectorArc.bind(this);
+    this.drawCoursePath.bind(this);
+    this.getMinRowHeight.bind(this);
+    this.getConnectionVerticalOffset.bind(this);
+  } 
+
+  draw (planner) {
+    this.canvas.canvas.width = $(`#fsp-content`).outerWidth();
+    this.canvas.canvas.height = $(`#fsp-content`).outerHeight();
+    const paths = this.getPaths();
+    this.semesterRows.forEach(semesterRow => {
+      semesterRow.courseComponents.forEach(courseComponent => {
+        const {tileID} = courseComponent;
+        const pathsFromCourse = paths[tileID];
+        pathsFromCourse.forEach(path => this.drawCoursePath(path));
+      });
+    });
+  }
+
+  getPaths () {
+    const mostRecentCourseInstance = {};
+    const pathsFromTileID = {};
+    this.semesterRows.forEach(semesterRow => {
+      const currentSemesterCourses = {};
+      const {semester} = semesterRow;
+      semesterRow.courseComponents.forEach(courseComponent => {
+        const {subject, course, tileID} = courseComponent;
+        const position = this.getCourseCanvasLocation(tileID);
+        const {prerequisites, corequisites} = getCourseObject(subject, course);
+        const courseString = `${subject} ${course}`;
+        currentSemesterCourses[courseString] = {id: tileID, position, semester, courseComponent};
+        pathsFromTileID[tileID] = [];
+        // pathsFromTileID[tileID] = [];
+        // Add prereq paths
+        (prerequisites || []).forEach(prereq => {
+          const prereqString = `${prereq.subject} ${prereq.course}`;
+          if (prereqString in mostRecentCourseInstance) {
+            const id = mostRecentCourseInstance[prereqString].id;
+            const prereqPosition = mostRecentCourseInstance[prereqString].position;
+            const fromSemester = mostRecentCourseInstance[prereqString].semester;
+            const fromComponent = mostRecentCourseInstance[prereqString].courseComponent;
+            pathsFromTileID[id].push({from: prereqPosition, to: position, fromSemester, toSemester: semester, fromComponent, toComponent: courseComponent});
+          }
+        });
+
+        // Add coreq paths
+        (corequisites || []).forEach(coreq => {
+          const coreqString = `${coreq.subject} ${coreq.course}`;
+          if (coreqString in currentSemesterCourses) {
+            const id = currentSemesterCourses[coreqString].id;
+            const coreqPosition = currentSemesterCourses[coreqString].position;
+            const fromComponent = currentSemesterCourses[coreqString].courseComponent;
+            pathsFromTileID[id].push({from: coreqPosition, to: position, fromSemester: semester, toSemester: semester, fromComponent, toComponent: courseComponent});
+          }
+        });
+
+      });
+      Object.entries(currentSemesterCourses).forEach(([courseString, details]) => {
+        mostRecentCourseInstance[courseString] = details;
+      });
+    });
+
+    return pathsFromTileID;
+  }
+
+  getCourseCanvasLocation(tileID) {
+    const targetOffset = $(`#${tileID}`).offset();
+    const canvasOffset = $(`#fsp-canvas`).offset();
+    return {
+      top: targetOffset.top + $(`#${tileID}`).outerHeight() / 2 - canvasOffset.top,
+      left: targetOffset.left + $(`#${tileID}`).outerWidth() / 2 - canvasOffset.left,
+    };
+  }
+
+  getMinRowHeight(semester) {
+    const semesterRowIndex = this.semesterRows.findIndex(row => row.semester == semester);
+    if (semesterRowIndex < 0) return 0;
+    const semesterRow = this.semesterRows[semesterRowIndex];
+    const componentHeights = semesterRow.courseComponents.filter(courseComponent => !courseComponent.isDragging).map(courseComponent => this.getCourseCanvasLocation(courseComponent.tileID).top);
+    return componentHeights.length > 0 ? Math.min(...componentHeights) : 0;
+  }
+
+  drawCoursePath(pathObject) {
+    const {from, to, fromSemester, toSemester, fromComponent, toComponent} = pathObject;
+    // console.log(`Drawing path ${JSON.stringify({from, to})}`);
+    if($(`#${toComponent.tileID}`).is(":hover") || ($(`#${fromComponent.tileID}`).is(":hover") && fromSemester == toSemester)) {
+      if (toComponent.prereqWarning) {
+        this.canvas.strokeStyle = '#990000';
+      } else {
+        this.canvas.strokeStyle = '#009900';
+      }
+      this.canvas.lineWidth = 2;
+    } else if ($(`#${fromComponent.tileID}`).is(":hover")) {
+      this.canvas.strokeStyle = '#007799';
+      this.canvas.lineWidth = 2;
+    } else {
+      this.canvas.strokeStyle = '#999999';
+      this.canvas.lineWidth = 1;
+    }
+    // this.drawCanvasLine(from, to);
+
+    if (fromSemester == toSemester) {
+      this.drawCanvasLine(from, to);
+    } else {
+      const {canvas} = this;
+      canvas.beginPath();
+      canvas.moveTo(from.left, from.top);
+      // just draw straight line for vertical alignment
+      if (Math.abs(from.left - to.left) < 10) {
+        canvas.lineTo(from.left, to.top);
+        canvas.stroke();
+      } else {
+        const horizontalLineLocation = Math.min(this.getConnectionVerticalOffset(fromComponent.tileID, toSemester), to.top);
+        if (from.top < horizontalLineLocation) {
+          canvas.lineTo(from.left, horizontalLineLocation - 5);
+          canvas.stroke();
+          if (from.left < to.left) {
+            canvas.beginPath();
+            canvas.arc(from.left + 5, horizontalLineLocation - 5, 5, 0.5 * Math.PI, Math.PI);
+            canvas.stroke();
+            canvas.moveTo(from.left + 5, horizontalLineLocation);
+            canvas.lineTo(to.left - 5, horizontalLineLocation);
+            canvas.stroke();
+            canvas.beginPath();
+            canvas.arc(to.left - 5, horizontalLineLocation + 5, 5, 1.5 * Math.PI, 2 * Math.PI);
+            canvas.stroke();
+            canvas.moveTo(to.left, horizontalLineLocation + 5);
+            canvas.lineTo(to.left, to.top);
+            canvas.stroke();
+          } else {
+            canvas.beginPath();
+            canvas.arc(from.left - 5, horizontalLineLocation - 5, 5, 0, 0.5 * Math.PI);
+            canvas.stroke();
+            canvas.moveTo(from.left - 5, horizontalLineLocation);
+            canvas.lineTo(to.left + 5, horizontalLineLocation);
+            canvas.stroke();
+            canvas.beginPath();
+            canvas.arc(to.left + 5, horizontalLineLocation + 5, 5, 1 * Math.PI, 1.5 * Math.PI);
+            canvas.stroke();
+            canvas.moveTo(to.left, horizontalLineLocation + 5);
+            canvas.lineTo(to.left, to.top);
+            canvas.stroke();
+          }
+        } else {
+          canvas.lineTo(from.left, horizontalLineLocation + 5);
+          canvas.stroke();
+          if (from.left < to.left) {
+            canvas.beginPath();
+            canvas.arc(from.left + 5, horizontalLineLocation + 5, 5, 1 * Math.PI, 1.5 * Math.PI);
+            canvas.stroke();
+            canvas.moveTo(from.left + 5, horizontalLineLocation);
+            canvas.lineTo(to.left - 5, horizontalLineLocation);
+            canvas.stroke();
+            canvas.beginPath();
+            canvas.arc(to.left - 5, horizontalLineLocation - 5, 5, 1.5 * Math.PI, 2 * Math.PI);
+            canvas.stroke();
+            canvas.moveTo(to.left, horizontalLineLocation - 5);
+            canvas.lineTo(to.left, to.top);
+            canvas.stroke();
+          } else {
+            canvas.beginPath();
+            canvas.arc(from.left - 5, horizontalLineLocation + 5, 5, 1.5 * Math.PI, 2 * Math.PI);
+            canvas.stroke();
+            canvas.moveTo(from.left - 5, horizontalLineLocation);
+            canvas.lineTo(to.left + 5, horizontalLineLocation);
+            canvas.stroke();
+            canvas.beginPath();
+            canvas.arc(to.left + 5, horizontalLineLocation - 5, 5, 1 * Math.PI, 1.5 * Math.PI);
+            canvas.stroke();
+            canvas.moveTo(to.left, horizontalLineLocation - 5);
+            canvas.lineTo(to.left, to.top);
+            canvas.stroke();
+          }
+        }
+
+      }
+    }
+  }
+
+  getConnectionVerticalOffset(tileID, toSemester) {
+    if (this.connectionVerticalOffsets[tileID] !== undefined && this.connectionVerticalOffsets[tileID][toSemester] !== undefined) {
+      return this.connectionVerticalOffsets[tileID][toSemester];
+    } else {
+      const minRowHeight = this.getMinRowHeight(toSemester);
+      const fromHeight = this.getCourseCanvasLocation(tileID).top;
+      if (minRowHeight  - 35 < fromHeight) {
+        return minRowHeight;
+      } else {
+        return minRowHeight - 35;
+      }
+    }
+  }
+
+  drawCanvasLine(from, to) {
+    const {canvas} = this;
+    canvas.beginPath();
+    canvas.moveTo(from.left, from.top);
+    canvas.lineTo(to.left, to.top);
+    canvas.stroke();
+  }
+
+  drawConnectorArc(line1Endpoint, line2Endpoint) {
+
+  }
+}
+
+class PlannerHeader {
+
+}
+
 class Planner {
   schedule = JSON.parse(JSON.stringify(SCHEDULE_EXAMPLE_JSON));
   potentialToSemesters = new Set();
@@ -320,6 +743,7 @@ class Planner {
     this.getSchedule.bind(this);
     this.getCourseCanvasLocation.bind(this);
     this.drawCanvasLine.bind(this);
+    this.dropSemester.bind(this);
   }
 
   /**
@@ -328,12 +752,22 @@ class Planner {
   resetPlanner() {
     CourseComponent.resetItems();
     SemesterRowComponent.resetItems();
+    MajorRequirementComponent.resetItems();
+    SemesterDeleteComponent.resetItems();
     const fsp = $("#fsp-content");
     fsp.html("");
     $("#fsp-classes-navbar").html("");
     $("#fsp-classes-list").html("");
+    $(`#fsp-course-drag`).html("");
     this.potentialToSemesters = new Set();
     this.semesterRows = [];
+  }
+
+
+  renderMinorChanges() {
+    const canvas = document.getElementById("fsp-canvas").getContext("2d");
+    this.canvasComponent = (new CanvasComponent(this.semesterRows, canvas));
+    this.canvasComponent.draw(this);
   }
 
   /**
@@ -342,12 +776,13 @@ class Planner {
   renderPlanner() {
     // Object.kets*this.schedule.semesters
     this.resetPlanner();
+    const startingSemester = this.schedule["starting semester"];
 
     const scheduleSemesters = Object.keys(this.schedule.semesters);
     scheduleSemesters.forEach(semester => this.schedule.semesters[semester].sort((a, b) => `${a.subject} ${a.course}` < `${b.subject} ${b.course}` ? -1 : 1));
-    const normalSemesters = getSemesterRange(scheduleSemesters);
+    const normalSemesters = getSemesterRange([...new Set(scheduleSemesters.concat([startingSemester]))]);
     const normalSemestersSet = new Set(normalSemesters);
-    const otherSemesters = scheduleSemesters.filter(semester => !normalSemestersSet.has(semester));
+    const otherSemesters = [...new Set(scheduleSemesters.concat(["transfer"]))].filter(semester => !normalSemestersSet.has(semester));
     const semesterList = otherSemesters.concat(normalSemesters);
 
     const canvas = document.getElementById("fsp-canvas").getContext("2d");
@@ -365,7 +800,7 @@ class Planner {
     // Render sidebar
     const majorNavbar = (new MajorNavbarComponent(this.schedule.majors)).render(this, $('#fsp-classes-navbar'));
 
-
+    const majorList = (new MajorListComponent(this.selectedMajor, allCourses, existingCourses, unscheduledCourses)).render(this, $("#fsp-classes-list"));
 
 
 
@@ -453,6 +888,7 @@ class Planner {
     semesterList.forEach(semester => {
       this.semesterRows.push((new SemesterRowComponent(semester, this.schedule, semesterList)).render(this, fsp));
     });
+    (new AddSemeseterComponent(nextSemester(semesterList[semesterList.length - 1]))).render(this, fsp);
     
 /*
     semesterList.forEach((semester, index) => {
@@ -522,8 +958,8 @@ class Planner {
 
     // console.log(courseStringToTileID);
 
-    canvas.canvas.width = $(`#fsp-planner`).outerWidth();
-    canvas.canvas.height = $(`#fsp-planner`).outerHeight();
+    // canvas.canvas.width = $(`#fsp-planner`).outerWidth();
+    // canvas.canvas.height = $(`#fsp-planner`).outerHeight();
 
     // const CSCourses = getCoursesInMajor("Computer Science");
     // Object.entries(dataByTileID).forEach(([tileID, tile]) => {
@@ -573,6 +1009,10 @@ class Planner {
 
 
     // $(".fsp-content").
+    // this.canvasComponent = (new CanvasComponent(this.semesterRows, canvas));
+    // this.canvasComponent
+    this.renderMinorChanges();
+    $(window).on('resize', () => {this.renderMinorChanges()});
   }
   
   /**
@@ -616,6 +1056,11 @@ class Planner {
     canvas.stroke();
   }
 
+  dropSemester(semester) {
+    delete this.schedule.semesters[semester];
+    this.renderPlanner();
+  }
+
   
 }
 
@@ -623,7 +1068,8 @@ class Planner {
 $(document).ready(() => {
   // $(".fsp-content").html("Test");
 
-  const SCHEDULE_SEMESTERS = Object.keys(SCHEDULE_EXAMPLE_JSON.semesters);
+  const SCHEDULE_SEMESTERS = [...new Set(Object.keys(SCHEDULE_EXAMPLE_JSON.semesters).concat(SCHEDULE_EXAMPLE_JSON["starting semester"]))];
+  console.log(SCHEDULE_SEMESTERS);
   console.log(getSemesterRange(SCHEDULE_SEMESTERS));
   const planner = new Planner();
   // planner.renderPlanner();

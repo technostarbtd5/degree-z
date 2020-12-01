@@ -16,19 +16,24 @@
     <script src="/client/common/header.js"></script>
   </head>
   <body>
-    <div class="fsp-body">
-      <header class="fsp-header">Future Semester Planner</header>
-      <section class="fsp">
-        <div class="fsp-planner" id="fsp-planner">
-          <canvas class="fsp-canvas" id="fsp-canvas"></canvas>
-          <div class="fsp-content" id="fsp-content"></div>
+    <div id="fsp-course-drag"></div>
+    <div class="fsp-container-super">
+      <div class="fsp-body">
+        <header class="fsp-header">Future Semester Planner</header>
+        <div class="fsp" id="fsp">
+          <div class="fsp-planner-cell">
+            <div class="fsp-planner" id="fsp-planner">
+              <canvas class="fsp-canvas" id="fsp-canvas"></canvas>
+              <div class="fsp-content" id="fsp-content"></div>
+            </div>
+          </div>
+          <div class="fsp-classes-container" id="fsp-classes-container">
+            <header class="fsp-classes-header">Courses</header>
+            <nav class="fsp-classes-navbar" id="fsp-classes-navbar"></nav>
+            <div class="fsp-classes-list" id="fsp-classes-list"></div>
+          </div>
         </div>
-        <aside class="fsp-classes-container" id="fsp-classes-container">
-          <header class="fsp-classes-header">Courses</header>
-          <nav class="fsp-classes-navbar" id="fsp-classes-navbar"></nav>
-          <div class="fsp-classes-list" id="fsp-classes-list"></div>
-        </aside>
-      </section>
+      </div>
     </div>
   </body>
 </html>
