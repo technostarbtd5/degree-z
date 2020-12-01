@@ -2,7 +2,7 @@
 	$dbConnect = false;
 	$dbUser = 'root';
 	$dbPass = '';
-	$dbSelect = 'test2';
+	$dbSelect = 'degreeZ';
 	@ $db = new mysqli('localhost', $dbUser, $dbPass, $dbSelect);
 
 	if ($db->connect_error) {
@@ -12,9 +12,8 @@
 		$dbConnect = true;
     }
 
-    $sql = "SELECT Major, Minor, Concentration, GPA, Person FROM testing";
+    $sql = "SELECT Major, Minor, Concentration, GPA, Person FROM persondata";
     $result = $db->query($sql);
-
     ?>
 
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>

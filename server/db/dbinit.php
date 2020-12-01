@@ -33,6 +33,8 @@ if ($mysqli->select_db($nameDB) === false) {
   // $db = new mysqli($servernameDB, $usernameDB, $passwordDB, $nameDB);
 
   // Planner tables
+
+
   $planner_sql = "CREATE TABLE `plans` (
     `id` int AUTO_INCREMENT,
     `name` varchar(255) NOT NULL,
@@ -54,6 +56,36 @@ if ($mysqli->select_db($nameDB) === false) {
   );";
 
   $mysqli->query($planner_courses_sql);
+
+  $data_sql = "CREATE TABLE `persondata` (
+    `Person` varchar(255),
+    `Major` varchar(255),
+    `Minor` varchar(255),
+    `Concentration` varchar(255),
+    `GPA` decimal(60),
+  );";
+  $mysqli->query($data_sql);
+
+$courses_sql = "CREATE TABLE `courses` (
+  `taken` varchar(255),
+);";
+
+$mysqli->query($courses_sql);
+
+$sql1 = "INSERT INTO `classes` (`taken`) VALUES
+('Alexandra Mednikova', 'Information Technology and Web Science', 'N/A','Data Science', '3.5')";
+
+
+$sq2 = "INSERT INTO `classes` (`taken`) VALUES
+('Calculus I'),
+('Introduction to Management'),
+('Business Law and Ethics'),
+('Computer Science I'),
+('Introduction to Information Technology and Web Science'),
+('Calculus II'),
+('Physics I'),
+('IT and Society')";
+
 
   // TODO: ADD FOREIGN KEY
   /*
