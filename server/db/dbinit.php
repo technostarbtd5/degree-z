@@ -73,7 +73,7 @@ $courses_sql = "CREATE TABLE `courses` (
 
 $mysqli->query($courses_sql);
 
-$sql1 = "INSERT INTO `classes` (`taken`) VALUES
+$sql1 = "INSERT INTO `persondata` (`taken`) VALUES
 ('Alexandra Mednikova', 'Information Technology and Web Science', 'N/A','Data Science', '3.5')";
 
 
