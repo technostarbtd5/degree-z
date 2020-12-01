@@ -6,6 +6,7 @@ export const SCHEDULE_EXAMPLE_JSON = {
   "minors": [
     "Economics",
   ],
+  "starting semester": "Fall 2019",
   "semesters": {
     "transfer": [
       {"subject": "CHEM", "course": "1100"},
@@ -48,17 +49,17 @@ export const SCHEDULE_EXAMPLE_JSON = {
       {"subject": "ITWS", "course": "4310"},
       {"subject": "ITWS", "course": "4500"},
     ],
-    // "Fall 2021": [
-    //   {"subject": "CSCI", "course": "4100"},
-    //   {"subject": "CSCI", "course": "4220"},
-    //   {"subject": "CSCI", "course": "4430"},
-    //   {"subject": "ITWS", "course": "4100"},
-    //   {"subject": "ECON", "course": "2010"},
-    // ],
-    // "Spring 2022": [
-    //   {"subject": "CSCI", "course": "4150"},
-    //   {"subject": "CSCI", "course": "4380"},
-    // ],
+    "Fall 2021": [
+      {"subject": "CSCI", "course": "4100"},
+      {"subject": "CSCI", "course": "4220"},
+      {"subject": "CSCI", "course": "4430"},
+      {"subject": "ITWS", "course": "4100"},
+      {"subject": "ECON", "course": "2010"},
+    ],
+    "Spring 2022": [
+      {"subject": "CSCI", "course": "4150"},
+      {"subject": "CSCI", "course": "4380"},
+    ],
   },
 };
 
