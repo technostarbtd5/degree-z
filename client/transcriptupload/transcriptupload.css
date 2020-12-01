@@ -141,11 +141,15 @@ h1 {
 }
 
 .full-line {
-    flex: 0 1 100%;
+    flex: 0 1 99%;
+    margin-left: 0.5%;
+    margin-right: 0.5%;
 }
 
 .half-line {
-    flex: 0 1 50%;
+    flex: 0 1 49%;
+    margin-left: 0.5%;
+    margin-right: 0.5%;
 }
 
 #courseMap {
@@ -194,6 +198,10 @@ h1 {
     background-color: #8BFA69;
 }
 
+#total {
+    display: flex;
+}
+
 .left {
     text-align: left;
 }
@@ -204,6 +212,10 @@ h1 {
 
 .center {
     text-align: center;
+}
+
+.yellow {
+    background-color: yellow;
 }
 
 /*#courseProgress{
