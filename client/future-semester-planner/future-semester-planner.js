@@ -159,6 +159,7 @@ class CourseComponent {
         $(`#${tileID}`).css({"z-index": 5});
         $(`#fsp-course-drag`).offset($(`#${tileID}`).offset());
         $(`#fsp-course-drag`).append($(`#${tileID}`));
+        this.isDragging = true;
       },
       // drag: () => {
       //   $(`#${tileID}`).css({"position": "absolute"});
@@ -588,7 +589,7 @@ class CanvasComponent {
     const semesterRowIndex = this.semesterRows.findIndex(row => row.semester == semester);
     if (semesterRowIndex < 0) return 0;
     const semesterRow = this.semesterRows[semesterRowIndex];
-    const componentHeights = semesterRow.courseComponents.map(courseComponent => this.getCourseCanvasLocation(courseComponent.tileID).top);
+    const componentHeights = semesterRow.courseComponents.filter(courseComponent => !courseComponent.isDragging).map(courseComponent => this.getCourseCanvasLocation(courseComponent.tileID).top);
     return componentHeights.length > 0 ? Math.min(...componentHeights) : 0;
   }
 
@@ -622,7 +623,7 @@ class CanvasComponent {
         canvas.lineTo(from.left, to.top);
         canvas.stroke();
       } else {
-        const horizontalLineLocation = this.getConnectionVerticalOffset(fromComponent.tileID, toSemester);
+        const horizontalLineLocation = Math.min(this.getConnectionVerticalOffset(fromComponent.tileID, toSemester), to.top);
         if (from.top < horizontalLineLocation) {
           canvas.lineTo(from.left, horizontalLineLocation - 5);
           canvas.stroke();
@@ -695,10 +696,10 @@ class CanvasComponent {
     } else {
       const minRowHeight = this.getMinRowHeight(toSemester);
       const fromHeight = this.getCourseCanvasLocation(tileID).top;
-      if (minRowHeight  - 40 < fromHeight) {
+      if (minRowHeight  - 35 < fromHeight) {
         return minRowHeight;
       } else {
-        return minRowHeight - 40;
+        return minRowHeight - 35;
       }
     }
   }
