@@ -64,6 +64,7 @@ if ($mysqli->select_db($nameDB) === false) {
     `Concentration` varchar(255),
     `GPA` decimal(60),
   );";
+  
   $mysqli->query($data_sql);
 
 $courses_sql = "CREATE TABLE `courses` (
