@@ -206,16 +206,16 @@ class Term {
 		}			
 		result += `</div> \
 			${this.hasTermData ? ` \
-				Term Data: \
+				<p class="full-line${this.hasCumulativeData ? " subtext" : ""}">Term Data: \
 				Attempted: ${this.termData.attempted} \
 				Passed: ${this.termData.passed} \
-				GPA: ${this.termData.gpa}` : ""
+				GPA: ${this.termData.gpa}</p>` : ""
 			} \
 			${this.hasCumulativeData ? ` \
-				Cumulative Data: \
+				<p class="full-line">Cumulative Data: \
 				Attempted: ${this.cumulativeData.attempted} \
 				Passed: ${this.cumulativeData.passed} \
-				GPA: ${this.cumulativeData.gpa}` : ""
+				GPA: ${this.cumulativeData.gpa}</p>` : ""
 			}
 		</section>`;
 		return result;
