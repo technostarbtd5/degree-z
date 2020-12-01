@@ -14,7 +14,6 @@
 
     $sql = "SELECT Major, Minor, Concentration, GPA, Person FROM testing";
     $result = $db->query($sql);
-
     ?>
 
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
@@ -130,29 +129,19 @@
     <h4>Student Progress</h4>
     <div class="progress">
         <div class="progress-bar progress-bar-striped bg-danger" role="progressbar" style="width: 50%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
-    </div>
+    </div><br>
+
+<?php
+    $sql2 = "SELECT taken FROM classes";
+    $result5 = $db->query($sql2);
+
+    if ($result5->num_rows > 0) {
+        // output data of each row
+        echo "<b>Courses Completed:</b> </br>";
+        while($row1 = $result5->fetch_assoc()) {
+          echo "<table> <td> " . $row1["taken"].  " </td> </table>";
+        }
+      } 
+    ?>
 
 
-
-<table style="width:100%">
-  <tr>
-    <th>Courses Taken:</th>
-    <td>Courses Required:</td>
-  </tr>
-  <tr>
-    <th rowspan="2">Telephone:</th>
-    <td>55577854</td>
-  </tr>
-  <tr>
-    <td>55577855</td>
-  </tr>
-</table>
-
-</div>
-  <div class="col-md-6">table_row_2</div>
-  <div class="col-md-6">table_row_3</div>
-  <div class="col-md-6">table_row_4</div>
-  <div class="col-md-6">table_row_5</div>
-  <div class="col-md-6">table_row_6</div>
-</div>
-<p id="demo"></p>
