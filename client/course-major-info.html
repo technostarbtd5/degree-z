@@ -13,11 +13,23 @@
         }
 
     </style>
+    <style>
+        .hidden{
+            display:none;
+        }
+        button{
+            background-color: #FF737D;
+            border-color: black;
+            border-radius: 50%;
+        }
+    </style>
+
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
     <style type="text/css"></style>
     <script src="/client/common/header.js"></script>
+    <script src="course-major-info.js"></script>
 
     <title>Course and Major Info</title>
 </head>
@@ -83,11 +95,51 @@
                     <li>Humanities Elective Credit Hours: 4</li>
                     <li>Social Science Elective Credit Hours: 4</li>
                     <li>HASS Elective Credit Hours: 8</li>
-                    <li>CSCI 1100 - Computer Science I Credit Hours: 4</li>
-                    <li>CSCI 1200 - Data Structures Credit Hours: 4</li>
-                    <li>MATH 1010 - Calculus I Credit Hours: 4</li>
-                    <li>ITWS 1220 - IT and Society Credit Hours: 4</li>
-                    <li>ITWS 2210 - Introduction to Human Computer Interaction Credit Hours: 4</li>
+                    <li><button onclick="hidecsci1100()">CSCI 1100 - Computer Science I Credit Hours: 4</button></li>
+                        <ul id= "csci1100info" class="hidden">
+                            <li>An introduction to computer programming algorithm design and analysis. Additional topics include basic 
+                                computer organization; internal representation of scalar and array data; use of top-down design and subprograms 
+                                to tackle complex problems; abstract data types. Enrichment material as time allows. Interdisciplinary case 
+                                studies, numerical and nonnumerical applications. Students who have passed CSCI 1200 cannot register for this course.</li>
+                            <li>When Offered: Fall, spring, and summer terms annually.</li>
+                        </ul>
+                    <li><button onclick="hidecsci1200()">CSCI 1200 - Data Structures Credit Hours: 4</button></li>
+                        <ul id= "csci1200info" class="hidden">
+                            <li>Programming concepts: functions, parameter passing, pointers, arrays, strings, structs, classes, templates. 
+                                Mathematical tools: sets, functions, and relations, order notation, complexity of algorithms, proof by induction. 
+                                Data structures and their representations: data abstraction and internal representation, sequences, trees, binary 
+                                search trees, associative structures. Algorithms: searching and sorting, generic algorithms, iterative and 
+                                recursive algorithms. Methods of testing correctness and measuring performance.</li>
+                            <li>Prerequisites/Corequisites: Prerequisite: CSCI 1100 or permission of instructor.</li>
+                            <li>When Offered: Fall and spring terms annually.</li>
+                        </ul>
+                    <li><button onclick="hidemath1010()">MATH 1010 - Calculus I Credit Hours: 4</li>
+                        <ul id= "math1010info" class="hidden">
+                            <li>Functions, limits, continuity, derivatives, implicit differentiation, related rates, maxima and minima, 
+                                elementary transcendental functions, introduction to definite integral with applications to area and volumes 
+                                of revolution.
+                                Students cannot get credit for both MATH-1010 and MATH-1500.</li>
+                            <li>When Offered: Fall and spring terms annually.</li>
+                        </ul>
+                    <li><button onclick="hideitws1220()">ITWS 1220 - IT and Society Credit Hours: 4</li>
+                        <ul id= "itws1220info" class="hidden">
+                            <li>Will IT increase prosperity? For whom? What role should governments play in IT development? Do corporations
+                                 have new responsibilities in the Information Era? What about IT professionals? This course explores the issues, 
+                                 the arguments and working solutions. The first section examines macro indicators and trends. The second section 
+                                 examines the microeconomics and politics of specific arenas—the software industry, the automated work place, 
+                                 telemedicine, television. The last section explores opportunities for improving society, using IT. </li>
+                            <li>When Offered: Spring term annually.</li>
+                            <li>Cross Listed: Cross listed as IHSS 1220. Students cannot obtain credit for both this course and IHSS 1220.</li>
+                        </ul>
+                    <li><button onclick="hideitws2210()">TWS 2210 - Introduction to Human Computer Interaction Credit Hours: 4</li>
+                        <ul id= "itws2210info" class="hidden">
+                            <li>An introduction to the current theories, methods, and issues in human-computer interaction. Theory and research 
+                                along with practical application are discussed within the context of organizational impact. The course provides 
+                                the knowledge of HCI systems and research used for the implementation of safe, quick, and useable interactive 
+                                technologies.</li>
+                            <li>When Offered: Spring term annually.</li>
+
+                        </ul>
                     <li>Free Elective Credit Hours: 12</li>
                 </ul>
 
