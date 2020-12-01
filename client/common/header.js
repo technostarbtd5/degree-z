@@ -7,9 +7,6 @@ $(document).ready(() => {
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav">
-        <li class="nav-item" id="about_nav">
-          <a class="nav-link" href="about">About </a>
-        </li>
         <li class="nav-item" id="catalog_nav">
           <a class="nav-link" href="catalog">Catalog</a>
         </li>

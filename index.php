@@ -6,13 +6,10 @@ $request = $_SERVER['REQUEST_URI'];
 
 switch ($request) {
   case '/':
-    require __DIR__ . '/client/home.html';
+    require __DIR__ . '/client/home.php';
     break;
   case '':
-    require __DIR__ . '/client/home.html';
-    break;
-  case '/about':
-    require __DIR__ . '/client/about.html';
+    require __DIR__ . '/client/home.php';
     break;
   case '/planner':
     require __DIR__ . '/client/future-semester-planner/future-semester-planner.html';
