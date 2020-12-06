@@ -3,7 +3,7 @@
 // Authenticate!
 include_once(__DIR__ ."/phpCAS-1.3.6/CAS.php");
 phpCAS::client(CAS_VERSION_2_0, 'cas-auth.rpi.edu', 443, '/cas/');
-phpCAS::setCasServerCACert(__DIR__ .'/CACert.pem');
+phpCAS::setCasServerCACert(__DIR__ .'/cacert.pem');
 if (phpCAS::isAuthenticated()) {
   echo "User:" . phpCAS::getUser();
   // echo "<a href='./logout.php'>Logout</a>";
