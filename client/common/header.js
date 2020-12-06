@@ -16,6 +16,9 @@ $(document).ready(() => {
         <li class="nav-item" id="planner_nav">
             <a class="nav-link" href="planner">Planner</a>
         </li>
+        <li class="nav-item" id="planner_nav">
+          <a class="nav-link" href="logout">Logout</a>
+        </li>
       </ul>
     </div>
   </nav>

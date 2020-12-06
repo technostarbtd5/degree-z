@@ -204,11 +204,16 @@ class CourseComponent {
   }
 
   addPrereqWarning(unfilledPrereqs) {
-    if (unfilledPrereqs.length > 0) {
+    const {subject, course, semester} = this;
+    console.log(new Set(getCourseObject(subject, course).offered));
+    // console.log((new Set(...(getCourseObject(subject, course).offered || []))));
+    if (unfilledPrereqs.length > 0 || !((new Set(getCourseObject(subject, course).offered || [])).has(semester.split(" ")[0]) || semester == "transfer")) {
       this.prereqWarning = true;
       $(`#${this.tileID}`).css({"box-shadow": "0px 0px 10px red", "border-color": "red", "borer-width": "3px"});
       $(`#${this.tileID}`).tooltip({content: `Missing prerequisites: ${unfilledPrereqs.join(", ")}`});
     }
+
+    // if ()
   }
 
   static resetItems() {
@@ -589,7 +594,7 @@ class CanvasComponent {
     const semesterRowIndex = this.semesterRows.findIndex(row => row.semester == semester);
     if (semesterRowIndex < 0) return 0;
     const semesterRow = this.semesterRows[semesterRowIndex];
-    const componentHeights = semesterRow.courseComponents.filter(courseComponent => !courseComponent.isDragging).map(courseComponent => this.getCourseCanvasLocation(courseComponent.tileID).top);
+    const componentHeights = semesterRow.courseComponents.filter(courseComponent => !courseComponent.isDragging || semesterRow.courseComponents.length < 2).map(courseComponent => this.getCourseCanvasLocation(courseComponent.tileID).top);
     return componentHeights.length > 0 ? Math.min(...componentHeights) : 0;
   }
 
@@ -718,10 +723,16 @@ class CanvasComponent {
 }
 
 class PlannerHeader {
+  constructor(rin, scheduleID) {
+    this.rin = rin;
+    this.scheduleID = scheduleID;
+  }
 
+  
 }
 
 class Planner {
+  activeScheduleID = "New Schedule";
   schedule = JSON.parse(JSON.stringify(SCHEDULE_EXAMPLE_JSON));
   potentialToSemesters = new Set();
   selectedMajor = this.schedule.majors.length > 0 ? this.schedule.majors[0] : "Electives";
