@@ -204,11 +204,16 @@ class CourseComponent {
   }
 
   addPrereqWarning(unfilledPrereqs) {
-    if (unfilledPrereqs.length > 0) {
+    const {subject, course, semester} = this;
+    console.log(new Set(getCourseObject(subject, course).offered));
+    // console.log((new Set(...(getCourseObject(subject, course).offered || []))));
+    if (unfilledPrereqs.length > 0 || !((new Set(getCourseObject(subject, course).offered || [])).has(semester.split(" ")[0]) || semester == "transfer")) {
       this.prereqWarning = true;
       $(`#${this.tileID}`).css({"box-shadow": "0px 0px 10px red", "border-color": "red", "borer-width": "3px"});
       $(`#${this.tileID}`).tooltip({content: `Missing prerequisites: ${unfilledPrereqs.join(", ")}`});
     }
+
+    // if ()
   }
 
   static resetItems() {
@@ -718,10 +723,16 @@ class CanvasComponent {
 }
 
 class PlannerHeader {
+  constructor(rin, scheduleID) {
+    this.rin = rin;
+    this.scheduleID = scheduleID;
+  }
 
+  
 }
 
 class Planner {
+  activeScheduleID = "New Schedule";
   schedule = JSON.parse(JSON.stringify(SCHEDULE_EXAMPLE_JSON));
   potentialToSemesters = new Set();
   selectedMajor = this.schedule.majors.length > 0 ? this.schedule.majors[0] : "Electives";
