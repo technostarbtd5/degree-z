@@ -1,5 +1,18 @@
 <?php
 
+// Authenticate!
+include_once(__DIR__ ."/phpCAS-1.3.6/CAS.php");
+phpCAS::client(CAS_VERSION_2_0, 'cas-auth.rpi.edu', 443, '/cas/');
+phpCAS::setCasServerCACert(__DIR__ .'/CACert.pem');
+if (phpCAS::isAuthenticated()) {
+  echo "User:" . phpCAS::getUser();
+  // echo "<a href='./logout.php'>Logout</a>";
+} else {
+  phpCAS::forceAuthentication();
+  // echo "<a href='./login.php'>Login</a>";
+}
+
+
 include(__DIR__ . "/server/db/dbinit.php");
 // Router script
 $request = $_SERVER['REQUEST_URI'];
@@ -20,6 +33,8 @@ switch ($request) {
   case '/catalog':
     require __DIR__ . '/client/course-major-info.html';
     break;
+  case '/logout':
+    require __DIR__ . '/server/authentication/logout.php';
   default:
     http_response_code(404);
     require __DIR__ . '/client/404.html';
