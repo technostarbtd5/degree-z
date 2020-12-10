@@ -602,6 +602,7 @@ class CanvasComponent {
     const {from, to, fromSemester, toSemester, fromComponent, toComponent} = pathObject;
     // console.log(`Drawing path ${JSON.stringify({from, to})}`);
     if($(`#${toComponent.tileID}`).is(":hover") || ($(`#${fromComponent.tileID}`).is(":hover") && fromSemester == toSemester)) {
+      // console.log("Stroke coloring");
       if (toComponent.prereqWarning) {
         this.canvas.strokeStyle = '#990000';
       } else {
@@ -609,6 +610,7 @@ class CanvasComponent {
       }
       this.canvas.lineWidth = 2;
     } else if ($(`#${fromComponent.tileID}`).is(":hover")) {
+      // console.log("Stroke coloring");
       this.canvas.strokeStyle = '#007799';
       this.canvas.lineWidth = 2;
     } else {
@@ -722,11 +724,81 @@ class CanvasComponent {
   }
 }
 
-class PlannerHeader {
-  constructor(rin, scheduleID) {
-    this.rin = rin;
+class PlannerHeaderComponent {
+  constructor(scheduleID) {
     this.scheduleID = scheduleID;
+    this.render.bind(this);
   }
+
+  render(planner, parentElement) {
+    parentElement.append(`<div id="get-schedules-debug">Get Schedules Debug</div><div id="get-schedules-debug-result"></div>`);
+    $(`#get-schedules-debug`).click(() => {
+      console.log("click");
+      $.post("/api/planner", {request: "getSchedules"}, (response, status) => {
+        console.log("response:");
+        console.log(response);
+        $(`#get-schedules-debug-result`).html(response);
+      });
+    });
+
+    parentElement.append(`<div id="set-schedule-debug">Set Schedule Debug</div><div id="set-schedule-debug-result"></div>`);
+    $(`#set-schedule-debug`).click(() => {
+      console.log("click");
+      $.post("/api/planner", {request: "setSchedule", schedule: planner.schedule}, (response, status) => {
+        console.log("response:");
+        console.log(response);
+        $(`#set-schedule-debug-result`).html(response);
+      });
+    });
+
+    parentElement.append(`<div id="delete-schedule-debug">delete Schedule Debug</div><div id="delete-schedule-debug-result"></div>`);
+    $(`#delete-schedule-debug`).click(() => {
+      console.log("click");
+      $.post("/api/planner", {request: "deleteSchedule", scheduleID: planner.activeScheduleID}, (response, status) => {
+        console.log("response:");
+        console.log(response);
+        $(`#delete-schedule-debug-result`).html(response);
+      });
+    });
+
+    parentElement.append(`<div id="fsp-schedule-selector">
+      <select name="Schedule" id="fsp-schedule-select"></select>
+      <div id="fsp-schedule-selected"></div>
+    </div>`);
+    $.post("/api/planner", {request: "getSchedules"}, (response, status) => {
+      // console.log("response:");
+      // console.log(response);
+      // $(`#get-schedules-debug-result`).html(response);
+      
+      JSON.parse(response).forEach(schedule => {
+        const {name, id} = schedule;
+        $(`#fsp-schedule-select`).append(`<option id="fsp-schedule-select-option-${id}" value="${id}" ${id == planner.activeScheduleID ? "selected" : ""}>${name}</option>`);
+      });
+    });
+
+    console.log(planner.activeScheduleID);
+
+    // $(`#fsp-schedule-select`).val(`${planner.activeScheduleID}`).attr("selected", true);
+    // console.log(`Schedule selected: ${$(`#fsp-schedule-select`).val()}`);
+    // $(`#fsp-schedule-select-option-${planner.activeScheduleID}`).attr("selected", true);
+    
+    $(`#fsp-schedule-select`).change(function() {
+      const id = $(this).val();
+      $.post("/api/planner", {request: "getSchedule", scheduleID: id}, (response, status) => {
+        const schedule = JSON.parse(response);
+        schedule["starting semester"] = "Fall 2019";
+        console.log(schedule);
+        planner.schedule = schedule;
+        planner.activeScheduleID = id;
+        planner.renderPlanner();
+      });
+    });
+
+
+
+  }
+
+
 
   
 }
@@ -814,6 +886,9 @@ class Planner {
     const majorList = (new MajorListComponent(this.selectedMajor, allCourses, existingCourses, unscheduledCourses)).render(this, $("#fsp-classes-list"));
 
 
+    // Render header
+    $("#fsp-header").html("");
+    const header = (new PlannerHeaderComponent(undefined)).render(this, $("#fsp-header"));
 
     // this.potentialToSemesters = new Set();
 

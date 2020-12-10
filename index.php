@@ -35,6 +35,10 @@ switch ($request) {
     break;
   case '/logout':
     require __DIR__ . '/server/authentication/logout.php';
+    break;
+  case '/api/planner':
+    require __DIR__ . '/server/api/future-semester-planner.php';
+    break;
   default:
     http_response_code(404);
     require __DIR__ . '/client/404.html';
