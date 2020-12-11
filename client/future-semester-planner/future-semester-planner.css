@@ -196,6 +196,12 @@ body {
   text-align: center;
 }
 
+.fsp-shorthand {
+  font-size: .7em;
+  text-align: center;
+  font-weight: bold;
+}
+
 .fsp-course-details {
 }
 
