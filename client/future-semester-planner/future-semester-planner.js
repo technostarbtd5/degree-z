@@ -1000,8 +1000,11 @@ class AddSemeseterComponent {
   }
 }
 
+const LINE_OFFSET_VERTICAL = 40;
+const RAW_COURSE_HEIGHT = 28;
 class CanvasComponent {
   connectionVerticalOffsets = {};
+  pathsToRedraw = [];
 
   constructor (semesterRows, canvas) {
     this.semesterRows = semesterRows;
@@ -1014,12 +1017,15 @@ class CanvasComponent {
     this.drawCoursePath.bind(this);
     this.getMinRowHeight.bind(this);
     this.getConnectionVerticalOffset.bind(this);
+    this.setConnectionVerticalOffsets.bind(this);
   } 
 
   draw (planner) {
     this.canvas.canvas.width = $(`#fsp-content`).outerWidth();
     this.canvas.canvas.height = $(`#fsp-content`).outerHeight();
     const paths = this.getPaths();
+    this.setConnectionVerticalOffsets(Object.values(paths).flat());
+    this.pathsToRedraw = [];
     this.semesterRows.forEach(semesterRow => {
       semesterRow.courseComponents.forEach(courseComponent => {
         const {tileID} = courseComponent;
@@ -1027,6 +1033,7 @@ class CanvasComponent {
         pathsFromCourse.forEach(path => this.drawCoursePath(path));
       });
     });
+    this.pathsToRedraw.forEach(path => this.drawCoursePath(path));
   }
 
   getPaths () {
@@ -1095,20 +1102,28 @@ class CanvasComponent {
   drawCoursePath(pathObject) {
     const {from, to, fromSemester, toSemester, fromComponent, toComponent} = pathObject;
     // console.log(`Drawing path ${JSON.stringify({from, to})}`);
+    let triangleSize = 8;
     if($(`#${toComponent.tileID}`).is(":hover") || ($(`#${fromComponent.tileID}`).is(":hover") && fromSemester == toSemester)) {
       // console.log("Stroke coloring");
       if (toComponent.prereqWarning) {
         this.canvas.strokeStyle = '#990000';
+        this.canvas.fillStyle = '#990000';
       } else {
         this.canvas.strokeStyle = '#009900';
+        this.canvas.fillStyle = '#009900';
       }
-      this.canvas.lineWidth = 2;
+      this.canvas.lineWidth = 3;
+      this.pathsToRedraw.push(pathObject);
     } else if ($(`#${fromComponent.tileID}`).is(":hover")) {
       // console.log("Stroke coloring");
       this.canvas.strokeStyle = '#007799';
-      this.canvas.lineWidth = 2;
+      this.canvas.fillStyle = '#007799';
+      this.canvas.lineWidth = 3;
+      this.pathsToRedraw.push(pathObject);
     } else {
       this.canvas.strokeStyle = '#999999';
+      this.canvas.fillStyle = '#999999';
+      triangleSize = 5;
       this.canvas.lineWidth = 1;
     }
     // this.drawCanvasLine(from, to);
@@ -1123,6 +1138,13 @@ class CanvasComponent {
       if (Math.abs(from.left - to.left) < 10) {
         canvas.lineTo(from.left, to.top);
         canvas.stroke();
+        if (from.top < to.top) {
+          canvas.beginPath();
+          canvas.moveTo(to.left, to.top - RAW_COURSE_HEIGHT);
+          canvas.lineTo(to.left - triangleSize, to.top - RAW_COURSE_HEIGHT - triangleSize);
+          canvas.lineTo(to.left + triangleSize, to.top - RAW_COURSE_HEIGHT - triangleSize);
+          canvas.fill();
+        }
       } else {
         const horizontalLineLocation = Math.min(this.getConnectionVerticalOffset(fromComponent.tileID, toSemester), to.top);
         if (from.top < horizontalLineLocation) {
@@ -1154,6 +1176,13 @@ class CanvasComponent {
             canvas.moveTo(to.left, horizontalLineLocation + 5);
             canvas.lineTo(to.left, to.top);
             canvas.stroke();
+          }
+          if (horizontalLineLocation + RAW_COURSE_HEIGHT < to.top) {
+            canvas.beginPath();
+            canvas.moveTo(to.left, to.top - RAW_COURSE_HEIGHT);
+            canvas.lineTo(to.left - triangleSize, to.top - RAW_COURSE_HEIGHT - triangleSize);
+            canvas.lineTo(to.left + triangleSize, to.top - RAW_COURSE_HEIGHT - triangleSize);
+            canvas.fill();
           }
         } else {
           canvas.lineTo(from.left, horizontalLineLocation + 5);
@@ -1192,17 +1221,64 @@ class CanvasComponent {
   }
 
   getConnectionVerticalOffset(tileID, toSemester) {
+    const minRowHeight = this.getMinRowHeight(toSemester);
+    const fromHeight = this.getCourseCanvasLocation(tileID).top;
     if (this.connectionVerticalOffsets[tileID] !== undefined && this.connectionVerticalOffsets[tileID][toSemester] !== undefined) {
-      return this.connectionVerticalOffsets[tileID][toSemester];
+      return minRowHeight - LINE_OFFSET_VERTICAL - this.connectionVerticalOffsets[tileID][toSemester];
     } else {
-      const minRowHeight = this.getMinRowHeight(toSemester);
-      const fromHeight = this.getCourseCanvasLocation(tileID).top;
-      if (minRowHeight  - 35 < fromHeight) {
+
+      if (minRowHeight  - LINE_OFFSET_VERTICAL < fromHeight) {
         return minRowHeight;
       } else {
-        return minRowHeight - 35;
+        return minRowHeight - LINE_OFFSET_VERTICAL;
       }
     }
+  }
+
+  setConnectionVerticalOffsets(paths) {
+    const OFFSET_AMOUNT = 7;
+    const rowsBySemester = {};
+    paths.forEach(pathObject => {
+      const {from, to, fromSemester, toSemester, fromComponent, toComponent} = pathObject;
+      const minRowHeight = this.getMinRowHeight(toSemester);
+      const fromHeight = this.getCourseCanvasLocation(fromComponent.tileID).top;
+      if (Math.abs(from.left, to.left >= 10) && minRowHeight - LINE_OFFSET_VERTICAL >= fromHeight) {
+        if (!rowsBySemester[toSemester]) rowsBySemester[toSemester] = [];
+        rowsBySemester[toSemester].push({from: Math.min(from.left, to.left), to: Math.max(from.left, to.left), tileID: fromComponent.tileID});
+      }
+    });
+    Object.entries(rowsBySemester).forEach(([toSemester, row]) => {
+      // Calculate vertical offset per item
+      // console.log(`Semester ${toSemester} row: ${JSON.stringify(row)}`);
+      const rowByTileID = {};
+      row.forEach(line => {
+        const {from, to, tileID} = line;
+        if (tileID in rowByTileID) {
+          rowByTileID[tileID] = {
+            from: Math.min(from, rowByTileID[tileID].from),
+            to: Math.max(to, rowByTileID[tileID].to),
+            tileID
+          };
+        } else {
+          rowByTileID[tileID] = line;
+        }
+      })
+      const timeInstances = Object.values(rowByTileID).map(line => {
+        return [{time: line.from, offset: OFFSET_AMOUNT, tileID: line.tileID}, {time: line.to, offset: -OFFSET_AMOUNT}];
+      }).flat().sort((a, b) => (a.time - b.time || a.offset - b.offset));
+
+      // console.log(`Semester ${toSemester} timeInstances: ${JSON.stringify(timeInstances)}`);
+      let offset = 0;
+      timeInstances.forEach(timeEvent => {
+        if (timeEvent.tileID) {
+          if (!this.connectionVerticalOffsets[timeEvent.tileID]) this.connectionVerticalOffsets[timeEvent.tileID] = {};
+          this.connectionVerticalOffsets[timeEvent.tileID][toSemester] = offset;
+        }
+        offset += timeEvent.offset;
+      })
+      // row.sort((a, b) => a.from - b.from);
+      // row.forEach()
+    });
   }
 
   drawCanvasLine(from, to) {
