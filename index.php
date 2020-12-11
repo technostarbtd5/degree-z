@@ -35,6 +35,9 @@ switch ($request) {
   case '/logout':
     require __DIR__ . '/server/authentication/logout.php';
     break;
+  case '/api/planner':
+    require __DIR__ . '/server/api/future-semester-planner.php';
+    break;
   case '/api/transcript':
     require __DIR__ . '/server/api/transcriptupload.php';
     break;
