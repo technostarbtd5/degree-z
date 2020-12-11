@@ -1,8 +1,28 @@
 <?php
+
+// Authenticate!
+include_once("../phpCAS-1.3.6/CAS.php");
+phpCAS::client(CAS_VERSION_2_0, 'cas-auth.rpi.edu', 443, '/cas/');
+phpCAS::setCasServerCACert('../cacert.pem');
+if (phpCAS::isAuthenticated()) {
+  // echo "User:" . phpCAS::getUser();
+  // echo "<a href='./logout.php'>Logout</a>";
+} else {
+  phpCAS::forceAuthentication();
+  // echo "<a href='./login.php'>Login</a>";
+}
+
+
+
+
 	$dbConnect = false;
 	$dbUser = 'root';
 	$dbPass = '';
+<<<<<<< Updated upstream
 	$dbSelect = 'test2';
+=======
+	$dbSelect = 'degreez';
+>>>>>>> Stashed changes
 	@ $db = new mysqli('localhost', $dbUser, $dbPass, $dbSelect);
 
 	if ($db->connect_error) {
@@ -12,8 +32,13 @@
 		$dbConnect = true;
     }
 
+<<<<<<< Updated upstream
     $sql = "SELECT Major, Minor, Concentration, GPA, Person FROM testing";
+=======
+    $sql = "SELECT id, `name`, major, minor, concentration, gpa FROM students";
+>>>>>>> Stashed changes
     $result = $db->query($sql);
+    $info = $result->fetch_assoc()
     ?>
 
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
@@ -27,7 +52,11 @@
 <style type="text/css"></style>
 <script src="home.js"></script>
 
+<<<<<<< Updated upstream
 <script src="/client/common/header.js"></script>
+=======
+<script src="common/header.js"></script>
+>>>>>>> Stashed changes
 <link rel="stylesheet" href="../degree-z.css">
 <title>Home</title>
 </head>
@@ -62,69 +91,58 @@
     
     <ul class="list-group">
 
+
+
+    <li class="list-group-item"> <?php 
+      $query1="SELECT * FROM students WHERE students.username =\"" . phpCas::getUser() . "\"";
+      $result10 = $db->query($query1);
+          echo "Username: " . $result10->fetch_assoc()["username"].  "<br>";
+      
+     
+?></li>
+
+    
+
+
+
     <li class="list-group-item"> <?php 
         
-        $result0 = $db->query($sql);
-        if ($result0->num_rows > 0) {
-  // output data of each row
-  while($row1 = $result0->fetch_assoc()) {
-    echo "Name: " . $row1["Person"].  "<br>";
-  }
-} 
+        $query1="SELECT * FROM students WHERE students.username =\"" . phpCas::getUser() . "\"";
+        $result10 = $db->query($query1);
+            echo "Major(s): " . $result10->fetch_assoc()["major"].  "<br>";
 
 ?></li>
 
 
 
-        <li class="list-group-item"> <?php if ($result->num_rows > 0) {
-  // output data of each row
-  while($row = $result->fetch_assoc()) {
-    echo "Major(s): " . $row["Major"].  "<br>";
-  }
-} 
+      <li class="list-group-item"> <?php 
+
+      $query1="SELECT * FROM students WHERE students.username =\"" . phpCas::getUser() . "\"";
+      $result10 = $db->query($query1);
+          echo "Minor(s): " . $result10->fetch_assoc()["minor"].  "<br>";
 
 ?></li>
-
-
-
-
         <li class="list-group-item"><?php 
         
-        $result1 = $db->query($sql);
-        if ($result1->num_rows > 0) {
-  // output data of each row
-  while($row1 = $result1->fetch_assoc()) {
-    echo "Minor(s): " . $row1["Minor"].  "<br>";
-  }
-} 
-
+        $query1="SELECT * FROM students WHERE students.username =\"" . phpCas::getUser() . "\"";
+        $result10 = $db->query($query1);
+            echo "Concentration: " . $result10->fetch_assoc()["concentration"].  "<br>";
 ?>
 
 </li>
         <li class="list-group-item"><?php 
         
-        $result2 = $db->query($sql);
-        if ($result2->num_rows > 0) {
-  // output data of each row
-  while($row1 = $result2->fetch_assoc()) {
-    echo "Concentration: " . $row1["Concentration"].  "<br>";
-  }
-} 
+        $query1="SELECT * FROM students WHERE students.username =\"" . phpCas::getUser() . "\"";
+        $result10 = $db->query($query1);
+            echo "GPA: " . $result10->fetch_assoc()["gpa"].  "<br>";
+  
 
 ?>
             
         </li>
-        <li class="list-group-item"><?php 
         
-        $result3 = $db->query($sql);
-        if ($result3->num_rows > 0) {
-  // output data of each row
-  while($row1 = $result3->fetch_assoc()) {
-    echo "GPA: " . $row1["GPA"].  "<br>";
-  }
-} 
 
-?></li>
+<?php echo  $result10->fetch_assoc()["credits_taken"]/127 ?>
     </ul><br>
     <h4>Student Progress</h4>
     <div class="progress">
