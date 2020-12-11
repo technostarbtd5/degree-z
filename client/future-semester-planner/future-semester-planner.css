@@ -293,6 +293,10 @@ body {
   /* padding: 10px 0; */
 }
 
+.fsp-segment-fulfilled {
+  flex: 0 0 100%;
+}
+
 .fsp-list-active {
   background-color: gray;
   border-color: #999;

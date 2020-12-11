@@ -164,7 +164,7 @@ function doCoursesMatch(courseA, courseB) {
  */
 function getFulfilledRequirements(coursesTaken, majorRequirements) {
   // First, preprocess requirements! All requirements should be in the format of "n of".
-  console.log(JSON.stringify(coursesTaken));
+  // console.log(JSON.stringify(coursesTaken));
   const preprocessRequirement = requirement => {
     if (requirement.optional) return false; // Don't include optional items!
     if ("subject" in requirement && "course" in requirement) {
@@ -179,7 +179,7 @@ function getFulfilledRequirements(coursesTaken, majorRequirements) {
       // console.log(subRequirements);
       const preprocessedSubRequirements = subRequirements.map((subreq, index) => {
         const preprocessed = preprocessRequirement(subreq);
-        preprocessed.index = index;
+        if (preprocessed) preprocessed.index = index;
         return preprocessed;
       }).filter(subreq => subreq).sort((a, b) => {
         const aAmt = a.amount || 1;
@@ -200,10 +200,11 @@ function getFulfilledRequirements(coursesTaken, majorRequirements) {
   }
 
   const preprocessedRequirements = preprocessRequirement({"all of": majorRequirements});
-  console.log(preprocessedRequirements);
+  // console.log(preprocessedRequirements);
 
   // Now, convert requirements to graph form and scan recursively!
   const requirementToGraph = (requirement, courses) => {
+    // console.log(courses);
     const graph = [];
     const addNode = () => {
       graph.push({});
@@ -227,15 +228,19 @@ function getFulfilledRequirements(coursesTaken, majorRequirements) {
     }, {});
 
     // Add requirements to graph
-    const addRequirementToGraph = requirement => {
+    const topRequirementChildrenNodes = [];
+    const addRequirementToGraph = (requirement, firstCall = false) => {
       if ("subject" in requirement && "course" in requirement) {
+        requirement.graphNode = coursesTakenNodes[`${requirement.subject} ${requirement.course}`];
         return coursesTakenNodes[`${requirement.subject} ${requirement.course}`];
       } else if ("n of" in requirement && "amount" in requirement) {
         const reqNode = addNode();
+        requirement.graphNode = reqNode;
         addEdge(reqNode, sink, requirement.amount - 1);
         const subRequirements = requirement["n of"];
         subRequirements.forEach(subreq => {
           const subreqNode = addRequirementToGraph(subreq);
+          if (firstCall) topRequirementChildrenNodes.push(subreqNode);
           if (subreqNode !== undefined) {
             addEdge(reqNode, subreqNode, 1);
           }
@@ -245,32 +250,71 @@ function getFulfilledRequirements(coursesTaken, majorRequirements) {
       return undefined;
     }
 
-    const topRequirementNode = addRequirementToGraph(requirement);
-    addEdge(topRequirementNode, sink, Number.MAX_SAFE_INTEGER);
+    const topRequirementNode = addRequirementToGraph(requirement, true);
+    addEdge(topRequirementNode, sink, requirement.amount);
 
-    return {graph, coursesTakenNodes, topRequirementNode};
+    return {graph, coursesTakenNodes, topRequirementNode, topRequirementChildrenNodes};
   }
 
-  console.log(requirementToGraph(preprocessedRequirements, coursesTaken));
-  console.log(networkFlow(requirementToGraph(preprocessedRequirements, coursesTaken).graph, 0, 1));
+  // console.log(requirementToGraph(preprocessedRequirements, coursesTaken));
+  // console.log(networkFlow(requirementToGraph(preprocessedRequirements, coursesTaken).graph, 0, 1));
   
   // Trim sub-requirements that can't possibly be fulfilled.
-  const pruneRequirement = (requirement, courses) => {
-    const coursesTakenSet = new Set(courses.map(course => `${course.subject} ${course.course}`));
+  const pruneRequirement = (requirement, coursesTakenSet) => {
+    // const coursesTakenSet = new Set(courses.map(course => `${course.subject} ${course.course}`));
     if ("subject" in requirement && "course" in requirement) {
       // If a course has been taken, it is a filled requirement
-      return coursesTakenSet.has(`${requirement.subject} ${requirement.course}`) ? {requirement, complete: true} : {requirement, complete: false};
+      const output = coursesTakenSet.has(`${requirement.subject} ${requirement.course}`) ? {requirement, complete: true, prunedRequirement: requirement} : {requirement, complete: false, prunedRequirement: requirement};
+      // coursesTakenSet.delete(`${requirement.subject} ${requirement.course}`);
+      return output;
     } else if ("n of" in requirement && "amount" in requirement) {
       const newRequirement = {
-        "n of": requirement["n of"].map(subreq => pruneRequirement(subreq, courses)).filter(subreq => subreq.complete).map(subreq => subreq.requirement),
+        "n of": requirement["n of"].map(subreq => pruneRequirement(subreq, coursesTakenSet)).filter(subreq => subreq.complete).map(subreq => subreq.requirement),
         "amount": requirement.amount,
         "category name": requirement["category name"],
         index: requirement.index,
         fulfillmentIndex: requirement.fulfillmentIndex,
       }
-      const {graph, topRequirementNode} = requirementToGraph(newRequirement, courses);
+      const {graph, topRequirementNode, topRequirementChildrenNodes, coursesTakenNodes} = requirementToGraph(newRequirement, [...coursesTakenSet].map(courseString => {
+        const [subject, course] = courseString.split(" ");
+        return {subject, course};
+      }));
       const flow = networkFlow(graph, 0, 1);
-      return {requirement: newRequirement, complete: flow[topRequirementNode][1] >= requirement.amount};
+      // Prune prereqs that aren't actually used to fill requirement
+      // newRequirement["n of"] = newRequirement["n of"].filter((subreq, index) => {
+      //   const childNode = topRequirementChildrenNodes[index];
+      //   const isFlowing = flow[topRequirementNode][childNode] < 0; // Assert that this node feeds into topRequirementNode to confirm that prereq is used
+        
+      //   return isFlowing;
+      // });
+      const prunedRequirement = {
+        "n of": newRequirement["n of"].map(subreq => pruneRequirement(subreq, coursesTakenSet)).filter((subreq, index) => {
+          const childNode = topRequirementChildrenNodes[index];
+          return flow[topRequirementNode][childNode] < 0; // Assert that this node feeds into topRequirementNode to confirm that prereq is used
+        }).map(subreq => subreq.prunedRequirement),
+        "amount": requirement.amount,
+        "category name": requirement["category name"],
+        index: requirement.index,
+        fulfillmentIndex: requirement.fulfillmentIndex,
+      }
+      const complete =  flow[topRequirementNode][1] >= requirement.amount;
+      // console.log(complete);
+      // if (!complete) {
+        // console.log(requirement);
+        // console.log(flow);
+        // console.log(graph);
+        // console.log(topRequirementNode);
+        // console.log(topRequirementChildrenNodes);
+        // console.log(coursesTakenNodes);
+      // }
+
+      // Evaluate course utilization
+      const addFulfillments = req => {
+        if ("n of" in req) {
+          
+        }
+      }
+      return {requirement: newRequirement, complete, flow, prunedRequirement};
 
 
 
@@ -288,7 +332,7 @@ function getFulfilledRequirements(coursesTaken, majorRequirements) {
     } 
   }
 
-  console.log(pruneRequirement(preprocessedRequirements, coursesTaken));
+  // console.log(pruneRequirement(preprocessedRequirements, new Set(coursesTaken.map(course => `${course.subject} ${course.course}`))));
 
   const unusedCourses = coursesTaken.reduce((accumulator, course) => {
     accumulator[`${course.subject} ${course.course}`] = course;
@@ -296,6 +340,7 @@ function getFulfilledRequirements(coursesTaken, majorRequirements) {
   }, {});
   const getFulfillingCourses = requirement => {
     // If requirement is a simple course, return the course if the course is marked as unused!
+
     if ("subject" in requirement && "course" in requirement) {
       const courseString = `${requirement.subject} ${requirement.course}`;
       if (courseString in unusedCourses) {
@@ -306,7 +351,7 @@ function getFulfilledRequirements(coursesTaken, majorRequirements) {
       }
     } else if ("n of" in requirement && "amount" in requirement) {
       // Otherwise, examine subreqs.
-      const prunedRequirement = pruneRequirement(requirement, Object.values(unusedCourses));
+      const prunedRequirement = pruneRequirement(requirement, new Set(Object.values(unusedCourses).map(course => `${course.subject} ${course.course}`)));
       // console.log(prunedRequirement);
       const subRequirements = requirement["n of"];
       const subRequirementsByFulfillmentIndex = subRequirements.reduce((accumulator, subreq) => {
@@ -315,11 +360,22 @@ function getFulfilledRequirements(coursesTaken, majorRequirements) {
       }, {});
 
       // Prioritize complete requirement trees!
+      // if (prunedRequirement.complete) {
+      //   prunedRequirement.requirement["n of"].forEach(subreq => {
+      //     const fulfillingCourses = getFulfillingCourses(subreq);
+      //     subreqFulfillments.push(fulfillingCourses);
+      //     delete subRequirementsByFulfillmentIndex[subreq.fulfillmentIndex];
+      //   });
+      // }
+
+      // Otherwise, prioritize completed subreqs.
       const subreqFulfillments = [];
+      // console.log(prunedRequirement.prunedRequirement);
       prunedRequirement.requirement["n of"].forEach(subreq => {
         const fulfillingCourses = getFulfillingCourses(subreq);
         subreqFulfillments.push(fulfillingCourses);
         delete subRequirementsByFulfillmentIndex[subreq.fulfillmentIndex];
+
       });
 
       // Then, loop through all remaining trees.
@@ -327,11 +383,15 @@ function getFulfilledRequirements(coursesTaken, majorRequirements) {
         const fulfillingCourses = getFulfillingCourses(subreq);
         subreqFulfillments.push(fulfillingCourses);
       });
-      return {"fulfilling courses": [subreqFulfillments], complete: prunedRequirement.complete, index: requirement.index};
+      return {"fulfilling courses": subreqFulfillments, complete: prunedRequirement.complete, index: requirement.index};
     }
   }
 
-  console.log(getFulfillingCourses(preprocessedRequirements));
+  const fulfillingCoursesList = getFulfillingCourses(preprocessedRequirements);
+
+  console.log(fulfillingCoursesList);
+
+  return fulfillingCoursesList;
 
 
 
@@ -405,7 +465,55 @@ getFulfilledRequirements([
 
   {"subject": "CSCI", "course": "4150"},
   {"subject": "CSCI", "course": "4380"},
-], MAJORS_EXAMPLE_JSON["ITWS"].requirements)
+], MAJORS_EXAMPLE_JSON["ITWS"].requirements);
+
+console.log("Test CS");
+getFulfilledRequirements([
+  {"subject": "CHEM", "course": "1100"},
+  {"subject": "CHEM", "course": "1200"},
+  {"subject": "CSCI", "course": "1100"},
+  {"subject": "MATH", "course": "1010"},
+  {"subject": "MATH", "course": "1020"},
+  {"subject": "MGMT", "course": "2100"},
+  {"subject": "PHYS", "course": "1100"},
+  {"subject": "STSH", "course": "1000"},
+  {"subject": "STSS", "course": "1000"},
+  {"subject": "STSS", "course": "1000"},
+  {"subject": "WRIT", "course": "1000"},
+
+  {"subject": "BIOL", "course": "1010"},
+  {"subject": "BIOL", "course": "1015"},
+  {"subject": "CSCI", "course": "1200"},
+  {"subject": "IHSS", "course": "1200"},
+  {"subject": "MATH", "course": "2010"},
+
+  {"subject": "CSCI", "course": "2200"},
+  {"subject": "CSCI", "course": "2500"},
+  {"subject": "ECON", "course": "2020"},
+  {"subject": "ITWS", "course": "1100"},
+  {"subject": "ITWS", "course": "1220"},
+
+  {"subject": "CSCI", "course": "2300"},
+  {"subject": "MATH", "course": "4100"},
+  {"subject": "COMM", "course": "4420"},
+  {"subject": "ECON", "course": "4130"},
+  {"subject": "ITWS", "course": "2110"},
+
+  {"subject": "CSCI", "course": "2600"},
+  {"subject": "CSCI", "course": "4210"},
+  {"subject": "ITWS", "course": "2210"},
+  {"subject": "ITWS", "course": "4310"},
+  {"subject": "ITWS", "course": "4500"},
+
+  {"subject": "CSCI", "course": "4100"},
+  {"subject": "CSCI", "course": "4220"},
+  {"subject": "CSCI", "course": "4430"},
+  {"subject": "ITWS", "course": "4100"},
+  {"subject": "ECON", "course": "2010"},
+
+  {"subject": "CSCI", "course": "4150"},
+  {"subject": "CSCI", "course": "4380"},
+], MAJORS_EXAMPLE_JSON["Computer Science"].requirements);
 
 
 
@@ -684,22 +792,38 @@ class MajorNavbarComponent {
 
 class MajorRequirementComponent {
   static numComponents = 0;
-  constructor (requirementName, requirements, validCourses) {
+  constructor (requirementName, requirements, validCourses, fulfilledRequirements = false) {
     this.id = MajorRequirementComponent.numComponents++;
     this.requirementName = requirementName;
     this.requirements = requirements;
     this.validCourses = validCourses;
+    this.fulfilledRequirements = fulfilledRequirements;
     this.render.bind(this);
   }
 
   render(planner, parentElement) {
-    const {id, requirementName, requirements, validCourses} = this;
+    const {id, requirementName, requirements, validCourses, fulfilledRequirements} = this;
+    // console.log(fulfilledRequirements);
+    // console.log(fulfilledRequirements["fulfilling courses"]);
+    const fulfilledRequirementsByIndex = fulfilledRequirements && fulfilledRequirements["fulfilling courses"] && fulfilledRequirements["fulfilling courses"].reduce(
+      (accumulator, fulfilledRequirementsInIndex) => {
+        // console.log(fulfilledRequirementsInIndex);
+        accumulator[fulfilledRequirementsInIndex.index] = fulfilledRequirementsInIndex;
+        return accumulator;
+      }, {}
+    );
+
+    console.log(fulfilledRequirementsByIndex);
     const titleID = `fsp-list-title-${id}`
     const segmentID = `fsp-list-segment-${id}`
-    parentElement.append(`<div class="fsp-list-title" id="${titleID}">${requirementName}<div class="fsp-direction-indicator">&#x25bc;</div></div>
-    <div class="fsp-list-segment" id="${segmentID}"></div>`);
+    parentElement.append(`<div class="fsp-list-title" id="${titleID}">${requirementName}<div class="fsp-direction-indicator">&#x25bc;</div>${fulfilledRequirements && fulfilledRequirements.complete ? `<img src="/client/future-semester-planner/check_circle_outline-24px.svg" class="fsp-list-completed">`: ""}</div>
+    <div class="fsp-list-segment" id="${segmentID}">
+      <div id="segment-fulfilled-${segmentID}" class="fsp-segment-fulfilled"></div>
+    </div>`);
     console.log(requirements);
-    requirements.forEach(requirement => {
+    requirements.forEach((requirement, index) => {
+      const fulfilledRequirementsInIndex = fulfilledRequirementsByIndex && fulfilledRequirementsByIndex[index];
+      // console.log(fulfilledRequirementsInIndex);
       if ("subject" in requirement && "course" in requirement) {
         // return `${requirement.subject} ${requirement.course}`
         const {subject, course} = requirement;
@@ -710,13 +834,26 @@ class MajorRequirementComponent {
           // $(`#${segmentID}`).append(`<div class="requirement-course-container" id="course-container-${containerID}"></div>`);
           (new CourseComponent(requirement.subject, requirement.course)).render(planner, $(`#${segmentID}`));
         }
+
+        // Add "fulfilled by" indicator
+        if (
+          fulfilledRequirementsInIndex &&
+          fulfilledRequirementsInIndex.complete && 
+          fulfilledRequirementsInIndex["fulfilling courses"] && 
+          fulfilledRequirementsInIndex["fulfilling courses"].length > 0 && 
+          "subject" in fulfilledRequirementsInIndex["fulfilling courses"][0] && 
+          "course" in fulfilledRequirementsInIndex["fulfilling courses"][0]
+        ) {
+          $(`#segment-fulfilled-${segmentID}`).append(`<div class="fsp-fulfilled-course">${fulfilledRequirementsInIndex["fulfilling courses"][0].subject} ${fulfilledRequirementsInIndex["fulfilling courses"][0].course}</div>`)
+        }
       } else if ("subject" in requirement && "minLevel" in requirement) {
         console.log(Object.keys(COURSES_EXAMPLE_JSON[requirement.subject]).filter(course => course >= requirement.minLevel));
         const newRequirements = Object.keys(COURSES_EXAMPLE_JSON[requirement.subject])
             .filter(course => course >= requirement.minLevel)
             .map(course => ({subject: requirement.subject, course}));
         console.log(newRequirements);
-        (new MajorRequirementComponent(`${requirement.subject} course above level ${requirement.minLevel}:`, newRequirements, validCourses))
+        // const fulfilledRequirementsInIndex = fulfilledRequirementsByIndex && fulfilledRequirementsByIndex[index];
+        (new MajorRequirementComponent(`${requirement.subject} course above level ${requirement.minLevel}:`, newRequirements, validCourses, fulfilledRequirementsInIndex))
             .render(planner, $(`#${segmentID}`));
         // return Object.keys(COURSES_EXAMPLE_JSON[requirement.subject])
         //     .filter(course => course >= requirement.minLevel)
@@ -725,10 +862,16 @@ class MajorRequirementComponent {
         // return getCoursesInArray(requirement["n of"] || requirement["one of"]);
         const newRequirements = requirement["n of"] || requirement["one of"] || requirement["all of"];
         const newRequirementName = `${"category name" in requirement ? `${requirement["category name"]} - ` : ""}${"n of" in requirement ? `${requirement.amount} of:` : `${"one of" in requirement ? "One" : "All"} of:`}`;
-        (new MajorRequirementComponent(newRequirementName, newRequirements, validCourses))
+        (new MajorRequirementComponent(newRequirementName, newRequirements, validCourses, fulfilledRequirementsInIndex))
             .render(planner, $(`#${segmentID}`));
       }
     });
+    if ($(`#segment-fulfilled-${segmentID}`).html()) {
+      $(`#segment-fulfilled-${segmentID}`).prepend("<div>Fulfilled by:</div>");
+    }
+
+    
+
     
     // Add visibility toggle
     $(`#${titleID}`).click(() => {
@@ -758,6 +901,10 @@ class MajorListComponent {
   }
 
   render (planner, parentElement) {
+
+
+
+
     parentElement.append(`<div id="fsp-requirements-list"></div>`);
     if (this.selectedMajor == "Electives") {
       // unscheduledCoursesTileIDs.forEach(course => {
@@ -780,8 +927,19 @@ class MajorListComponent {
       (new MajorRequirementComponent("Repeat Courses:", repeatOptions, this.existingCourses))
           .render(planner, $("#fsp-requirements-list"));
     } else {
+
+        // Calculate requirement fulfillments
+        const coursesTaken = [...this.existingCourses].map(courseString => {
+          const [subject, course] = courseString.split(" ");
+          return {subject, course};
+        });
+
+        const fulfilledRequirements = MAJORS_EXAMPLE_JSON[this.selectedMajor] ? getFulfilledRequirements(coursesTaken, MAJORS_EXAMPLE_JSON[this.selectedMajor].requirements) : false;
+
+        console.log(fulfilledRequirements);  
+    
       
-      (new MajorRequirementComponent("Requirements:", MAJORS_EXAMPLE_JSON[this.selectedMajor] ? MAJORS_EXAMPLE_JSON[this.selectedMajor].requirements : [], this.unscheduledCourses))
+      (new MajorRequirementComponent("Requirements:", MAJORS_EXAMPLE_JSON[this.selectedMajor] ? MAJORS_EXAMPLE_JSON[this.selectedMajor].requirements : [], this.unscheduledCourses, fulfilledRequirements))
           .render(planner, $("#fsp-requirements-list"));
       // const appendCourses = (requirements, parentID) => {
       //   requirements.forEach(courseElement => {
@@ -799,7 +957,7 @@ class MajorListComponent {
       // }
     }
 
-    $(`#fsp-classes-list`).droppable({
+    $(`#fsp-classes-list`).droppable({ 
       tolerance: "pointer",
       over: () => {
         $(`#fsp-requirements-list`).addClass("fsp-row-active");
