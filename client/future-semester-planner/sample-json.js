@@ -85,7 +85,7 @@ export const MAJORS_EXAMPLE_JSON = {
         {"subject": "MATH", "course": "4040"},
         {"subject": "MATH", "course": "4100"},
         {"subject": "MATP", "course": "4600"},
-      ]},
+      ], "category name": "Math Option I"},
       {"subject": "MATH", "minLevel": 2000},
       {"one of": [
         {"subject": "CSCI", "course": "4961"},
@@ -115,7 +115,7 @@ export const MAJORS_EXAMPLE_JSON = {
             {"subject": "CSCI", "course": "4800"},
             {"subject": "CSCI", "course": "4820"},
           ],
-          "amount": 3
+          "amount": 3, "category name": "Theory and Algorithms"
         },
         {
           "n of": [
@@ -136,7 +136,7 @@ export const MAJORS_EXAMPLE_JSON = {
             {"subject": "CSCI", "course": "6510"},
             {"subject": "CSCI", "course": "4470"},
           ],
-          "amount": 3
+          "amount": 3, "category name": "Systems and Software"
         },
         {
           "n of": [
@@ -165,9 +165,9 @@ export const MAJORS_EXAMPLE_JSON = {
             {"subject": "CSCI", "course": "4600"},
             {"subject": "CSCI", "course": "6600"},
           ],
-          "amount": 3
+          "amount": 3, "category name": "AI & Data"
         },
-      ]},
+      ], "category name": "CS Capstone"},
     ]
   },
   "ITWS": {
