@@ -136,6 +136,18 @@ class Course {
 		</section>`;
 		return result;
 	}
+
+	get toJSON() {
+		var result = {};
+		result["subject"] = this.subject;
+		result["course_code"] = this.course_num;
+		result["level"] = this.level;
+		result["name"] = this.name;
+		result["grade"] = this.grade;
+		result["credits"] = this.credits;
+		result["status"] = this.status;
+		return result;
+	}
 }
 
 class Term {
@@ -238,12 +250,28 @@ class Term {
 		return result;
 	}
 
-	// get toJSON() {
-	// 	var result = {};
-	// 	result.semester = this.semester;
-	// 	if (name != "") result.name = this.name;
-
-	// }
+	get toJSON() {
+		var result = {};
+		result["semester"] = this.semester;
+		if (this.name != "") result["name"] = this.name;
+		result["courses"] = this.courses.map(c => c.toJSON);
+		if (this.hasSubtext) {
+			result["major"] = this.subtext.major;
+			result["standing1"] = this.subtext.academic;
+			result["standing2"] = this.subtext.additional;
+		}
+		if (this.hasTermData) {
+			result["current_taken"] = this.termData.attempted;
+			result["current_received"] = this.termData.passed;
+			result["current_gpa"] = this.termData.gpa;
+		}
+		if (this.hasCumulativeData) {
+			result["total_taken"] = this.cumulativeData.attempted;
+			result["total_received"] = this.cumulativeData.passed;
+			result["total_gpa"] = this.cumulativeData.gpa;
+		}
+		return result;
+	}
 }
 
 class Transcript {
@@ -509,7 +537,6 @@ class Transcript {
 			end = offset;
 			while((/^[.0-9]+$/).test(totalInfo[end]) == true) end++;
 			var num = parseFloat(totalInfo.substring(offset, end));
-			console.log(num);
 			switch (i) {
 				case 0:
 					this.totalData.attempted = num;
@@ -535,22 +562,31 @@ class Transcript {
 		this.progressTerm = progressData;
 	}
 
-	// store() {
-	// 	// ajax request to send data to php and have it store data, may need to set up somehow
-	// 	$.ajax({
-	// 		type: "POST",
-	// 		url: "/api/transcript",
-	// 		data: {
-	// 			studentData: this.studentData,
-	// 			totalData: this.totalData,
-	// 			transferTerms: this.transferTerms,
-	// 			gradeTerms: this.gradeTerms,
-	// 			progressTerm: this.progressTerm,
-	// 		}
-	// 		success: function(result) {
-	// 		}
-	// 	});
-	// }
+	store() {
+		var sendData = {};
+		sendData["name"] = this.studentData.name;
+		sendData["majors"] = this.studentData.majors;
+		sendData["minors"] = this.studentData.minors;
+		sendData["taken"] = this.totalData.attempted;
+		sendData["received"] = this.totalData.passed;
+		sendData["gpa"] = this.totalData.gpa;
+
+		sendData["terms"] = {};
+		sendData["terms"]["transfer"] = this.transferTerms.map(t => t.toJSON);
+		sendData["terms"]["current"] = this.gradeTerms.map(t => t.toJSON);
+		sendData["terms"]["future"] = this.progressTerm.toJSON;
+
+
+		// ajax request to send data to php and have it store data, may need to set up somehow
+		$.ajax({
+			type: "POST",
+			url: "/api/transcript",
+			data: {storeData: sendData},
+			success: function(result) {
+				console.log(result);
+			}
+		});
+	}
 
 	toHTML(s) {
 		var result = "";
@@ -640,10 +676,14 @@ function retrieveTranscript() {
 				console.log("found no one");
 				return;
 			}
+			else {
+				console.log(result);
+				return;
+			}
 			var temp = new Transcript(null, true);
 			temp.setData(result.studentData, result.totalData, result.transferTerms, result.gradeTerms, result.progressTerm);
 			styleFilename();
-			temp.showTranscript(new DOMParser());
+			temp.display(new DOMParser());
 			styleSections();
 		}
 	});
@@ -684,7 +724,7 @@ function parseTranscript(formObj) {
 			var transcriptBody = parser.parseFromString(result, "text/html").body;			
 			var transcript = new Transcript(transcriptBody);
 			transcript.display(parser);
-			//transcript.store();
+			transcript.store();
 		}
 	)
 	
