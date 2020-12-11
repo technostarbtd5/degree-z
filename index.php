@@ -12,7 +12,6 @@ if (phpCAS::isAuthenticated()) {
   // echo "<a href='./login.php'>Login</a>";
 }
 
-
 include(__DIR__ . "/server/db/dbinit.php");
 // Router script
 $request = $_SERVER['REQUEST_URI'];
@@ -38,6 +37,9 @@ switch ($request) {
     break;
   case '/api/planner':
     require __DIR__ . '/server/api/future-semester-planner.php';
+    break;
+  case '/api/transcript':
+    require __DIR__ . '/server/api/transcriptupload.php';
     break;
   default:
     http_response_code(404);

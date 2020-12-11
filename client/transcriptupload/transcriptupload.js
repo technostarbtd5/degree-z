@@ -10,27 +10,6 @@ var student = {
 	minors: []
 };
 
-$(document).ready(() => {
-	$("#transcript_nav").addClass("active");
-
-	document.getElementById("transcript-input").addEventListener("change", function() {
-		this.placeholder = getFilename(this.value);
-		$("#filename").html(`Transcript: ${this.placeholder}<br> <input type="submit" value="Parse!" />`);
-		$("#filename").css("display", "block");
-
-		$(".file-upload p").html("<b>Upload new transcript</b>");
-	});
-
-	document.getElementById("new-upload").addEventListener("click", function() {
-		showUpload();
-		// transcriptInput.placeholder = getFilename(this.value);
-		// transcriptInput.dispatchEvent(new Event("change"));
-		$("#close-button").css("display", "block");
-	});
-
-	document.getElementById("close-button").addEventListener("click", hideUpload);
-})
-
 function getFilename(path) {
 	var i = path.length-1;
 	while (i >= 0 && path.charAt(i) != '\\') i--;
@@ -56,7 +35,7 @@ function styleFilename() {
 			<a href="#student-title" class="goto">My Degree</a> \
 			<a href="#transfer-title" class="goto">Accepted Transfer Courses</a> \
 			<a href="#grades-title" class="goto">Courses Taken</a> \
-			<a href="#total-title" class="goto">Total Info</a> \
+			<a href="#total" class="goto">Total Info</a> \
 			<a href="#progress-title" class="goto">Courses in Progress</a> \
 		</b>`;
 }
@@ -219,6 +198,7 @@ class Term {
 		var result = ` \
 		<section class="term">
 			<h5 class="full-line center term-title">${this.semester}</h5>
+			<section class="term-head">
 			${this.name == "" ? "" : `<p class="full-line${this.hasSubtext ? " subtext" : ""}">${this.name}</p>`} \
 			${this.hasSubtext ? ` \
 				<p class="full-line${this.subtext.academic == "" ? "" : " subtext"}">Major: ${this.subtext.major}</p> \
@@ -231,12 +211,14 @@ class Term {
 					Additional Standing: ${this.subtext.additional} \
 				</p>`}` : ""
 			}
+			</section> \
 			<div class="courses">`;
 
 		for (var i = 0; i < this.courses.length; i++) {
 			result += this.courses[i].toHTML;
 		}			
 		result += `</div> \
+			<section class="term-foot"> \
 			${this.hasTermData ? ` \
 				<p class="full-line subtext">This Term: \
 				<p class="half-line${this.hasCumulativeData ? " subtext" : ""}"> \
@@ -251,9 +233,17 @@ class Term {
 				<p class="half-line">${this.cumulativeData.passed}/${this.cumulativeData.attempted} Credits Received</p> \
 				<p class="half-line right">GPA: ${this.cumulativeData.gpa}</p>` : ""
 			}
+			</section> \
 		</section>`;
 		return result;
 	}
+
+	// get toJSON() {
+	// 	var result = {};
+	// 	result.semester = this.semester;
+	// 	if (name != "") result.name = this.name;
+
+	// }
 }
 
 class Transcript {
@@ -278,7 +268,8 @@ class Transcript {
 	gradeTerms = [];
 	progressTerm;
 
-	constructor(transcriptBody) {
+	constructor(transcriptBody, empty=false) {
+		if (empty) return;
 		this.transcriptInfo = transcriptBody.getElementsByClassName("pagebodydiv")[0].getElementsByClassName("datadisplaytable")[0];
 		
 		// Load data
@@ -511,7 +502,6 @@ class Transcript {
 
 
 		// Create total data
-		console.log(totalInfo);
 		offset = totalInfo.indexOf("Overall");
 		var end = offset;
 		for (var i = 0; i < 6; i++) {
@@ -536,6 +526,31 @@ class Transcript {
 			offset = end+1;
 		}
 	}
+
+	setData(studentData, totalData, transferData, gradeData, progressData) {
+		this.studentData = studentData;
+		this.totalData = totalData;
+		this.transferTerms = transferData;
+		this.gradeTerms = gradeData;
+		this.progressTerm = progressData;
+	}
+
+	// store() {
+	// 	// ajax request to send data to php and have it store data, may need to set up somehow
+	// 	$.ajax({
+	// 		type: "POST",
+	// 		url: "/api/transcript",
+	// 		data: {
+	// 			studentData: this.studentData,
+	// 			totalData: this.totalData,
+	// 			transferTerms: this.transferTerms,
+	// 			gradeTerms: this.gradeTerms,
+	// 			progressTerm: this.progressTerm,
+	// 		}
+	// 		success: function(result) {
+	// 		}
+	// 	});
+	// }
 
 	toHTML(s) {
 		var result = "";
@@ -581,10 +596,10 @@ class Transcript {
 				result += "</section>";
 				break;
 			case "Total":
-				result = `<h4 class="sectiontitle" id="total-title">Total Info</h4> \
+				result = ` \
 				<section id="total"> \
-					<p class="half-line">${this.totalData.passed}/${this.totalData.attempted} Credits Received</p> \
-					<p class="half-line right">GPA: ${this.totalData.gpa}</p> \
+					<h5 class="half-line center">Total Credits Received: ${this.totalData.passed}/${this.totalData.attempted}</h5> \
+					<h5 class="half-line center">Total GPA: ${this.totalData.gpa}</h5> \
 				</section>`;
 				break;
 			case "Progress":
@@ -598,7 +613,64 @@ class Transcript {
 		}
 		return result;
 	}
+
+	display(parser) {
+		document.getElementById("infocard").innerHTML = "";
+		document.getElementById("infocard").append(parser.parseFromString(this.toHTML("Student"),"text/html").body);
+		document.getElementById("courseMap").innerHTML = "";
+		document.getElementById("courseMap").append(parser.parseFromString(this.toHTML("Transfer"), "text/html").body);
+		document.getElementById("courseMap").append(parser.parseFromString(this.toHTML("Grades"), "text/html").body);
+		document.getElementById("courseMap").append(parser.parseFromString(this.toHTML("Total"), "text/html").body);
+		document.getElementById("courseMap").append(parser.parseFromString(this.toHTML("Progress"), "text/html").body);
+	}
 }
+
+function retrieveTranscript() {
+	// write ajax request that sends user and gets user transcript info as result
+	// if user doesn't exist or doesn't have transcript info, do nothing
+	// if user exists, then set member variables and call showTranscript on self
+	console.log("made request");
+	$.ajax({
+		type: "POST",
+		url: "/api/transcript",
+		data: {getUser: 1},
+		success: function(result) {
+			// echo is what creates result
+			if (result == "") {
+				console.log("found no one");
+				return;
+			}
+			var temp = new Transcript(null, true);
+			temp.setData(result.studentData, result.totalData, result.transferTerms, result.gradeTerms, result.progressTerm);
+			styleFilename();
+			temp.showTranscript(new DOMParser());
+			styleSections();
+		}
+	});
+}
+
+$(document).ready(() => {
+	$("#transcript_nav").addClass("active");
+
+	document.getElementById("transcript-input").addEventListener("change", function() {
+		this.placeholder = getFilename(this.value);
+		$("#filename").html(`Transcript: ${this.placeholder}<br> <input type="submit" value="Parse!" />`);
+		$("#filename").css("display", "block");
+
+		$(".file-upload p").html("<b>Upload new transcript</b>");
+	});
+
+	document.getElementById("new-upload").addEventListener("click", function() {
+		showUpload();
+		// transcriptInput.placeholder = getFilename(this.value);
+		// transcriptInput.dispatchEvent(new Event("change"));
+		$("#close-button").css("display", "block");
+	});
+
+	document.getElementById("close-button").addEventListener("click", hideUpload);
+
+	retrieveTranscript();
+})
 
 function parseTranscript(formObj) {
 	$("#header").html("Your Transcript");
@@ -611,22 +683,13 @@ function parseTranscript(formObj) {
 			// No info in head, so only extract body from html
 			var transcriptBody = parser.parseFromString(result, "text/html").body;			
 			var transcript = new Transcript(transcriptBody);
-
-			// Figure out how to avoid repetition of student info
-			document.getElementById("infocard").innerHTML = "";
-			document.getElementById("infocard").append(parser.parseFromString(transcript.toHTML("Student"),"text/html").body);
-
-			document.getElementById("courseMap").innerHTML = "";
-			document.getElementById("courseMap").append(parser.parseFromString(transcript.toHTML("Transfer"), "text/html").body);
-			document.getElementById("courseMap").append(parser.parseFromString(transcript.toHTML("Grades"), "text/html").body);
-			document.getElementById("courseMap").append(parser.parseFromString(transcript.toHTML("Total"), "text/html").body);
-			document.getElementById("courseMap").append(parser.parseFromString(transcript.toHTML("Progress"), "text/html").body);
-			console.log(parser.parseFromString(transcript.toHTML("Student"),"text/html"));
-			
+			transcript.display(parser);
+			//transcript.store();
 		}
 	)
 	
 	styleSections();
+
 	alert("transcript parsed");
 	return false;
 }

@@ -1,4 +1,4 @@
-How to use: Ensure that this project is in a folder inside xampp\htdocs. Boot up XAMPP.
+How to use: Ensure that this project is in a folder inside xampp\htdocs. Also ensure that this project is configured to run on a virtual host linking to the website root folder, otherwise the routing likely won't work! Boot up XAMPP. 
 
 WHEN MAKING DATABASE CHANGES:
 

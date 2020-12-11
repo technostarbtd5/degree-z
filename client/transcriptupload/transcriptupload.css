@@ -168,6 +168,12 @@ h1 {
     margin-top: 10px;
 }
 
+.term-head, .term-foot {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
 .subtext {
     margin-bottom: 0;
 }
@@ -199,7 +205,13 @@ h1 {
 }
 
 #total {
+    border: 2px solid #888;
+    border-radius: 10px;
+    padding: 5px;
+    margin-bottom: 10px;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
     display: flex;
+    flex-wrap: wrap;
 }
 
 .left {
