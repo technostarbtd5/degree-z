@@ -85,7 +85,7 @@ export const MAJORS_EXAMPLE_JSON = {
         {"subject": "MATH", "course": "4040"},
         {"subject": "MATH", "course": "4100"},
         {"subject": "MATP", "course": "4600"},
-      ]},
+      ], "category name": "Math Option I"},
       {"subject": "MATH", "minLevel": 2000},
       {"one of": [
         {"subject": "CSCI", "course": "4961"},
@@ -115,7 +115,7 @@ export const MAJORS_EXAMPLE_JSON = {
             {"subject": "CSCI", "course": "4800"},
             {"subject": "CSCI", "course": "4820"},
           ],
-          "amount": 3
+          "amount": 3, "category name": "Theory and Algorithms"
         },
         {
           "n of": [
@@ -136,7 +136,7 @@ export const MAJORS_EXAMPLE_JSON = {
             {"subject": "CSCI", "course": "6510"},
             {"subject": "CSCI", "course": "4470"},
           ],
-          "amount": 3
+          "amount": 3, "category name": "Systems and Software"
         },
         {
           "n of": [
@@ -165,17 +165,88 @@ export const MAJORS_EXAMPLE_JSON = {
             {"subject": "CSCI", "course": "4600"},
             {"subject": "CSCI", "course": "6600"},
           ],
-          "amount": 3
+          "amount": 3, "category name": "AI & Data"
         },
-      ]},
+      ], "category name": "CS Capstone"},
     ]
-  }
+  },
+  "ITWS": {
+    "requirements": [
+      // Core requirements
+      {"subject": "ITWS", "course": "1100"},
+      {"subject": "ITWS", "course": "2110"},
+      {"subject": "ITWS", "course": "1220"},
+      {"subject": "ITWS", "course": "2210"},
+      {"subject": "ITWS", "course": "4500"},
+      {"subject": "ITWS", "course": "4310"},
+      {"subject": "MATH", "course": "1010"},
+      {"subject": "CSCI", "course": "1100"},
+      {"subject": "CSCI", "course": "1200"},
+      {"subject": "BIOL", "minLevel": 1000},
+      {"subject": "PHYS", "minLevel": 1000},
+      {"subject": "MATH", "minLevel": 1000},
+      {"one of": [
+        {"subject": "ITWS", "course": "4100"},
+        {"subject": "ITWS", "course": "4990"},
+      ], "category name": "ITWS Capstone/Research"},
+      // {"one of": [
+      //   {"subject": "CSCI", "course": "4380"},
+      //   {"subject": "MGMT", "course": "4170"},
+      // ]},
+      {"one of": [
+        {"all of": [ // Web Technologies
+          {"subject": "CSCI", "course": "2200"},
+          {"subject": "CSCI", "course": "2300"},
+          {"subject": "CSCI", "course": "2500"},
+          {"subject": "CSCI", "course": "2600"},
+          {"subject": "CSCI", "course": "4210"},
+          {"subject": "CSCI", "course": "4220"},
+          {"subject": "CSCI", "course": "4380"},
+          {"one of": [ // Comm design elective
+            {"subject": "COMM", "course": "2660"},
+            {"subject": "COMM", "course": "4320"},
+            {"subject": "COMM", "course": "4420"},
+            {"subject": "COMM", "course": "4690"},
+            {"subject": "COMM", "course": "4460"},
+            {"subject": "COMM", "course": "4470"},
+            {"subject": "COMM", "course": "4690"},
+          ], "category name": "Communication Design Elective"},
+          {"one of": [ // Intel. systems
+            {"subject": "COGS", "course": "4210"},
+            {"subject": "ISYE", "course": "4810"},
+            {"subject": "CSCI", "course": "4100"},
+            {"subject": "CSCI", "course": "4150"},
+          ], "category name": "Intelligent Systems Elective"},
+          {"one of": [ // Assessment
+            {"subject": "COMM", "course": "4420"},
+            {"subject": "COMM", "course": "4470"},
+            {"subject": "ISYE", "course": "4760"},
+            {"subject": "MGMT", "course": "2100"},
+          ], "category name": "Assessment Elective"},
+          {"one of": [ // Computing
+            {"subject": "CSCI", "course": "4020"},
+            {"subject": "CSCI", "course": "4320"},
+            {"subject": "CSCI", "course": "4430"},
+            {"subject": "ECSE", "course": "4750"},
+          ], "category name": "Computing Elective"},
+          {"one of": [ // Database
+            {"subject": "CSCI", "course": "4390"},
+            {"subject": "CSCI", "course": "4100"},
+            {"subject": "CSCI", "course": "4150"},
+            {"subject": "CSCI", "course": "4440"},
+          ], "category name": "Database Elective"},
+        ], "category name": "Web Technologies"},
+
+      ], "category name": "ITWS Concentration"},
+    ]
+  },
 }
 
 export const COURSES_EXAMPLE_JSON = {
   "BIOL": {
     "1010": {
       "title": "Introduction to Biology",
+      "shorthand": "Intro to Bio",
       "credits": 3,
       "offered": ["Fall", "Spring", "Summer"],
       "corequisites": [
@@ -184,6 +255,7 @@ export const COURSES_EXAMPLE_JSON = {
     },
     "1015": {
       "title": "Introduction to Biology Laboratory",
+      "shorthand": "Intro to Bio Lab",
       "credits": 1,
       "offered": ["Fall", "Spring", "Summer"],
       "corequisites": [
@@ -194,11 +266,13 @@ export const COURSES_EXAMPLE_JSON = {
   "CHEM": {
     "1100": {
       "title": "Chemistry I",
+      "shorthand": "Chem I",
       "credits": 4,
       "offered": ["Fall", "Spring", "Summer"],
     },
     "1200": {
       "title": "Chemistry II",
+      "shorthand": "Chem II",
       "credits": 4,
       "offered": ["Spring", "Summer"],
     },
@@ -206,6 +280,7 @@ export const COURSES_EXAMPLE_JSON = {
   "COMM": {
     "4420": {
       "title": "Foundations of HCI Usability",
+      "shorthand": "HCI Usability",
       "credits": 4,
       "offered": ["Fall"],
     },
@@ -213,16 +288,19 @@ export const COURSES_EXAMPLE_JSON = {
   "CSCI": {
     "1100": {
       "title": "Computer Science I",
+      "shorthand": "CS1",
       "credits": 4,
       "offered": ["Fall", "Spring", "Summer"],
     },
     "1200": {
       "title": "Data Structures",
+      "shorthand": "Data Structures",
       "credits": 4,
       "offered": ["Fall", "Spring"],
     },
     "2200": {
       "title": "Foundations of Computer Science",
+      "shorthand": "FOCS",
       "credits": 4,
       "offered": ["Fall", "Spring"],
       "prerequisites": [
@@ -232,6 +310,7 @@ export const COURSES_EXAMPLE_JSON = {
     },
     "2300": {
       "title": "Introduction to Algorithms",
+      "shorthand": "Algo",
       "credits": 4,
       "offered": ["Fall", "Spring"],
       "prerequisites": [
@@ -241,6 +320,7 @@ export const COURSES_EXAMPLE_JSON = {
     },
     "2500": {
       "title": "Computer Organization",
+      "shorthand": "CompOrg",
       "credits": 4,
       "offered": ["Fall", "Spring"],
       "prerequisites": [
@@ -249,6 +329,7 @@ export const COURSES_EXAMPLE_JSON = {
     },
     "2600": {
       "title": "Principles of Software",
+      "shorthand": "PSoft",
       "credits": 4,
       "offered": ["Spring", "Summer"],
       "prerequisites": [
@@ -257,6 +338,7 @@ export const COURSES_EXAMPLE_JSON = {
     },
     "4100": {
       "title": "Machine Learning from Data",
+      "shorthand": "ML from Data",
       "credits": 4,
       "offered": ["Fall"],
       "prerequisites": [
@@ -265,6 +347,7 @@ export const COURSES_EXAMPLE_JSON = {
     },
     "4150": {
       "title": "Introduction to Artificial Intelligence",
+      "shorthand": "Intro to AI",
       "credits": 4,
       "offered": ["Spring"],
       "prerequisites": [
@@ -273,6 +356,7 @@ export const COURSES_EXAMPLE_JSON = {
     },
     "4210": {
       "title": "Operating Systems",
+      "shorthand": "OpSys",
       "credits": 4,
       "offered": ["Spring", "Summer"],
       "prerequisites": [
@@ -282,6 +366,7 @@ export const COURSES_EXAMPLE_JSON = {
     },
     "4220": {
       "title": "Network Programming",
+      "shorthand": "NetProg",
       "credits": 4,
       "offered": ["Fall"],
       "prerequisites": [
@@ -290,6 +375,7 @@ export const COURSES_EXAMPLE_JSON = {
     },
     "4380": {
       "title": "Database Systems",
+      "shorthand": "Database",
       "credits": 4,
       "offered": ["Fall", "Spring"],
       "prerequisites": [
@@ -298,6 +384,7 @@ export const COURSES_EXAMPLE_JSON = {
     },
     "4430": {
       "title": "Programming Languages",
+      "shorthand": "ProgLang",
       "credits": 4,
       "offered": ["Fall"],
       "prerequisites": [
@@ -309,6 +396,7 @@ export const COURSES_EXAMPLE_JSON = {
   "ECON": {
     "2010": {
       "title": "Intermediate Microeconomic Theory",
+      "shorthand": "Microecon",
       "credits": 4,
       "offered": ["Fall", "Spring"],
       "prerequisites": [
@@ -318,6 +406,7 @@ export const COURSES_EXAMPLE_JSON = {
     },
     "2020": {
       "title": "Intermediate Macroeconomic Theory",
+      "shorthand": "Macroecon",
       "credits": 4,
       "offered": ["Fall", "Spring"],
       "prerequisites": [
@@ -327,6 +416,7 @@ export const COURSES_EXAMPLE_JSON = {
     },
     "4130": {
       "title": "Money and Banking",
+      "shorthand": "Money & Banking",
       "credits": 4,
       "offered": ["Fall", "Spring"],
       "prerequisites": [
@@ -337,6 +427,7 @@ export const COURSES_EXAMPLE_JSON = {
   "IHSS": {
     "1200": {
       "title": "Principles of Economics",
+      "shorthand": "Principles of Econ",
       "credits": 4,
       "offered": ["Fall", "Spring"],
     },
@@ -344,16 +435,19 @@ export const COURSES_EXAMPLE_JSON = {
   "ITWS": {
     "1100": {
       "title": "Introduction to Information Technology and Web Science",
+      "shorthand": "Intro to ITWS",
       "credits": 4,
       "offered": ["Fall", "Spring"],
     },
     "1220": {
       "title": "IT and Society",
+      "shorthand": "IT & Society",
       "credits": 4,
       "offered": ["Spring"],
     },
     "2110": {
       "title": "Web Systems Development",
+      "shorthand": "WebSys",
       "credits": 4,
       "offered": ["Fall"],
       "prerequisites": [
@@ -365,11 +459,13 @@ export const COURSES_EXAMPLE_JSON = {
     },
     "2210": {
       "title": "Introduction to Human Computer Interaction",
+      "shorthand": "Intro to HCI",
       "credits": 4,
       "offered": ["Spring"],
     },
     "4100": {
       "title": "Information Technology and Web Science Capstone",
+      "shorthand": "ITWS Capstone",
       "credits": 4,
       "offered": ["Fall", "Spring"],
       "prerequisites": [
@@ -379,6 +475,7 @@ export const COURSES_EXAMPLE_JSON = {
     },
     "4310": {
       "title": "Managing IT Resources",
+      "shorthand": "MITR",
       "credits": 4,
       "offered": ["Fall", "Spring"],
       "prerequisites": [
@@ -387,6 +484,7 @@ export const COURSES_EXAMPLE_JSON = {
     },
     "4500": {
       "title": "Web Science Systems Development",
+      "shorthand": "WebSci",
       "credits": 4,
       "offered": ["Spring"],
       "prerequisites": [
@@ -397,11 +495,13 @@ export const COURSES_EXAMPLE_JSON = {
   "MATH": {
     "1010": {
       "title": "Calculus I",
+      "shorthand": "Calc I",
       "credits": 4,
       "offered": ["Fall", "Spring"],
     },
     "1020": {
       "title": "Calculus II",
+      "shorthand": "Calc II",
       "credits": 4,
       "offered": ["Fall", "Spring"],
       "prerequisites": [
@@ -410,6 +510,7 @@ export const COURSES_EXAMPLE_JSON = {
     },
     "2010": {
       "title": "Multivariable Calculus and Matrix Algebra",
+      "shorthand": "Multivar", 
       "credits": 4,
       "offered": ["Fall", "Spring"],
       "prerequisites": [
@@ -418,6 +519,7 @@ export const COURSES_EXAMPLE_JSON = {
     },
     "4100": {
       "title": "Linear Algebra",
+      "shorthand": "Linalg",
       "credits": 4,
       "offered": ["Fall", "Spring"],
       "prerequisites": [
@@ -428,6 +530,7 @@ export const COURSES_EXAMPLE_JSON = {
   "MGMT": {
     "2100": {
       "title": "Statistical Methods",
+      "shorthand": "Stats",
       "credits": 4,
       "offered": ["Fall", "Spring"],
     },
@@ -435,6 +538,7 @@ export const COURSES_EXAMPLE_JSON = {
   "PHYS": {
     "1100": {
       "title": "Physics I",
+      "shorthand": "Physics I",
       "credits": 4,
       "offered": ["Fall", "Spring"],
     },
@@ -442,18 +546,21 @@ export const COURSES_EXAMPLE_JSON = {
   "STSH": {
     "1000": {
       "title": "Science & Technology Elective",
+      "shorthand": "STSH Elective",
       "credits": 4,
     },
   },
   "STSS": {
     "1000": {
       "title": "Science & Technology Elective",
+      "shorthand": "STSS Elective",
       "credits": 4,
     },
   },
   "WRIT": {
     "1000": {
       "title": "Writing Elective",
+      "shorthand": "WRIT Elective",
       "credits": 4,
     },
   },
