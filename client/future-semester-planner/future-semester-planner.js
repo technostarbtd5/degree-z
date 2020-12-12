@@ -1407,17 +1407,19 @@ class PlannerHeaderComponent {
     });
 
     $(`#fsp-schedule-delete`).click(() => {
-      console.log("delete click")
-      $.post("/api/planner", {request: "deleteSchedule", scheduleID: planner.activeScheduleID}, 
-          (response, status) => {
-        console.log("response:");
-        console.log(response);
-        // $(`#set-schedule-debug-result`).html(response);
-        planner.activeScheduleName = "New Schedule";
-        planner.activeScheduleID = "New Schedule";
-        planner.fetchSchedules(true);
-        // planner.renderPlanner();
-      });
+      console.log("delete click");
+      if(confirm(`This will delete schedule ${planner.activeScheduleName}! Are you sure you want to do this?`)) {
+        $.post("/api/planner", {request: "deleteSchedule", scheduleID: planner.activeScheduleID}, 
+            (response, status) => {
+          console.log("response:");
+          console.log(response);
+          // $(`#set-schedule-debug-result`).html(response);
+          planner.activeScheduleName = "New Schedule";
+          planner.activeScheduleID = "New Schedule";
+          planner.fetchSchedules(true);
+          // planner.renderPlanner();
+        });
+      }
     });
 
     $(`#fsp-schedule-selector`).change(function() {
