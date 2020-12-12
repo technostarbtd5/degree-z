@@ -65,6 +65,14 @@ body {
   margin: 15px;
 }
 
+.fsp-schedule-verical-bar {
+  background-color: #bbb;
+  min-height: 80px;
+  max-height: 80px;
+  min-width: 3px;
+  padding: 0px 1px;
+}
+
 .fsp-schedule-selected-item {
   margin: 5px;
   font-size: large;
@@ -76,8 +84,15 @@ body {
   max-width: 200px;
 }
 
-#fsp-schedule-save, #fsp-schedule-delete {
+#fsp-schedule-save, #fsp-schedule-delete, #fsp-schedule-edit-name {
   margin: 5px;
+  padding: 5px;
+}
+
+#fsp-schedule-save:hover, #fsp-schedule-delete:hover, #fsp-schedule-edit-name:hover {
+  border-radius: 6px;
+  background-color: gray;
+  cursor: pointer;
 }
 
 .fsp-classes-header {

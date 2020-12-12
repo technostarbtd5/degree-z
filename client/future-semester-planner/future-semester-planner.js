@@ -665,7 +665,10 @@ class CourseComponent {
     if (unfilledPrereqs.length > 0 || !((new Set(getCourseObject(subject, course).offered || [])).has(semester.split(" ")[0]) || semester == "transfer")) {
       this.prereqWarning = true;
       $(`#${this.tileID}`).css({"box-shadow": "0px 0px 10px red", "border-color": "red", "borer-width": "3px"});
-      $(`#${this.tileID}`).tooltip({content: `Missing prerequisites: ${unfilledPrereqs.join(", ")}`});
+      let title = "";
+      if (unfilledPrereqs.length > 0) title += `Missing prerequisites: ${unfilledPrereqs.join(", ")}! `;
+      if (!((new Set(getCourseObject(subject, course).offered || [])).has(semester.split(" ")[0]) || semester == "transfer")) title += "Wrong semester!";
+      $(`#${this.tileID}`).prop('title', title);
     }
 
     // if ()
@@ -1328,12 +1331,14 @@ class PlannerHeaderComponent {
       </div>
       <input class="fsp-schedule-selected-item" id="fsp-schedule-selected-name-edit" value="${planner.activeScheduleName}">
       <img class="fsp-schedule-selected-item" title="Edit Name" id="fsp-schedule-edit-name" src="/client/future-semester-planner/create-24px.svg"></div>
+      <div class="fsp-schedule-verical-bar"></div>
       <select id="fsp-major-selector" multiple>
         ${Object.keys(MAJORS_EXAMPLE_JSON).map(major => {
           return `<option value="${major}" ${plannerMajors.has(major) ? "selected" : ""}>${major}</option>`;
         }).join("")}
       </select>
       <div id="fsp-majors-selected">Majors selected: ${[...plannerMajors].join(", ")}</div>
+      <div class="fsp-schedule-verical-bar"></div>
       <img title="Save Schedule" id="fsp-schedule-save" src="/client/future-semester-planner/save-24px.svg">
       <img title="Delete Schedule" id="fsp-schedule-delete" src="/client/future-semester-planner/delete-24px.svg">
     </div>`);
