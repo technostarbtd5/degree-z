@@ -135,6 +135,14 @@ function setSchedule() {
         $statement = $db->prepare($query);
         $statement->bind_param("i", $scheduleID);
         $statement->execute();
+
+        if(isset($_POST["scheduleName"])) {
+          $scheduleName = $_POST["scheduleName"];
+          $query = 'UPDATE `plans` SET `name`=? WHERE `id`=?;';
+          $statement = $db->prepare($query);
+          $statement->bind_param("si", $scheduleName, $scheduleID);
+          $statement->execute();
+        }
       } else {
         // OR create a new schedule!
         $scheduleName = isset($_POST["scheduleName"]) ? $_POST["scheduleName"] : "New Schedule";

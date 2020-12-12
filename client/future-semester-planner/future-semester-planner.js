@@ -1301,6 +1301,34 @@ class PlannerHeaderComponent {
   }
 
   render(planner, parentElement) {
+    const plannerMajors = new Set(planner.schedule.majors || []);
+    const selectedScheduleName = planner.schedules.concat({id: "New Schedule", name: "New Schedule"}).find(schedule => schedule.id == planner.activeScheduleID) ? planner.schedules.concat({id: "New Schedule", name: "New Schedule"}).find(schedule => schedule.id == planner.activeScheduleID).name : "";
+    parentElement.append(`<div id="fsp-logo">Future Semester Planner</div>
+    <div id="fsp-schedule-section">
+      <select id="fsp-schedule-selector">
+        ${planner.schedules.concat({id: "New Schedule", name: "New Schedule"}).map(schedule => {
+          const {id, name} = schedule;
+          return `<option value="${id}" ${id == planner.activeScheduleID ? "selected" : ""}>${name}</option>`;
+        }).join("")}
+      </select>
+      <div id="fsp-schedule-selected"><div class="fsp-schedule-selected-item">Selected Schedule: </div><div class="fsp-schedule-selected-item" id="fsp-schedule-selected-name">
+        ${selectedScheduleName}
+      </div><img class="fsp-schedule-selected-item" title="Edit Name" id="fsp-schedule-edit-name" src="/client/future-semester-planner/create-24px.svg"></div>
+      <select id="fsp-major-selector" multiple>
+        ${Object.keys(MAJORS_EXAMPLE_JSON).map(major => {
+          return `<option value="${major}" ${plannerMajors.has(major) ? "selected" : ""}>${major}</option>`;
+        }).join("")}
+      </select>
+      <div id="fsp-majors-selected">Majors selected: ${[...plannerMajors].join(", ")}</div>
+      <img title="Save Schedule" id="fsp-schedule-save" src="/client/future-semester-planner/save-24px.svg">
+    </div>`);
+
+
+    $(`#fsp-major-selector`).change(function() {
+      console.log($(this).val());
+      planner.schedule.majors = $(this).val();
+      planner.renderPlanner();
+    });
 
     /*
     parentElement.append(`<div id="get-schedules-debug">Get Schedules Debug</div><div id="get-schedules-debug-result"></div>`);
@@ -1426,6 +1454,7 @@ class Planner {
     $(`#fsp-course-drag`).html("");
     this.potentialToSemesters = new Set();
     this.semesterRows = [];
+    this.selectedMajor = this.schedule.majors.length > 0 ? this.schedule.majors[0] : "Electives";
   }
 
 
