@@ -66,7 +66,7 @@ h1 {
 }
 
 .file-upload p {
-    margin: 38px 0px;
+    margin: 36px 0px;
 }
 
 #filename {
@@ -78,70 +78,154 @@ h1 {
     display: none;
 }
 
+#current-filename {
+    margin-bottom: 1px;
+}
+
+#new-upload {
+    text-decoration: underline;
+    width: 25%;
+    height: 30px;
+}
+
+#new-upload:hover {
+    color: #999;
+}
+
 #new-input {
     display: none;
 }
 
+#goto-links {
+    margin-bottom: 3px;
+}
 
-/* Daniel's styling */
+.goto {
+    text-decoration: underline;
+    color: black;
+    margin-right: 5px;
+}
 
-table, th, td {
-    border: 1px solid black;
-    text-align: left;
+.goto:hover {
+    color: #999;
+}
+
+#infosection {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.sectiontitle {
+    text-align: center;
+    background-color: #FF737D;
+    border-radius: 10px;
+    padding-bottom: 5px;
+    margin-bottom: 0px;
+}
+
+#userinfo {
+    width: 100%;
+    order: 1;
+    display: none;
+    padding: 10px;
+}
+
+#student {
+    border: 2px solid #888;
+    border-radius: 10px;
+    padding: 5px;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.full-line {
+    flex: 0 1 99%;
+    margin-left: 0.5%;
+    margin-right: 0.5%;
+}
+
+.half-line {
+    flex: 0 1 49%;
+    margin-left: 0.5%;
+    margin-right: 0.5%;
 }
 
 #courseMap {
     width: 50%;
-    float: left;
+    flex-grow: 2;
+    order: 2;
+    padding: 10px;
 }
 
-.tablecontainer{
-    width:100%;
+.term {
     display: flex;
     flex-wrap: wrap;
 }
-.semtable{
-    margin:5px;
-    width:40%;
-}
-#courseProgress{
-    float:left;
-    width:40%;
+
+.term-title {
+    margin-top: 10px;
 }
 
-#plist {
-    list-style-type: none;
-    width:100
+.term-head, .term-foot {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
 }
 
-#plist ul {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-    display:none;
-    margin-left:5px;
-}
-#plist li{
-    border: 2px solid #FF737D;
-
+.subtext {
+    margin-bottom: 0;
 }
 
-.dropbutton{
-    float:right;
-    margin:5px;
+.courses {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    align-content: space-around;
 }
 
-.dropbutton:hover{
-    cursor: pointer;
+.course {
+    border: 2px solid #ccc;
+    border-radius: 10px;
+    padding: 5px;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+    margin: 5px;
+    flex: 2 1 30%;
+    display: flex;
+    flex-wrap: wrap;
 }
 
-.check {
-    float:right;
-    fill: green;
-    margin:5px;
+.course:hover {
+    box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
 }
-.xbutton{
-    float:right;
-    fill: red;
-    margin:5px;
+
+.course-name {
+    background-color: #8BFA69;
+}
+
+#total {
+    border: 2px solid #888;
+    border-radius: 10px;
+    padding: 5px;
+    margin-bottom: 10px;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.left {
+    text-align: left;
+}
+
+.right {
+    text-align: right;
+}
+
+.center {
+    text-align: center;
+}
+
+.yellow {
+    background-color: yellow;
 }

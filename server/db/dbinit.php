@@ -38,18 +38,28 @@ if ($mysqli->select_db($nameDB) === false) {
   $planner_sql = "CREATE TABLE `plans` (
     `id` int AUTO_INCREMENT,
     `name` varchar(255) NOT NULL,
-    `RIN` bigint(11),
+    `RCSID` varchar(11),
     PRIMARY KEY (`id`)
   );";
 
   $mysqli->query($planner_sql);
 
+  $planner_majors_sql = "CREATE TABLE `plan_majors` (
+    `id` int AUTO_INCREMENT,
+    `name` varchar(255) NOT NULL,
+    `type` varchar(11) NOT NULL,
+    `plan_id` int,
+    PRIMARY KEY (`id`),
+    FOREIGN KEY (`plan_id`) REFERENCES `plans` (`id`)
+  );";
+
+  $mysqli->query($planner_majors_sql);
+
   $planner_courses_sql = "CREATE TABLE `plan_courses` (
     `id` int AUTO_INCREMENT,
     `course_department` varchar(4) NOT NULL,
-    `course_number` int(4) NOT NULL,
+    `course_number` varchar(4) NOT NULL,
     `semester` varchar(20) NOT NULL,
-    `RIN` bigint(11),
     `plan_id` int,
     PRIMARY KEY (`id`),
     FOREIGN KEY (`plan_id`) REFERENCES `plans` (`id`)
@@ -62,53 +72,112 @@ if ($mysqli->select_db($nameDB) === false) {
     `Major` varchar(255),
     `Minor` varchar(255),
     `Concentration` varchar(255),
-    `GPA` decimal(60),
+    `GPA` decimal(60)
   );";
-  
+
   $mysqli->query($data_sql);
 
-$courses_sql = "CREATE TABLE `courses` (
-  `taken` varchar(255),
-);";
+  $courses_sql = "CREATE TABLE `classes` (
+    `taken` varchar(255)
+  );";
 
-$mysqli->query($courses_sql);
+  $mysqli->query($courses_sql);
 
-$sql1 = "INSERT INTO `persondata` (`taken`) VALUES
-('Alexandra Mednikova', 'Information Technology and Web Science', 'N/A','Data Science', '3.5')";
+  $sql1 = "INSERT INTO `persondata` VALUES
+  ('Alexandra Mednikova', 'Information Technology and Web Science', 'N/A','Data Science', '3.5')";
 
 
-$sq2 = "INSERT INTO `classes` (`taken`) VALUES
-('Calculus I'),
-('Introduction to Management'),
-('Business Law and Ethics'),
-('Computer Science I'),
-('Introduction to Information Technology and Web Science'),
-('Calculus II'),
-('Physics I'),
-('IT and Society')";
+  $sq2 = "INSERT INTO `classes` VALUES
+  ('Calculus I'),
+  ('Introduction to Management'),
+  ('Business Law and Ethics'),
+  ('Computer Science I'),
+  ('Introduction to Information Technology and Web Science'),
+  ('Calculus II'),
+  ('Physics I'),
+  ('IT and Society')";
+
+  $mysqli->query($sql1);
+  $mysqli->query($sq2);
+
+  // Transcript tables, may overlap with previously created tables
+  $t_student_sql = "CREATE TABLE `students` (
+    `id` int AUTO_INCREMENT,
+    `name` varchar(255) NOT NULL,
+    `username` varchar(255) NOT NULL,
+    `college` varchar(255) NOT NULL,
+    `major` varchar(255) NOT NULL,
+    `department` varchar(255) NOT NULL,
+    `minor` varchar(255),
+    `concentration` varchar(255),
+    `credits_taken` int(4) NOT NULL,
+    `credits_received` int(4) NOT NULL,
+    `gpa` decimal(60, 2),
+    PRIMARY KEY (`id`),
+    UNIQUE (`username`)
+  );";
+
+  $mysqli->query($t_student_sql);
+
+  $t_term_sql = "CREATE TABLE `terms` (
+    `id` int AUTO_INCREMENT,
+    `type` varchar(255) NOT NULL,
+    `semester` varchar(255) NOT NULL,
+    `name` varchar(255),
+    `major` varchar(255),
+    `standing1` varchar(255),
+    `standing2` varchar(255),
+    `credits_taken` int(4),
+    `credits_received` int(4),
+    `gpa` decimal(60, 2),
+    `total_credits_taken` int(4),
+    `total_credits_received` int(4),
+    `total_gpa` decimal(60, 2),
+    `student_id` int,
+    PRIMARY KEY (`id`),
+    FOREIGN KEY (`student_id`) REFERENCES `students` (`id`)
+  );";
+
+  $mysqli->query($t_term_sql);
+
+  $t_course_sql = "CREATE TABLE `courses` (
+    `id` int AUTO_INCREMENT,
+    `subject` varchar(11) NOT NULL,
+    `code` int(5) NOT NULL,
+    `name` varchar(255) NOT NULL,
+    `credits` int(4) NOT NULL,
+    `grade` varchar(11),
+    `level` varchar(11),
+    `status` varchar(11),
+    `term_id` int,
+    PRIMARY KEY (`id`),
+    FOREIGN KEY (`term_id`) REFERENCES `terms` (`id`) ON DELETE CASCADE
+  );";
+
+  $mysqli->query($t_course_sql);
 
 
   // TODO: ADD FOREIGN KEY
   /*
   $planner_sql = "CREATE TABLE `plans` (
-    `id` int AUTO_INCREMENT,
-    `name` varchar(255) NOT NULL,
-    `RIN` bigint(11),
-    PRIMARY KEY (`id`),
-    FOREIGN KEY (`RIN`) REFERENCES `students` (`RIN`)
+  `id` int AUTO_INCREMENT,
+  `name` varchar(255) NOT NULL,
+  `RIN` bigint(11),
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`RIN`) REFERENCES `students` (`RIN`)
   );
 
   $planner_courses_sql = "CREATE TABLE `plan_courses` (
-    `id` int AUTO_INCREMENT,
-    `course_department` varchar(4) NOT NULL,
-    `course_number` int(4) NOT NULL,
-    `semester` varchar(20) NOT NULL,
-    `RIN` bigint(11),
-    `plan_id` int,
-    PRIMARY KEY (`id`),
-    FOREIGN KEY (`plan_id`) REFERENCES `plans` (`id`)
+  `id` int AUTO_INCREMENT,
+  `course_department` varchar(4) NOT NULL,
+  `course_number` int(4) NOT NULL,
+  `semester` varchar(20) NOT NULL,
+  `RIN` bigint(11),
+  `plan_id` int,
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`plan_id`) REFERENCES `plans` (`id`)
   );";
-  
+
   */
 }
 

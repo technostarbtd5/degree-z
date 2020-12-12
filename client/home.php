@@ -18,11 +18,15 @@ if (phpCAS::isAuthenticated()) {
 	$dbConnect = false;
 	$dbUser = 'root';
 	$dbPass = '';
+<<<<<<< HEAD
 <<<<<<< Updated upstream
 	$dbSelect = 'test2';
 =======
 	$dbSelect = 'degreez';
 >>>>>>> Stashed changes
+=======
+	$dbSelect = 'degreeZ';
+>>>>>>> master
 	@ $db = new mysqli('localhost', $dbUser, $dbPass, $dbSelect);
 
 	if ($db->connect_error) {
@@ -32,59 +36,44 @@ if (phpCAS::isAuthenticated()) {
 		$dbConnect = true;
     }
 
+<<<<<<< HEAD
 <<<<<<< Updated upstream
     $sql = "SELECT Major, Minor, Concentration, GPA, Person FROM testing";
 =======
     $sql = "SELECT id, `name`, major, minor, concentration, gpa FROM students";
 >>>>>>> Stashed changes
+=======
+    $sql = "SELECT Major, Minor, Concentration, GPA, Person FROM persondata";
+>>>>>>> master
     $result = $db->query($sql);
     $info = $result->fetch_assoc()
     ?>
 
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
-<script type="text/javascript" src="home.js"></script>
+<script type="text/javascript" src="/client/home.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
 <style type="text/css">
 
 
 </style>
 <style type="text/css"></style>
-<script src="home.js"></script>
+<!-- <script src="home.js"></script> -->
 
 <<<<<<< Updated upstream
 <script src="/client/common/header.js"></script>
+<<<<<<< HEAD
 =======
 <script src="common/header.js"></script>
 >>>>>>> Stashed changes
 <link rel="stylesheet" href="../degree-z.css">
+=======
+<link rel="stylesheet" href="/degree-z.css">
+>>>>>>> master
 <title>Home</title>
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light" style="background-color: #FF737D;">
-        <a class="navbar-brand" href="#">DegreeZ</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav">
-                <li class="nav-item active">
-                    <a class="nav-link" href="home.html">Home </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="course-major-info.html">Degree</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="transcriptupload/transcriptupload.html">Transcript</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="future-semester-planner/future-semester-planner.html">Planner</a>
-                </li>
-            </ul>
-        </div>
-    </nav>
-
     <h1 class="header">Rensselaer</h1>
 
     
