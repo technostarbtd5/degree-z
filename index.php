@@ -18,10 +18,10 @@ $request = $_SERVER['REQUEST_URI'];
 
 switch ($request) {
   case '/':
-    require __DIR__ . '/client/home.php';
+    require __DIR__ . '/client/home/home.php';
     break;
   case '':
-    require __DIR__ . '/client/home.php';
+    require __DIR__ . '/client/home/home.php';
     break;
   case '/planner':
     require __DIR__ . '/client/future-semester-planner/future-semester-planner.html';
