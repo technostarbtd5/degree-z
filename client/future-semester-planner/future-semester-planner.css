@@ -29,10 +29,77 @@ body {
 .fsp-header {
   height: 100px;
   flex: 0 1 auto;
+  display: flex;
+  align-items: center;
+  background-color: #ccc;
+  /* border: 0 0 2px 0 solid #444; */
+  border-width: 3px 0;
+  border-style: solid;
+  border-color: #999;
+}
+
+#fsp-logo {
+  padding: 0 30px;
+  font-size: 40px;
+  font-weight: bold;
+}
+
+#fsp-schedule-section {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+}
+
+#fsp-schedule-selected {
+  display: flex;
+  align-items: center;
+  
 }
 
 #fsp-course-drag {
   position: absolute;
+}
+
+#fsp-schedule-selector, #fsp-major-selector {
+  height: 60px;
+  margin: 15px;
+}
+
+.fsp-schedule-verical-bar {
+  background-color: #bbb;
+  min-height: 80px;
+  max-height: 80px;
+  min-width: 3px;
+  padding: 0px 1px;
+}
+
+.fsp-schedule-selected-item {
+  margin: 5px;
+  font-size: large;
+}
+
+#fsp-majors-selected {
+  margin: 10px;
+  font-size: large;
+  max-width: 200px;
+}
+
+#fsp-schedule-save, #fsp-schedule-delete, #fsp-schedule-edit-name {
+  margin: 5px;
+  padding: 5px;
+}
+
+#fsp-schedule-save:hover, #fsp-schedule-delete:hover, #fsp-schedule-edit-name:hover {
+  border-radius: 6px;
+  background-color: gray;
+  cursor: pointer;
+}
+
+.fsp-classes-header {
+  padding: 10px;
+  font-size: 30px;
+  font-weight: bold;
+  background-color: #ddd;
 }
 
 .fsp {
@@ -301,5 +368,6 @@ body {
   background-color: gray;
   border-color: #999;
 }
+
 
 

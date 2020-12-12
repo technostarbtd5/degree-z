@@ -593,7 +593,18 @@ class CourseComponent {
 
     const {tileID, subject, course} = this;
     // Add course color
-    const courseColor = CSCourses.has(`${subject} ${course}`) ? "#ff9" : "#fbb";
+    // const courseColor = CSCourses.has(`${subject} ${course}`) ? "#ff9" : "#fbb";
+    const majors = planner.schedule.majors || [];
+    const majorColorPicker = [
+      ["#fbb", "#9cf4f7"],
+      ["#ff9", "#cbf29b"]
+    ];
+
+    const isMajor1 = majors.length > 0 && getCoursesInMajor(majors[0]).has(`${subject} ${course}`) ? 1 : 0;
+    const isMajor2 = majors.length > 1 && getCoursesInMajor(majors[1]).has(`${subject} ${course}`) ? 1 : 0;
+
+    const courseColor = majorColorPicker[isMajor1][isMajor2];
+
     $(`#${tileID}`).css({"background-color": courseColor});
 
     $(`#${tileID}`).draggable({
@@ -654,7 +665,10 @@ class CourseComponent {
     if (unfilledPrereqs.length > 0 || !((new Set(getCourseObject(subject, course).offered || [])).has(semester.split(" ")[0]) || semester == "transfer")) {
       this.prereqWarning = true;
       $(`#${this.tileID}`).css({"box-shadow": "0px 0px 10px red", "border-color": "red", "borer-width": "3px"});
-      $(`#${this.tileID}`).tooltip({content: `Missing prerequisites: ${unfilledPrereqs.join(", ")}`});
+      let title = "";
+      if (unfilledPrereqs.length > 0) title += `Missing prerequisites: ${unfilledPrereqs.join(", ")}! `;
+      if (!((new Set(getCourseObject(subject, course).offered || [])).has(semester.split(" ")[0]) || semester == "transfer")) title += "Wrong semester!";
+      $(`#${this.tileID}`).prop('title', title);
     }
 
     // if ()
@@ -673,7 +687,7 @@ class SemesterDeleteComponent {
   }
 
   render (planner, parentElement) {
-    parentElement.append(`<div class="fsp-semester-delete" id="fsp-semester-delete-${this.id}">-</div>`);
+    parentElement.append(`<div title="Delete all courses in the semester" class="fsp-semester-delete" id="fsp-semester-delete-${this.id}">-</div>`);
     $(`#fsp-semester-delete-${this.id}`).click(() => {
       console.log(`Deleting ${this.semester}`);
       // delete planner.schedule.semesters[this.semester];
@@ -782,6 +796,7 @@ class MajorNavbarComponent {
       const id = `fsp-major-button-${index}`;
       parentElement.append(`<div class="fsp-major-button ${major == selectedMajor ? "fsp-major-button-selected" : ""}" id="${id}">${major}</div>`);
       $(`#${id}`).click(() => {
+        console.log(`Major click on ${major} in navbar`);
         planner.selectedMajor = major;
         planner.renderPlanner();
       });
@@ -982,7 +997,7 @@ class AddSemeseterComponent {
   }
 
   render (planner, parentElement) {
-    parentElement.append(`<div class="fsp-add-sem-container"><div id="fsp-planner-add-semester">+</div></div>`);
+    parentElement.append(`<div class="fsp-add-sem-container" title="Add Semester"><div id="fsp-planner-add-semester">+</div></div>`);
     $("#fsp-planner-add-semester").droppable({
       over: () => {
         $(`#fsp-planner-add-semester`).addClass("fsp-row-active");
@@ -1301,6 +1316,113 @@ class PlannerHeaderComponent {
   }
 
   render(planner, parentElement) {
+    const plannerMajors = new Set(planner.schedule.majors || []);
+    // console.lo
+    // const selectedScheduleName = planner.schedules.concat({id: "New Schedule", name: "New Schedule"}).find(schedule => schedule.id == planner.activeScheduleID) ? planner.schedules.concat({id: "New Schedule", name: "New Schedule"}).find(schedule => schedule.id == planner.activeScheduleID).name : "";
+    parentElement.append(`<div id="fsp-logo">Future Semester Planner</div>
+    <div id="fsp-schedule-section">
+      <select id="fsp-schedule-selector">
+        ${planner.schedules.concat({id: "New Schedule", name: "New Schedule"}).map(schedule => {
+          const {id, name} = schedule;
+          return `<option value="${id}" ${id == planner.activeScheduleID ? "selected" : ""}>${name}</option>`;
+        }).join("")}
+      </select>
+      <div id="fsp-schedule-selected"><div class="fsp-schedule-selected-item">Selected Schedule: </div><div class="fsp-schedule-selected-item" id="fsp-schedule-selected-name">
+        ${planner.activeScheduleName}
+      </div>
+      <input class="fsp-schedule-selected-item" id="fsp-schedule-selected-name-edit" value="${planner.activeScheduleName}">
+      <img class="fsp-schedule-selected-item" title="Edit Name" id="fsp-schedule-edit-name" src="/client/future-semester-planner/create-24px.svg"></div>
+      <div class="fsp-schedule-verical-bar"></div>
+      <select id="fsp-major-selector" multiple>
+        ${Object.keys(MAJORS_EXAMPLE_JSON).map(major => {
+          return `<option value="${major}" ${plannerMajors.has(major) ? "selected" : ""}>${major}</option>`;
+        }).join("")}
+      </select>
+      <div id="fsp-majors-selected">Majors selected: ${[...plannerMajors].join(", ")}</div>
+      <div class="fsp-schedule-verical-bar"></div>
+      <img title="Save Schedule" id="fsp-schedule-save" src="/client/future-semester-planner/save-24px.svg">
+      <img title="Delete Schedule" id="fsp-schedule-delete" src="/client/future-semester-planner/delete-24px.svg">
+    </div>`);
+
+
+    $(`#fsp-major-selector`).change(function() {
+      console.log($(this).val());
+      planner.schedule.majors = $(this).val();
+      planner.renderPlanner();
+    });
+
+    $(`#fsp-schedule-selected-name-edit`).hide(0);
+
+    $(`#fsp-schedule-edit-name`).click(() => {
+      const isVisible = $(`#fsp-schedule-selected-name-edit`).is(`:visible`);
+      if (isVisible) {
+        $(`#fsp-schedule-selected-name-edit`).hide(0);
+        $(`#fsp-schedule-selected-name`).show(0);
+        planner.renderPlanner();
+      } else {
+        $(`#fsp-schedule-selected-name-edit`).show(0);
+        $(`#fsp-schedule-selected-name`).hide(0);
+      }
+    });
+
+    $(`#fsp-schedule-selected-name-edit`).bind("change paste keyup", function() {
+      console.log($(this).val());
+      planner.activeScheduleName = $(this).val();
+    });
+
+    const selectSchedule = id => {
+      planner.activeScheduleID = id;
+      planner.activeScheduleName = planner.schedules.concat({id: "New Schedule", name: "New Schedule"}).find(schedule => schedule.id == planner.activeScheduleID) ? planner.schedules.concat({id: "New Schedule", name: "New Schedule"}).find(schedule => schedule.id == planner.activeScheduleID).name : "";
+      planner.fetchActiveSchedule();
+    }
+
+    $(`#fsp-schedule-save`).click(() => {
+      console.log("click");
+      console.log(`Active schedule ID: ${planner.activeScheduleID}`);
+      $.post("/api/planner", {request: "setSchedule", schedule: planner.schedule, scheduleID: planner.activeScheduleID, scheduleName: planner.activeScheduleName}, 
+          (response, status) => {
+        console.log("response:");
+        console.log(response);
+        // $(`#set-schedule-debug-result`).html(response);
+        if (planner.activeScheduleID != "New Schedule") {
+          planner.fetchSchedules(false, () => {planner.renderPlanner();});
+        } else {
+          planner.fetchSchedules(false, () => {
+            if (planner.schedules.length > 0) {
+              selectSchedule(planner.schedules[planner.schedules.length - 1].id);
+            } else {
+              planner.renderPlanner();
+            }
+          });
+        }
+        // planner.renderPlanner();
+      });
+    });
+
+    $(`#fsp-schedule-delete`).click(() => {
+      console.log("delete click")
+      $.post("/api/planner", {request: "deleteSchedule", scheduleID: planner.activeScheduleID}, 
+          (response, status) => {
+        console.log("response:");
+        console.log(response);
+        // $(`#set-schedule-debug-result`).html(response);
+        planner.activeScheduleName = "New Schedule";
+        planner.activeScheduleID = "New Schedule";
+        planner.fetchSchedules(true);
+        // planner.renderPlanner();
+      });
+    });
+
+    $(`#fsp-schedule-selector`).change(function() {
+      console.log($(this).val());
+      selectSchedule($(this).val());
+    });
+
+
+
+
+
+    /*
     parentElement.append(`<div id="get-schedules-debug">Get Schedules Debug</div><div id="get-schedules-debug-result"></div>`);
     $(`#get-schedules-debug`).click(() => {
       console.log("click");
@@ -1323,7 +1445,7 @@ class PlannerHeaderComponent {
 
     parentElement.append(`<div id="delete-schedule-debug">delete Schedule Debug</div><div id="delete-schedule-debug-result"></div>`);
     $(`#delete-schedule-debug`).click(() => {
-      console.log("click");
+      console.log("delete click");
       $.post("/api/planner", {request: "deleteSchedule", scheduleID: planner.activeScheduleID}, (response, status) => {
         console.log("response:");
         console.log(response);
@@ -1363,6 +1485,7 @@ class PlannerHeaderComponent {
         planner.renderPlanner();
       });
     });
+    */
 
 
 
@@ -1375,6 +1498,8 @@ class PlannerHeaderComponent {
 
 class Planner {
   activeScheduleID = "New Schedule";
+  activeScheduleName = "New Schedule";
+  schedules = [];
   schedule = JSON.parse(JSON.stringify(SCHEDULE_EXAMPLE_JSON));
   potentialToSemesters = new Set();
   selectedMajor = this.schedule.majors.length > 0 ? this.schedule.majors[0] : "Electives";
@@ -1382,8 +1507,7 @@ class Planner {
   // mouse = {x: 0, y: 0};
   // isDragging = false;
   constructor() {
-    console.log(this.schedule);
-    this.renderPlanner();
+
     // $(document).mousemove(e => {
     //   this.mouse.x = e.pageX;
     //   this.mouse.y = e.pageY;
@@ -1397,12 +1521,21 @@ class Planner {
     this.getCourseCanvasLocation.bind(this);
     this.drawCanvasLine.bind(this);
     this.dropSemester.bind(this);
+    this.fetchSchedules.bind(this);
+    this.fetchActiveSchedule.bind(this);
+
+
+    console.log(this.schedule);
+    this.fetchSchedules(true);
+
+    this.renderPlanner();
   }
 
   /**
    * Reset all relevant items on re-render
    */
   resetPlanner() {
+    this.fetchSchedules();
     CourseComponent.resetItems();
     SemesterRowComponent.resetItems();
     MajorRequirementComponent.resetItems();
@@ -1414,6 +1547,7 @@ class Planner {
     $(`#fsp-course-drag`).html("");
     this.potentialToSemesters = new Set();
     this.semesterRows = [];
+    this.selectedMajor = this.schedule.majors.length > 0 ? ((new Set((this.schedule.majors || []).concat(["Electives", "Repeat Courses"]))).has(this.selectedMajor) ? this.selectedMajor: this.schedule.majors[0]) : "Electives";
   }
 
 
@@ -1669,6 +1803,51 @@ class Planner {
     // this.canvasComponent
     this.renderMinorChanges();
     $(window).on('resize', () => {this.renderMinorChanges()});
+  }
+
+  fetchSchedules(firstFetch = false, onComplete = () => {}) {
+    $.post("/api/planner", {request: "getSchedules"}, (response, status) => {
+      this.schedules = [];
+      // console.log("response:");
+      // console.log(response);
+      // $(`#get-schedules-debug-result`).html(response);
+      
+      JSON.parse(response).forEach(schedule => {
+        this.schedules.push(schedule);
+        // const {name, id} = schedule;
+        // $(`#fsp-schedule-select`).append(`<option id="fsp-schedule-select-option-${id}" value="${id}" ${id == planner.activeScheduleID ? "selected" : ""}>${name}</option>`);
+      });
+
+      if (firstFetch) {
+        console.log(this.schedules);
+        if (this.schedules.length > 0) {
+          this.activeScheduleID = this.schedules[0].id;
+          this.activeScheduleName = this.schedules[0].name;
+          this.fetchActiveSchedule();
+        } else {
+          this.fetchActiveSchedule();
+        }
+      }
+      // this.renderPlanner();
+      onComplete();
+    });
+  }
+
+  fetchActiveSchedule() {
+    if (this.activeScheduleID != "New Schedule") {
+      $.post("/api/planner", {request: "getSchedule", scheduleID: this.activeScheduleID}, (response, status) => {
+        console.log(response);
+        const schedule = JSON.parse(response);
+        schedule["starting semester"] = "Fall 2019";
+        console.log(schedule);
+        this.schedule = schedule;
+        // planner.activeScheduleID = id;
+        this.renderPlanner();
+      });
+    } else {
+      this.schedule = JSON.parse(JSON.stringify(SCHEDULE_EXAMPLE_JSON));
+      this.renderPlanner();
+    }
   }
   
   /**

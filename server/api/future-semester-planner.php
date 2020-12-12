@@ -101,8 +101,8 @@ function setSchedule() {
     $canEditSchedule = true;
     $scheduleIDActive = false;
     $scheduleID = -1;
-    if (isset($_POST["scheduleID"]) && is_integer($_POST["scheduleID"])) {
-      $scheduleID = $_POST["scheduleID"];
+    if (isset($_POST["scheduleID"])) {
+      $scheduleID = intval($_POST["scheduleID"]);
       $query = 'SELECT * FROM `plans` WHERE `id`=?';
       $statement = $db->prepare($query);
       $statement->bind_param("i", $scheduleID);
@@ -119,6 +119,10 @@ function setSchedule() {
       }
     }
 
+    if (isset($_POST["scheduleID"])) {
+      var_dump($_POST["scheduleID"]);
+    }
+
     echo "Can edit schedule " . htmlspecialchars($scheduleID) . "? " . ($canEditSchedule ? "true" : "false") . "; does schedule exist? " . ($scheduleIDActive ? "true" : "false"); 
 
 
@@ -126,10 +130,23 @@ function setSchedule() {
 
       // Clear existing entries
       if ($scheduleIDActive) {
-        $query = 'DELETE FROM `plan_courses` WHERE `plan_id`=?; DELETE FROM `plan_majors` WHERE `plan_id`=?;';
+        $query = 'DELETE FROM `plan_courses` WHERE `plan_id`=?;';
         $statement = $db->prepare($query);
-        $statement->bind_param("ii", $scheduleID, $scheduleID);
+        $statement->bind_param("i", $scheduleID);
         $statement->execute();
+
+        $query = 'DELETE FROM `plan_majors` WHERE `plan_id`=?;';
+        $statement = $db->prepare($query);
+        $statement->bind_param("i", $scheduleID);
+        $statement->execute();
+
+        if(isset($_POST["scheduleName"])) {
+          $scheduleName = $_POST["scheduleName"];
+          $query = 'UPDATE `plans` SET `name`=? WHERE `id`=?;';
+          $statement = $db->prepare($query);
+          $statement->bind_param("si", $scheduleName, $scheduleID);
+          $statement->execute();
+        }
       } else {
         // OR create a new schedule!
         $scheduleName = isset($_POST["scheduleName"]) ? $_POST["scheduleName"] : "New Schedule";
@@ -204,12 +221,38 @@ function deleteSchedule() {
   $statement->execute();
   $res = $statement->get_result();
   $schedule = $res->fetch_assoc();
+  var_dump($schedule);
+  echo $scheduleID;
   if ($schedule) {
-    $query = 'DELETE FROM `plans` WHERE `id`=?; DELETE FROM `plan_courses` WHERE `plan_id`=?; DELETE FROM `plan_majors` WHERE `plan_id`=?;';
+    // $query = 'DELETE FROM `plans` WHERE `id`=?; DELETE FROM `plan_courses` WHERE `plan_id`=?; DELETE FROM `plan_majors` WHERE `plan_id`=?;';
+    // $statement2 = $db->prepare($query);
+    // if ($statement2) {
+    //   $statement2->bind_param("iii", $scheduleID, $scheduleID, $scheduleID);
+    //   $statement2->execute();
+    //   echo "delete successful";
+    // } else {
+    //   echo $db->error;
+    // }
+    $query = 'DELETE FROM `plan_courses` WHERE `plan_id`=?;';
     $statement = $db->prepare($query);
-    $statement->bind_param("iii", $scheduleID, $scheduleID, $scheduleID);
+    $statement->bind_param("i", $scheduleID);
     $statement->execute();
+    $query = 'DELETE FROM `plan_majors` WHERE `plan_id`=?;';
+    $statement = $db->prepare($query);
+    $statement->bind_param("i", $scheduleID);
+    $statement->execute();
+    $query = 'DELETE FROM `plans` WHERE `id`=?;';
+    $statement = $db->prepare($query);
+    $statement->bind_param("i", $scheduleID);
+    $statement->execute();
+    echo "delete successful";
+  } else {
+    echo "delete unsuccessful";
   }
+}
+
+function getStarterSchedule() {
+
 }
 
 if (isset($_POST["request"])) {
@@ -222,6 +265,10 @@ if (isset($_POST["request"])) {
     break;
     case 'setSchedule':
       setSchedule();
+      
+    break;
+    case 'deleteSchedule':
+      deleteSchedule();
     break;
   }
 }
