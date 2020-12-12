@@ -1,0 +1,39 @@
+/*
+Color suggestions:
+	red: #D60021
+*/
+
+body {
+    margin: 0;
+}
+
+.current {
+    opacity: 1;
+}
+
+.background {
+    color: red;
+}
+
+#link {
+    padding: 10px;
+    text-align: right;
+}
+
+#alignright {
+    text-align: right;
+    margin-right: 100px;
+}
+
+table,
+th,
+td {
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+
+th,
+td {
+    padding: 5px;
+    text-align: left;
+}
