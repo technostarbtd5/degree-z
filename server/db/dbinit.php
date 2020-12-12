@@ -105,13 +105,15 @@ if ($mysqli->select_db($nameDB) === false) {
     `id` int AUTO_INCREMENT,
     `name` varchar(255) NOT NULL,
     `username` varchar(255) NOT NULL,
+    `college` varchar(255) NOT NULL,
     `major` varchar(255) NOT NULL,
     `minor` varchar(255),
     `concentration` varchar(255),
     `credits_taken` int(4) NOT NULL,
     `credits_received` int(4) NOT NULL,
-    `gpa` decimal(60),
-    PRIMARY KEY (`id`)
+    `gpa` decimal(60, 2),
+    PRIMARY KEY (`id`),
+    UNIQUE (`username`)
   );";
 
   $mysqli->query($t_student_sql);
@@ -126,10 +128,10 @@ if ($mysqli->select_db($nameDB) === false) {
     `standing2` varchar(255),
     `credits_taken` int(4),
     `credits_received` int(4),
-    `gpa` decimal(60),
+    `gpa` decimal(60, 2),
     `total_credits_taken` int(4),
     `total_credits_received` int(4),
-    `total_gpa` decimal(60),
+    `total_gpa` decimal(60, 2),
     `student_id` int,
     PRIMARY KEY (`id`),
     FOREIGN KEY (`student_id`) REFERENCES `students` (`id`)
@@ -148,7 +150,7 @@ if ($mysqli->select_db($nameDB) === false) {
     `status` varchar(11),
     `term_id` int,
     PRIMARY KEY (`id`),
-    FOREIGN KEY (`term_id`) REFERENCES `terms` (`id`)
+    FOREIGN KEY (`term_id`) REFERENCES `terms` (`id`) ON DELETE CASCADE
   );";
 
   $mysqli->query($t_course_sql);
