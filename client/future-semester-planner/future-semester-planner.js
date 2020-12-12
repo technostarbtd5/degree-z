@@ -742,7 +742,7 @@ class SemesterRowComponent {
     const {rowID, classesID, schedule, semester} = this;
     const semesterClasses = schedule.semesters[semester]
     parentElement.append(`<div class="fsp-row ${!semesterClasses || semesterClasses.length == 0 ? "no-classes" : ""}" id="${rowID}">
-      <div class="fsp-semester-name"><div class="fsp-name-container" id="${rowID}-semester-name">${semester}</div></div>
+      <div class="fsp-semester-name" id="${rowID}-outer-name"><div class="fsp-name-container" id="${rowID}-semester-name">${semester}</div></div>
       <div class="fsp-semester-classes" id="${classesID}"></div>
     </div>`);
     
@@ -760,9 +760,12 @@ class SemesterRowComponent {
       },
     });
 
+    let credits = 0;
     if(semesterClasses && semesterClasses.length > 0) {
       semesterClasses.forEach(course => {
-        const courseComponent = new CourseComponent(course.subject, course.course, semester).render(planner, $(`#${classesID}`));;
+        const courseComponent = new CourseComponent(course.subject, course.course, semester).render(planner, $(`#${classesID}`));
+        const courseObject = getCourseObject(course.subject, course.course);
+        credits += courseObject.credits || 0;
         // courseComponent
         const unfilledPrereqs = this.getUnfilledPrereqs(course.subject, course.course);
         courseComponent.addPrereqWarning(unfilledPrereqs);
@@ -770,6 +773,10 @@ class SemesterRowComponent {
       });
     } else {
       $(`#${classesID}`).append(`<div class="fsp-semester-no-courses">No courses</div>`);
+    }
+
+    if (credits > 0) {
+      $(`#${rowID}-outer-name`).append(`<div class="fsp-semester-credits">Credits: ${credits}</div>`);
     }
 
 
