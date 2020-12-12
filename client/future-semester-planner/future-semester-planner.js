@@ -593,7 +593,18 @@ class CourseComponent {
 
     const {tileID, subject, course} = this;
     // Add course color
-    const courseColor = CSCourses.has(`${subject} ${course}`) ? "#ff9" : "#fbb";
+    // const courseColor = CSCourses.has(`${subject} ${course}`) ? "#ff9" : "#fbb";
+    const majors = planner.schedule.majors || [];
+    const majorColorPicker = [
+      ["#fbb", "#9cf4f7"],
+      ["#ff9", "#cbf29b"]
+    ];
+
+    const isMajor1 = majors.length > 0 && getCoursesInMajor(majors[0]).has(`${subject} ${course}`) ? 1 : 0;
+    const isMajor2 = majors.length > 1 && getCoursesInMajor(majors[1]).has(`${subject} ${course}`) ? 1 : 0;
+
+    const courseColor = majorColorPicker[isMajor1][isMajor2];
+
     $(`#${tileID}`).css({"background-color": courseColor});
 
     $(`#${tileID}`).draggable({
@@ -673,7 +684,7 @@ class SemesterDeleteComponent {
   }
 
   render (planner, parentElement) {
-    parentElement.append(`<div class="fsp-semester-delete" id="fsp-semester-delete-${this.id}">-</div>`);
+    parentElement.append(`<div title="Delete all courses in the semester" class="fsp-semester-delete" id="fsp-semester-delete-${this.id}">-</div>`);
     $(`#fsp-semester-delete-${this.id}`).click(() => {
       console.log(`Deleting ${this.semester}`);
       // delete planner.schedule.semesters[this.semester];
@@ -982,7 +993,7 @@ class AddSemeseterComponent {
   }
 
   render (planner, parentElement) {
-    parentElement.append(`<div class="fsp-add-sem-container"><div id="fsp-planner-add-semester">+</div></div>`);
+    parentElement.append(`<div class="fsp-add-sem-container" title="Add Semester"><div id="fsp-planner-add-semester">+</div></div>`);
     $("#fsp-planner-add-semester").droppable({
       over: () => {
         $(`#fsp-planner-add-semester`).addClass("fsp-row-active");
