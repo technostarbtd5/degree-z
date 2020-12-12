@@ -1302,7 +1302,7 @@ class PlannerHeaderComponent {
 
   render(planner, parentElement) {
     const plannerMajors = new Set(planner.schedule.majors || []);
-    const selectedScheduleName = planner.schedules.concat({id: "New Schedule", name: "New Schedule"}).find(schedule => schedule.id == planner.activeScheduleID) ? planner.schedules.concat({id: "New Schedule", name: "New Schedule"}).find(schedule => schedule.id == planner.activeScheduleID).name : "";
+    // const selectedScheduleName = planner.schedules.concat({id: "New Schedule", name: "New Schedule"}).find(schedule => schedule.id == planner.activeScheduleID) ? planner.schedules.concat({id: "New Schedule", name: "New Schedule"}).find(schedule => schedule.id == planner.activeScheduleID).name : "";
     parentElement.append(`<div id="fsp-logo">Future Semester Planner</div>
     <div id="fsp-schedule-section">
       <select id="fsp-schedule-selector">
@@ -1312,8 +1312,10 @@ class PlannerHeaderComponent {
         }).join("")}
       </select>
       <div id="fsp-schedule-selected"><div class="fsp-schedule-selected-item">Selected Schedule: </div><div class="fsp-schedule-selected-item" id="fsp-schedule-selected-name">
-        ${selectedScheduleName}
-      </div><img class="fsp-schedule-selected-item" title="Edit Name" id="fsp-schedule-edit-name" src="/client/future-semester-planner/create-24px.svg"></div>
+        ${planner.activeScheduleName}
+      </div>
+      <input class="fsp-schedule-selected-item" id="fsp-schedule-selected-name-edit" value="${planner.activeScheduleName}">
+      <img class="fsp-schedule-selected-item" title="Edit Name" id="fsp-schedule-edit-name" src="/client/future-semester-planner/create-24px.svg"></div>
       <select id="fsp-major-selector" multiple>
         ${Object.keys(MAJORS_EXAMPLE_JSON).map(major => {
           return `<option value="${major}" ${plannerMajors.has(major) ? "selected" : ""}>${major}</option>`;
@@ -1329,6 +1331,29 @@ class PlannerHeaderComponent {
       planner.schedule.majors = $(this).val();
       planner.renderPlanner();
     });
+
+    $(`#fsp-schedule-selected-name-edit`).hide(0);
+
+    $(`#fsp-schedule-edit-name`).click(() => {
+      const isVisible = $(`#fsp-schedule-selected-name-edit`).is(`:visible`);
+      if (isVisible) {
+        $(`#fsp-schedule-selected-name-edit`).hide(0);
+        $(`#fsp-schedule-selected-name`).show(0);
+        planner.renderPlanner();
+      } else {
+        $(`#fsp-schedule-selected-name-edit`).show(0);
+        $(`#fsp-schedule-selected-name`).hide(0);
+      }
+    });
+
+    $(`#fsp-schedule-selected-name-edit`).bind("change paste keyup", function() {
+      console.log($(this).val());
+      planner.activeScheduleName = $(this).val();
+    });
+
+
+
+
 
     /*
     parentElement.append(`<div id="get-schedules-debug">Get Schedules Debug</div><div id="get-schedules-debug-result"></div>`);
@@ -1406,6 +1431,7 @@ class PlannerHeaderComponent {
 
 class Planner {
   activeScheduleID = "New Schedule";
+  activeScheduleName = "New Schedule";
   schedules = [];
   schedule = JSON.parse(JSON.stringify(SCHEDULE_EXAMPLE_JSON));
   potentialToSemesters = new Set();
@@ -1728,6 +1754,7 @@ class Planner {
         console.log(this.schedules);
         if (this.schedules.length > 0) {
           this.activeScheduleID = this.schedules[0].id;
+          this.activeScheduleName = this.schedules[0].name;
           this.fetchActiveSchedule();
         } 
       }
