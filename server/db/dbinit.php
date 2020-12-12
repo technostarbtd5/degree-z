@@ -95,6 +95,7 @@ if ($mysqli->select_db($nameDB) === false) {
     `id` int AUTO_INCREMENT,
     `name` varchar(255) NOT NULL,
     `username` varchar(255) NOT NULL,
+    `college` varchar(255) NOT NULL,
     `major` varchar(255) NOT NULL,
     `minor` varchar(255),
     `concentration` varchar(255),

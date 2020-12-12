@@ -5,15 +5,111 @@ $user = substr(phpCas::getUser(), stripos(phpCas::getUser(), ':'));
 if (isset($_POST["getUser"]) && $_POST["getUser"] == 1) {
 	$get_user = "SELECT * FROM `students` WHERE students.username = \"" . $user . "\";";
 	$result = $mysqli->query($get_user);
-	$user_data = $result->fetch_assoc();
-	// Create array that follows format of json in Transcript
-	echo json_encode($result->fetch_assoc());
+	$student = $result->fetch_assoc();
+
+	if (is_null($student)) echo "";
+	else {
+		// Create student data to send
+		$offset = 0;
+		$majors = array();
+		while (stripos($student["major"], ',', $offset) !== false) {
+			$next_offset = stripos($student["major"], ',', $offset);
+			array_push($majors, substr($student["major"], $offset, $next_offset - $offset));
+			$offset = $next_offset + 1;
+		}
+		array_push($majors, substr($student["major"], $offset));
+		$offset = 0;
+		$minors = array();
+		while (stripos($student["minor"], ',', $offset) !== false) {
+			$next_offset = stripos($student["minor"], ',', $offset);
+			array_push($minors, substr($student["minor"], $offset, $next_offset - $offset));
+			$offset = $next_offset + 1;
+		}
+		array_push($minors, substr($student["minor"], $offset));
+
+		$studentData = array(
+			"name" => $student["name"],
+			"college" => $student["college"],
+			"majors" => $majors,
+			"departments" => $majors,				// Fix this by sending department data
+			"minors" => $minors,
+		);
+
+		$totalData = array(
+			"attempted" => $student["credits_taken"],
+			"passed" => $student["credits_received"],
+			"gpa" => $student["gpa"],
+		);
+
+		$transferTerms = array();
+		$gradeTerms = array();
+		$progressTerm = array();
+
+		$get_term = "SELECT * FROM `terms` WHERE terms.student_id = " . $student["id"] . ";";
+		$result = $mysqli->query($get_term);
+		while ($term = $result->fetch_assoc()) {
+			$temp_term = array(
+				"semester" => $term["semester"],
+				"name" => $term["name"],
+				"courses" => array(),
+				"subtext" => array(
+					"major" => $term["major"],
+					"academic" => $term["standing1"],
+				    "additional" => $term["standing2"],
+				),
+				"termData" => array(
+					"attempted" => $term["credits_taken"],
+					"passed" => $term["credits_received"],
+				    "gpa" => $term["gpa"],
+				),
+				"cumulativeData" => array(
+					"attempted" => $term["total_credits_taken"],
+					"passed" => $term["total_credits_received"],
+				    "gpa" => $term["total_gpa"],
+				),
+			);
+			$get_course = "SELECT * FROM `courses` WHERE courses.term_id = " . $term["id"] . ";";
+			$result2 = $mysqli->query($get_course);
+			while ($course = $result2->fetch_assoc()) {
+				$temp_course = array(
+					"subject" => $course["subject"],
+					"course_num" => $course["code"],
+					"name" => $course["name"],
+					"level" => $course["level"],
+					"grade" => $course["grade"],
+					"credits" => $course["credits"],
+					"status" => $course["status"],
+				);
+				array_push($temp_term["courses"], $temp_course);
+			}
+			if ($term["type"] == "transfer") {
+				array_push($transferTerms, $temp_term);
+			}
+			else if ($term["type"] == "current") {
+				array_push($gradeTerms, $temp_term);
+			}			
+			else if ($term["type"] == "future") {
+				$progressTerm = $temp_term;
+			}
+		}
+
+		$ans = array(
+			"studentData" => $studentData,
+			"totalData" => $totalData,
+			"transferTerms" => $transferTerms,
+			"gradeTerms" => $gradeTerms,
+			"progressTerm" => $progressTerm,
+		);
+
+		// Create array that follows format of json in Transcript
+		echo json_encode($ans);
+	}
 }
 
 // Storing the transcript
 if (isset($_POST["storeData"]) && is_array($_POST["storeData"])) {
 	// Store student and total data
-	$insert_student = "REPLACE INTO `students` (`name`, `username`, `major`, `minor`, `credits_taken`, `credits_received`, `gpa`) VALUES (?, ?, ?, ?, ?, ?, ?)";
+	$insert_student = "REPLACE INTO `students` (`name`, `username`, `college`, `major`, `minor`, `credits_taken`, `credits_received`, `gpa`) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 	$major = "";
 	foreach ($_POST["storeData"]["majors"] as $temp_major) {
 		$major = $major . $temp_major . ($temp_major == $_POST["storeData"]["majors"][count($_POST["storeData"]["majors"])-1] ? "" : ", ");
@@ -23,7 +119,7 @@ if (isset($_POST["storeData"]) && is_array($_POST["storeData"])) {
 		$minor = $minor . $temp_minor . ($temp_minor == $_POST["storeData"]["minors"][count($_POST["storeData"]["minors"])-1] ? "" : ", ");
 	}
 	$statement = $mysqli->prepare($insert_student);
-	$statement->bind_param("ssssiid", $_POST["storeData"]["name"], $user, $major, $minor, $_POST["storeData"]["taken"], $_POST["storeData"]["received"], $_POST["storeData"]["gpa"]);
+	$statement->bind_param("ssssssiid", $_POST["storeData"]["name"], $user, $_POST["storeData"]["program"], $_POST["storeData"]["college"], $major, $minor, $_POST["storeData"]["taken"], $_POST["storeData"]["received"], $_POST["storeData"]["gpa"]);
 	$statement->execute();
 
 	// Get student id
@@ -97,6 +193,3 @@ if (isset($_POST["storeData"]) && is_array($_POST["storeData"])) {
 		$statement->execute();
 	}
 }
-
-
-

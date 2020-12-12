@@ -29,7 +29,6 @@ function styleFilename() {
 	hideUpload();
 	$("#userinfo").css("display", "block");
 	transcriptInput = document.getElementById("transcript-input");
-	document.getElementById("current-filename").innerHTML = `Current transcript: ${transcriptInput.placeholder}`;
 	document.getElementById("goto-links").innerHTML = ` \
 		<b>Go To: \
 			<a href="#student-title" class="goto">My Degree</a> \
@@ -66,7 +65,8 @@ class Course {
 	credits;
 	status = "";
 
-	constructor(courseBody, fields, hasLevel=0, hasGrade=0) {
+	constructor(courseBody, fields, hasLevel=0, hasGrade=0, empty=false) {
+		if (empty) return;
 		var offset = 0;
 		var end = offset;
 		for (var i = 0; i < fields; i++) {
@@ -101,6 +101,16 @@ class Course {
 			}
 			offset = end+1;
 		}
+	}
+
+	setCourseInfo(subject, course_num, level, name, grade, credits, status) {
+		this.subject = subject;
+		this.course_num = course_num;
+		this.level = level;
+		this.name = name;
+		this.grade = grade;
+		this.credits = credits;
+		this.status = status;
 	}
 
 	get toHTML() {
@@ -178,28 +188,30 @@ class Term {
 
 	constructor(semester, name="") {
 		this.semester = semester;
-		this.name = name;
+		this.name = name == null ? "" : name;
 	}
 
 	addSubtext(major, standings) {
-		this.hasSubtext = true;
+		if (major != null && standings[0] != null) this.hasSubtext = true;
 		this.subtext.major = major;
-		this.subtext.academic = standings[0];
-		this.subtext.additional = standings.length > 1 ? standings[1] : "";
+		this.subtext.academic = standings[0] == null ? "" : standings[0];
+		this.subtext.additional = standings.length > 1 ? (standings[1] == null ? "" : standings[1]) : "";
 	}
 
 	addTermData(termData) {
-		this.hasTermData = true;
-		this.termData.attempted = termData.attempted;
-		this.termData.passed = termData.passed;
-		this.termData.gpa = termData.gpa;
+		if (termData.attempted != null && termData.passed != null && termData.gpa != null)
+			this.hasTermData = true;
+		this.termData.attempted = termData.attempted == null ? 0 : termData.attempted;
+		this.termData.passed = termData.passed == null ? 0 : termData.passed;
+		this.termData.gpa = termData.gpa == null ? 0.00 : termData.gpa;
 	}
 
 	addCumulativeData(cumulativeData) {
-		this.hasCumulativeData = true;
-		this.cumulativeData.attempted = cumulativeData.attempted;
-		this.cumulativeData.passed = cumulativeData.passed;
-		this.cumulativeData.gpa = cumulativeData.gpa;
+		if (cumulativeData.attempted != null && cumulativeData.passed != null && cumulativeData.gpa != null)
+			this.hasCumulativeData = true;
+		this.cumulativeData.attempted = cumulativeData.attempted == null ? 0 : cumulativeData.attempted;
+		this.cumulativeData.passed = cumulativeData.passed == null ? 0 : cumulativeData.passed;
+		this.cumulativeData.gpa = cumulativeData.gpa == null ? 0.00 : cumulativeData.gpa;
 	}
 
 	addCourse(c) {
@@ -279,7 +291,6 @@ class Transcript {
 
 	studentData = {
 		name: "",
-		program: "",
 		college: "",
 		majors: [],
 		departments: [],
@@ -565,6 +576,7 @@ class Transcript {
 	store() {
 		var sendData = {};
 		sendData["name"] = this.studentData.name;
+		sendData["college"] = this.studentData.college;
 		sendData["majors"] = this.studentData.majors;
 		sendData["minors"] = this.studentData.minors;
 		sendData["taken"] = this.totalData.attempted;
@@ -676,12 +688,56 @@ function retrieveTranscript() {
 				console.log("found no one");
 				return;
 			}
-			else {
-				console.log(result);
-				return;
-			}
+			var resultJSON = JSON.parse(result);
 			var temp = new Transcript(null, true);
-			temp.setData(result.studentData, result.totalData, result.transferTerms, result.gradeTerms, result.progressTerm);
+			getTerms = (termString) => {
+				var terms = [];
+				for (var i=0; i < resultJSON[termString].length; i++) {
+					var current = resultJSON[termString][i];
+					var tempTerm = new Term(current["semester"], current["name"]);
+					tempTerm.addSubtext(current["subtext"]["major"], [current["subtext"]["academic"], current["subtext"]["additional"]]);
+					tempTerm.addTermData({
+						attempted: current["termData"]["attempted"],
+						passed: current["termData"]["passed"],
+						gpa: current["termData"]["gpa"]
+					});
+					tempTerm.addCumulativeData({
+						attempted: current["cumulativeData"]["attempted"],
+						passed: current["cumulativeData"]["passed"],
+						gpa: current["cumulativeData"]["gpa"]
+					});
+					for (var j=0; j < current["courses"].length; j++) {
+						var current2 = current["courses"][j];
+						var tempCourse = new Course(null, null, null, null, true);
+						tempCourse.setCourseInfo(current2.subject, current2.course_num,
+							current2.name, current2.level, current2.grade, current2.credits, current2.status);
+						tempTerm.addCourse(tempCourse);
+					}
+					terms.push(tempTerm);
+				}
+				return terms;
+			}
+			var current_p = resultJSON["progressTerm"];
+			var progressTerm = new Term(current_p["semester"], current_p["name"]);
+			progressTerm.addSubtext(current_p["subtext"]["major"], [current_p["subtext"]["academic"], current_p["subtext"]["additional"]]);
+			progressTerm.addTermData({
+				attempted: current_p["termData"]["attempted"],
+				passed: current_p["termData"]["passed"],
+				gpa: current_p["termData"]["gpa"]
+			});
+			progressTerm.addCumulativeData({
+				attempted: current_p["cumulativeData"]["attempted"],
+				passed: current_p["cumulativeData"]["passed"],
+				gpa: current_p["cumulativeData"]["gpa"]
+			});
+			for (var j=0; j < current_p["courses"].length; j++) {
+				var current_p2 = current_p["courses"][j];
+				var tempCourse = new Course(null, null, null, null, true);
+				tempCourse.setCourseInfo(current_p2.subject, current_p2.course_num,
+					current_p2.name, current_p2.level, current_p2.grade, current_p2.credits, current_p2.status);
+				progressTerm.addCourse(tempCourse);
+			}
+			temp.setData(resultJSON["studentData"], resultJSON["totalData"], getTerms("transferTerms"), getTerms("gradeTerms"), progressTerm);
 			styleFilename();
 			temp.display(new DOMParser());
 			styleSections();
