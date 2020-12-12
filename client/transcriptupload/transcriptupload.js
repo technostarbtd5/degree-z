@@ -578,6 +578,7 @@ class Transcript {
 		sendData["name"] = this.studentData.name;
 		sendData["college"] = this.studentData.college;
 		sendData["majors"] = this.studentData.majors;
+		sendData["departments"] = this.studentData.departments;
 		sendData["minors"] = this.studentData.minors;
 		sendData["taken"] = this.totalData.attempted;
 		sendData["received"] = this.totalData.passed;
