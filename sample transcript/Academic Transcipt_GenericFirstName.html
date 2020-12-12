@@ -1,0 +1,815 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!-- saved from url=(0043)https://sis.rpi.edu/rss/bwskotrn.P_ViewTran -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<link rel="stylesheet" href="./Academic Transcipt_GenericFirstName_files/web_defaultapp.css" type="text/css">
+<link rel="stylesheet" href="./Academic Transcipt_GenericFirstName_files/web_defaultprint.css" type="text/css" media="print">
+<title>Academic Transcipt</title>
+<meta http-equiv="Content-Script-Type" name="Default_Script_Language" content="text/javascript">
+<script language="JavaScript" type="text/javascript">
+<!-- Hide JavaScript from older browsers 
+window.onunload = function() {submitcount=0;}
+var submitcount=0;
+function checkSubmit() {
+if (submitcount == 0)
+   {
+   submitcount++;
+   return true;
+   }
+else
+   {
+alert("Your changes have already been submitted.");
+   return false;
+   }
+}
+//  End script hiding -->
+</script>
+<script language="JavaScript" type="text/javascript">
+<!-- Hide JavaScript from older browsers 
+//  Function to open a window
+function windowOpen(window_url) {
+   helpWin = window.open(window_url,'','toolbar=yes,status=no,scrollbars=yes,menubar=yes,resizable=yes,directories=no,location=no,width=350,height=400');
+   if (document.images) { 
+       if (helpWin) helpWin.focus()
+   }
+}
+//  End script hiding -->
+</script>
+<script language="JavaScript" type="text/javascript">
+<!-- Hide JavaScript from older browsers 
+function timeout_window() {
+   message_text = "WARNING: Your SIS/RSS session will time out in one minute.\nSessions end after 15 minutes of inactivity as a security measure.";
+   setTimeout('display_message(message_text)', 840000);
+}
+
+function display_message(message_text) {
+   window.alert(message_text);
+}
+//  End script hiding -->
+</script>
+</head>
+<body onload="timeout_window()" data-new-gr-c-s-check-loaded="14.984.0" data-gr-ext-installed="">
+<div class="headerwrapperdiv">
+<div class="pageheaderdiv1">
+<a href="https://sis.rpi.edu/rss/bwskotrn.P_ViewTran#main_content" onmouseover="window.status=&#39;Go to Main Content&#39;; return true" onmouseout="window.status=&#39;&#39;; return true" onfocus="window.status=&#39;Go to Main Content&#39;; return true" onblur="window.status=&#39;&#39;; return true" class="skiplinks">Go to Main Content</a>
+<h1>Rensselaer's Student Information System</h1></div><div class="headerlinksdiv">
+<span class="pageheaderlinks2">
+<map name="Module_Navigation_Links_H" title="Module Navigation Links">
+<p>
+<a href="https://sis.rpi.edu/rss/bwskotrn.P_ViewTran#skip_Module_Navigation_Links_H" onmouseover="window.status=&#39;Skip Module Navigation Links&#39;; return true" onmouseout="window.status=&#39;&#39;; return true" onfocus="window.status=&#39;Skip Module Navigation Links&#39;; return true" onblur="window.status=&#39;&#39;; return true" class="skiplinks">Skip Module Navigation Links</a>
+</p><table class="plaintable" summary="This is main table for displaying Tab Items." width="100%" cellspacing="0" cellpadding="0" border="0">
+<tbody><tr>
+<td class="pldefault">
+<table class="plaintable" summary="This table displays Tab Items." cellspacing="0" cellpadding="0" border="0">
+<tbody><tr>
+<td class="taboff" height="22">
+<a href="https://sis.rpi.edu/rss/twbkwbis.P_GenMenu?name=bmenu.P_GenMnu" onmouseover="window.status=&#39;Personal Information&#39;; return true" onmouseout="window.status=&#39;&#39;; return true" onfocus="window.status=&#39;Personal Information&#39;; return true" onblur="window.status=&#39;&#39;; return true">Personal Information</a>
+</td>
+<td class="bgtaboff" height="22" valign="top" align="right">
+<img src="./Academic Transcipt_GenericFirstName_files/web_tab_corner_right.gif" alt="Tab Corner Right" class="headerImg" title="Tab Corner Right" name="web_tab_corner_right" hspace="0" vspace="0" border="0" height="20" width="8">
+</td>
+<td class="tabon" height="22">
+<a href="https://sis.rpi.edu/rss/twbkwbis.P_GenMenu?name=bmenu.P_StuMainMnu" onmouseover="window.status=&#39;Student Menu&#39;; return true" onmouseout="window.status=&#39;&#39;; return true" onfocus="window.status=&#39;Student Menu&#39;; return true" onblur="window.status=&#39;&#39;; return true">Student Menu</a>
+</td>
+<td class="bgtabon" height="22" valign="top" align="right">
+<img src="./Academic Transcipt_GenericFirstName_files/web_tab_corner_right.gif" alt="Tab Corner Right" class="headerImg" title="Tab Corner Right" name="web_tab_corner_right" hspace="0" vspace="0" border="0" height="20" width="8">
+</td>
+<td class="taboff" height="22">
+<a href="https://sis.rpi.edu/rss/twbkwbis.P_GenMenu?name=bmenu.P_FinAidMainMnu" onmouseover="window.status=&#39;Financial Aid Menu&#39;; return true" onmouseout="window.status=&#39;&#39;; return true" onfocus="window.status=&#39;Financial Aid Menu&#39;; return true" onblur="window.status=&#39;&#39;; return true">Financial Aid Menu</a>
+</td>
+<td class="bgtaboff" height="22" valign="top" align="right">
+<img src="./Academic Transcipt_GenericFirstName_files/web_tab_corner_right.gif" alt="Tab Corner Right" class="headerImg" title="Tab Corner Right" name="web_tab_corner_right" hspace="0" vspace="0" border="0" height="20" width="8">
+</td>
+<td class="tabon" height="22">
+<a href="https://sis.rpi.edu/rss/twbkwbis.P_GenMenu?name=amenu.P_AcctInfoMnu" onmouseover="window.status=&#39;Student Account Detail&#39;; return true" onmouseout="window.status=&#39;&#39;; return true" onfocus="window.status=&#39;Student Account Detail&#39;; return true" onblur="window.status=&#39;&#39;; return true">Student Account Detail</a>
+</td>
+<td class="bgtabon" height="22" valign="top" align="right">
+<img src="./Academic Transcipt_GenericFirstName_files/web_tab_corner_right.gif" alt="Tab Corner Right" class="headerImg" title="Tab Corner Right" name="web_tab_corner_right" hspace="0" vspace="0" border="0" height="20" width="8">
+</td>
+<td class="taboff" height="22">
+<a href="https://sis.rpi.edu/rss/twbkwbis.P_GenMenu?name=bmenu.P_MainMnu" onmouseover="window.status=&#39;Main Menu&#39;; return true" onmouseout="window.status=&#39;&#39;; return true" onfocus="window.status=&#39;Main Menu&#39;; return true" onblur="window.status=&#39;&#39;; return true">Main Menu</a>
+</td>
+<td class="bgtaboff" height="22" valign="top" align="right">
+<img src="./Academic Transcipt_GenericFirstName_files/web_tab_corner_right.gif" alt="Tab Corner Right" class="headerImg" title="Tab Corner Right" name="web_tab_corner_right" hspace="0" vspace="0" border="0" height="20" width="8">
+</td>
+</tr>
+</tbody></table>
+</td>
+</tr>
+<tr>
+<td class="bgtabon" width="100%" colspan="2"><img src="./Academic Transcipt_GenericFirstName_files/web_transparent.gif" alt="Transparent Image" class="headerImg" title="Transparent Image" name="web_transparent" hspace="0" vspace="0" border="0" height="3" width="10"></td></tr></tbody></table>
+</map>
+</span>
+<a name="skip_Module_Navigation_Links_H"></a>
+</div>
+<table class="plaintable" summary="This table displays Menu Items and Banner Search textbox." width="100%">
+<tbody><tr>
+<td class="pldefault">
+<div class="headerlinksdiv2">
+<form action="https://sis.rpi.edu/rss/twbksrch.P_ShowResults" method="post">
+Search
+<span class="fieldlabeltextinvisible"><label for="keyword_in_id"><span class="fieldlabeltext">Search</span></label></span>
+<input type="text" name="KEYWRD_IN" size="20" maxlength="65" id="keyword_in_id">
+<input type="submit" value="Go">
+</form>
+</div>
+</td>
+<td class="pldefault"><p class="rightaligntext" p="">
+<span class="pageheaderlinks">
+<a href="https://sis.rpi.edu/rss/twbkwbis.P_GenMenu?name=bmenu.P_AdminMnu" class="submenulinktext2" id="ssbbackurl">RETURN TO MENU</a>
+|
+<a href="https://sis.rpi.edu/rss/twbksite.P_DispSiteMap?menu_name_in=bmenu.P_MainMnu&amp;depth_in=2&amp;columns_in=3" accesskey="2" class="submenulinktext2">SITE MAP</a>
+|
+<a href="https://sis.rpi.edu/stuhelp/hwshotrn.htm" accesskey="H" onclick="popup = window.open(&#39;/stuhelp/hwshotrn.htm&#39;, &#39;PopupPage&#39;,&#39;height=500,width=450,scrollbars=yes,resizable=yes&#39;); return false" target="_blank" onmouseover="window.status=&#39;&#39;;  return true" onmouseout="window.status=&#39;&#39;; return true" onfocus="window.status=&#39;&#39;;  return true" onblur="window.status=&#39;&#39;; return true" class="submenulinktext2">HELP</a>
+|
+<a href="https://sis.rpi.edu/rss/twbkwbis.P_Logout" accesskey="3" class="submenulinktext2">EXIT</a>
+</span>
+</p></td>
+</tr>
+</tbody></table>
+</div>
+<div class="pagetitlediv">
+<table class="plaintable" summary="This table displays title and static header displays." width="100%">
+<tbody><tr>
+<td class="pldefault">
+<h2>Display Transcript</h2>
+</td>
+<td class="pldefault">
+&nbsp;
+</td>
+<td class="pldefault"><p class="rightaligntext" p="">
+</p><div class="staticheaders">
+661661661 GenericFirstName R. GenericLastName<br>
+Dec 01, 2020 12:14 pm<br>
+</div>
+</td>
+</tr>
+<tr>
+<td class="bg3" width="100%" colspan="3"><img src="./Academic Transcipt_GenericFirstName_files/web_transparent.gif" alt="Transparent Image" class="headerImg" title="Transparent Image" name="web_transparent" hspace="0" vspace="0" border="0" height="3" width="10"></td>
+</tr>
+</tbody></table>
+<a name="main_content"></a>
+</div>
+<div class="pagebodydiv">
+<!--  ** END OF twbkwbis.P_OpenDoc **  -->
+<div class="infotextdiv"><table class="infotexttable" summary="This layout table contains information that may be helpful in understanding the content and functionality of this page.  It could be a brief set of instructions, a description of error messages, or other special information."><tbody><tr><td class="indefault"><img src="./Academic Transcipt_GenericFirstName_files/hwgginfo.gif" alt="Information" class="headerImg" title="Information" name="Info" hspace="0" vspace="0" border="0"></td><td class="indefault"><span class="infotext"> This is NOT an official transcript.  Courses which are in progress may also be included on this transcript.<p></p></span></td></tr></tbody></table><p></p></div>
+<a name="top">
+</a>
+<a href="https://sis.rpi.edu/rss/bwskotrn.P_ViewTran#trans_credit">Transfer Credit</a>
+&nbsp;&nbsp;
+<a href="https://sis.rpi.edu/rss/bwskotrn.P_ViewTran#insti_credit">Institution Credit</a>
+&nbsp;&nbsp;
+<a href="https://sis.rpi.edu/rss/bwskotrn.P_ViewTran#trans_totals">Transcript Totals</a>
+&nbsp;&nbsp;
+<a href="https://sis.rpi.edu/rss/bwskotrn.P_ViewTran#crses_progress">Courses in Progress</a>
+<p class="whitespace1">
+</p><table class="datadisplaytable" summary="This table will display the
+                                   user&#39;s Academic History in the following
+                                   sections:  Degree Information, Transfer
+                                   Credit By Institution, Institution
+                                   Credit, Transcript Totals ,
+                                   Courses In Progress." width="80%"><caption class="captiontext">Transcript Data</caption>
+<tbody><tr>
+<th colspan="12" class="ddtitle" scope="colgroup">STUDENT INFORMATION</th>
+</tr>
+<tr>
+<th colspan="2" class="ddlabel" scope="row">Name :</th>
+<td colspan="10" class="dddefault">GenericFirstName R. GenericLastName</td>
+</tr>
+<tr>
+<th colspan="2" class="ddlabel" scope="row">Student Type:</th>
+<td colspan="10" class="dddefault">Ongoing</td>
+</tr>
+<tr>
+<th colspan="6" class="ddtitle" scope="colgroup">Curriculum Information</th>
+</tr>
+<tr>
+<th colspan="6" class="ddlabel" scope="row">Current Program</th>
+</tr>
+<tr>
+<td colspan="6" class="dddefault">Bachelor of Science</td>
+</tr>
+<tr>
+<th colspan="3" class="ddlabel" scope="row">College:</th>
+<td colspan="3" class="dddefault">School of Science</td>
+</tr>
+<tr>
+<th colspan="3" class="ddlabel" scope="row">Major:</th>
+<td colspan="3" class="dddefault">Computer Science</td>
+</tr>
+<tr>
+<th colspan="3" class="ddlabel" scope="row">Major and Department:</th>
+<td colspan="3" class="dddefault">Information Tech &amp; Web Science, Information Tech &amp; Web Science</td>
+</tr>
+<tr>
+<td colspan="12" class="ddseparator">&nbsp;</td>
+</tr>
+<tr>
+<td colspan="12" class="ddseparator">***Transcript type:UWEB is NOT Official ***</td>
+</tr>
+<tr>
+<td colspan="12" class="ddseparator">&nbsp;</td>
+</tr>
+<tr>
+<td colspan="12" class="ddseparator">&nbsp;</td>
+</tr>
+<tr>
+<td colspan="12" class="ddseparator">&nbsp;</td>
+</tr>
+<tr>
+<th colspan="12" class="ddtitle" scope="colgroup">TRANSFER CREDIT ACCEPTED BY INSTITUTION&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://sis.rpi.edu/rss/bwskotrn.P_ViewTran#top" alt="TOP">-Top-</a><a name="trans_credit"></a></th>
+</tr>
+<tr>
+<th colspan="1" class="ddlabel" scope="row"><span class="fieldOrangetextbold">FALL 2019:</span></th>
+<td colspan="11" class="dddefault">Advanced Placement Credit</td>
+</tr>
+<tr>
+<th class="ddheader" scope="col">Subject</th>
+<th colspan="2" class="ddheader" scope="col">Course</th>
+<th colspan="3" class="ddheader" scope="col">Title</th>
+<th class="ddheader" scope="col">Grade</th>
+<th class="ddheader" scope="col">Credit Hours</th>
+<th colspan="4" class="ddheader" scope="col">Quality Points</th>
+<th class="ddheader" scope="col"><abbr title="Repeat Status">R</abbr></th>
+</tr>
+<tr>
+<td class="dddefault">CHEM</td>
+<td colspan="2" class="dddefault">1100</td>
+<td colspan="3" class="dddefault">CHEMISTRY I</td>
+<td class="dddefault">AP</td>
+<td class="dddefault"><p class="rightaligntext">    4.000</p></td>
+<td colspan="4" class="dddefault"><p class="rightaligntext">              0.00</p></td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">CHEM</td>
+<td colspan="2" class="dddefault">1200</td>
+<td colspan="3" class="dddefault">CHEMISTRY II</td>
+<td class="dddefault">AP</td>
+<td class="dddefault"><p class="rightaligntext">    4.000</p></td>
+<td colspan="4" class="dddefault"><p class="rightaligntext">              0.00</p></td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">CSCI</td>
+<td colspan="2" class="dddefault">1100</td>
+<td colspan="3" class="dddefault">COMPUTER SCIENCE I</td>
+<td class="dddefault">AP</td>
+<td class="dddefault"><p class="rightaligntext">    4.000</p></td>
+<td colspan="4" class="dddefault"><p class="rightaligntext">              0.00</p></td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">MATH</td>
+<td colspan="2" class="dddefault">1010</td>
+<td colspan="3" class="dddefault">CALCULUS I</td>
+<td class="dddefault">AP</td>
+<td class="dddefault"><p class="rightaligntext">    4.000</p></td>
+<td colspan="4" class="dddefault"><p class="rightaligntext">              0.00</p></td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">MATH</td>
+<td colspan="2" class="dddefault">1020</td>
+<td colspan="3" class="dddefault">CALCULUS II</td>
+<td class="dddefault">AP</td>
+<td class="dddefault"><p class="rightaligntext">    4.000</p></td>
+<td colspan="4" class="dddefault"><p class="rightaligntext">              0.00</p></td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">MGMT</td>
+<td colspan="2" class="dddefault">2100</td>
+<td colspan="3" class="dddefault">STATISTICAL METHODS</td>
+<td class="dddefault">AP</td>
+<td class="dddefault"><p class="rightaligntext">    4.000</p></td>
+<td colspan="4" class="dddefault"><p class="rightaligntext">              0.00</p></td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">PHYS</td>
+<td colspan="2" class="dddefault">1100</td>
+<td colspan="3" class="dddefault">PHYSICS I</td>
+<td class="dddefault">AP</td>
+<td class="dddefault"><p class="rightaligntext">    4.000</p></td>
+<td colspan="4" class="dddefault"><p class="rightaligntext">              0.00</p></td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">STSH</td>
+<td colspan="2" class="dddefault">1000</td>
+<td colspan="3" class="dddefault">SCIENCE &amp; TECHNOLOGY ELECTIVE</td>
+<td class="dddefault">AP</td>
+<td class="dddefault"><p class="rightaligntext">    4.000</p></td>
+<td colspan="4" class="dddefault"><p class="rightaligntext">              0.00</p></td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">STSS</td>
+<td colspan="2" class="dddefault">1000</td>
+<td colspan="3" class="dddefault">SCIENCE &amp; TECHNOLOGY ELECTIVE</td>
+<td class="dddefault">AP</td>
+<td class="dddefault"><p class="rightaligntext">    4.000</p></td>
+<td colspan="4" class="dddefault"><p class="rightaligntext">              0.00</p></td>
+<td class="dddefault">I</td>
+</tr>
+<tr>
+<td class="dddefault">STSS</td>
+<td colspan="2" class="dddefault">1000</td>
+<td colspan="3" class="dddefault">SCIENCE &amp; TECHNOLOGY ELECTIVE</td>
+<td class="dddefault">AP</td>
+<td class="dddefault"><p class="rightaligntext">    4.000</p></td>
+<td colspan="4" class="dddefault"><p class="rightaligntext">              0.00</p></td>
+<td class="dddefault">I</td>
+</tr>
+<tr>
+<td class="dddefault">WRIT</td>
+<td colspan="2" class="dddefault">1000</td>
+<td colspan="3" class="dddefault">WRITING ELECTIVE</td>
+<td class="dddefault">AP</td>
+<td class="dddefault"><p class="rightaligntext">    4.000</p></td>
+<td colspan="4" class="dddefault"><p class="rightaligntext">              0.00</p></td>
+<td class="dddefault">&nbsp;</td>
+</tr>
+<tr>
+<td colspan="4" class="dddead">&nbsp;</td>
+<th class="ddheader" scope="col">Attempt Hours</th>
+<th class="ddheader" scope="col">Passed Hours</th>
+<th class="ddheader" scope="col">Earned Hours</th>
+<th class="ddheader" scope="col">GPA Hours</th>
+<th class="ddheader" scope="col">Quality Points</th>
+<th colspan="3" class="ddheader" scope="col">GPA</th>
+</tr>
+<tr>
+<th colspan="4" class="ddlabel" scope="row">Current Term:</th>
+<td class="dddefault"><p class="rightaligntext">        0.000</p></td>
+<td class="dddefault"><p class="rightaligntext">       44.000</p></td>
+<td class="dddefault"><p class="rightaligntext">       44.000</p></td>
+<td class="dddefault"><p class="rightaligntext">        0.000</p></td>
+<td class="dddefault"><p class="rightaligntext">              0.00</p></td>
+<td colspan="3" class="dddefault"><p class="rightaligntext">                     0.00</p></td>
+</tr>
+<tr>
+<td colspan="12" class="ddseparator">&nbsp;</td>
+</tr>
+<tr>
+<td colspan="4" class="ddseparator"><div class="infotextdiv"><table class="infotexttable" summary="This layout table contains information that may be helpful in understanding the content and functionality of this page.  It could be a brief set of instructions, a description of error messages, or other special information."><tbody><tr><td class="indefault"><span class="infotext"> Unofficial Transcript</span></td></tr></tbody></table><p></p></div></td>
+</tr>
+<tr>
+<th colspan="12" class="ddtitle" scope="colgroup">INSTITUTION CREDIT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://sis.rpi.edu/rss/bwskotrn.P_ViewTran#top" alt="TOP">-Top-</a><a name="insti_credit"></a></th>
+</tr>
+<tr>
+<th colspan="12" class="ddlabel" scope="row"><span class="fieldOrangetextbold">Term: Fall 2019</span></th>
+</tr>
+<tr>
+<th colspan="4" class="ddlabel" scope="row">Major:</th>
+<td colspan="7" class="dddefault">Computer Science</td>
+</tr>
+<tr>
+<th colspan="4" class="ddlabel" scope="row">Academic Standing:</th>
+<td colspan="7" class="dddefault">Good Standing</td>
+</tr>
+<tr>
+<th colspan="4" class="ddlabel" scope="row">Additional Standing:</th>
+<td colspan="7" class="dddefault">Dean's Honor List</td>
+</tr>
+<tr>
+<th class="ddheader" scope="col">Subject</th>
+<th class="ddheader" scope="col">Course</th>
+<th class="ddheader" scope="col">Level</th>
+<th colspan="5" class="ddheader" scope="col">Title</th>
+<th class="ddheader" scope="col">Grade</th>
+<th class="ddheader" scope="col">Credit Hours</th>
+<th class="ddheader" scope="col">Quality Points</th>
+<th class="ddheader" scope="col"><abbr title="Repeat Status">R</abbr></th>
+</tr>
+<tr>
+<td class="dddefault">BIOL</td>
+<td class="dddefault">1010</td>
+<td class="dddefault">UG</td>
+<td colspan="5" class="dddefault">INTRODUCTION TO BIOLOGY</td>
+<td class="dddefault">A</td>
+<td class="dddefault"><p class="rightaligntext">        3.000</p></td>
+<td class="dddefault"><p class="rightaligntext">             12.00</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddead">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">BIOL</td>
+<td class="dddefault">1015</td>
+<td class="dddefault">UG</td>
+<td colspan="5" class="dddefault">INTRODUCTION TO BIOLOGY LAB</td>
+<td class="dddefault">A</td>
+<td class="dddefault"><p class="rightaligntext">        1.000</p></td>
+<td class="dddefault"><p class="rightaligntext">              4.00</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddead">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">CSCI</td>
+<td class="dddefault">1200</td>
+<td class="dddefault">UG</td>
+<td colspan="5" class="dddefault">DATA STRUCTURES</td>
+<td class="dddefault">A</td>
+<td class="dddefault"><p class="rightaligntext">        4.000</p></td>
+<td class="dddefault"><p class="rightaligntext">             16.00</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddead">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">IHSS</td>
+<td class="dddefault">1200</td>
+<td class="dddefault">UG</td>
+<td colspan="5" class="dddefault">PRINCIPLES OF ECONOMICS</td>
+<td class="dddefault">A</td>
+<td class="dddefault"><p class="rightaligntext">        4.000</p></td>
+<td class="dddefault"><p class="rightaligntext">             16.00</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddead">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">MATH</td>
+<td class="dddefault">2010</td>
+<td class="dddefault">UG</td>
+<td colspan="5" class="dddefault">MULTIVAR CALC &amp; MATRIX ALGEBRA</td>
+<td class="dddefault">A</td>
+<td class="dddefault"><p class="rightaligntext">        4.000</p></td>
+<td class="dddefault"><p class="rightaligntext">             16.00</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddead">&nbsp;</td>
+</tr>
+<tr>
+<th colspan="12" class="ddtitle" scope="colgroup">Term Totals (Undergraduate)</th>
+</tr>
+<tr>
+<td colspan="5" class="dddead">&nbsp;</td>
+<th class="ddheader" scope="col">Attempt Hours</th>
+<th class="ddheader" scope="col">Passed Hours</th>
+<th class="ddheader" scope="col">Earned Hours</th>
+<th class="ddheader" scope="col">GPA Hours</th>
+<th class="ddheader" scope="col">Quality Points</th>
+<th colspan="2" class="ddheader" scope="col">GPA</th>
+</tr>
+<tr>
+<th colspan="5" class="ddlabel" scope="row">Current Term:</th>
+<td class="dddefault"><p class="rightaligntext">       16.000</p></td>
+<td class="dddefault"><p class="rightaligntext">       16.000</p></td>
+<td class="dddefault"><p class="rightaligntext">       16.000</p></td>
+<td class="dddefault"><p class="rightaligntext">       16.000</p></td>
+<td class="dddefault"><p class="rightaligntext">             64.00</p></td>
+<td colspan="2" class="dddefault"><p class="rightaligntext">                     4.00</p></td>
+</tr>
+<tr>
+<th colspan="5" class="ddlabel" scope="row">Cumulative:</th>
+<td class="dddefault"><p class="rightaligntext">       16.000</p></td>
+<td class="dddefault"><p class="rightaligntext">       16.000</p></td>
+<td class="dddefault"><p class="rightaligntext">       16.000</p></td>
+<td class="dddefault"><p class="rightaligntext">       16.000</p></td>
+<td class="dddefault"><p class="rightaligntext">             64.00</p></td>
+<td colspan="2" class="dddefault"><p class="rightaligntext">                     4.00</p></td>
+</tr>
+<tr>
+<td colspan="12" class="ddseparator">&nbsp;</td>
+</tr>
+<tr>
+<td colspan="4" class="ddseparator"><div class="infotextdiv"><table class="infotexttable" summary="This layout table contains information that may be helpful in understanding the content and functionality of this page.  It could be a brief set of instructions, a description of error messages, or other special information."><tbody><tr><td class="indefault"><span class="infotext"> Unofficial Transcript</span></td></tr></tbody></table><p></p></div></td>
+</tr>
+<tr>
+<th colspan="12" class="ddlabel" scope="row"><span class="fieldOrangetextbold">Term: Spring 2020</span></th>
+</tr>
+<tr>
+<th colspan="4" class="ddlabel" scope="row">Major:</th>
+<td colspan="7" class="dddefault">Computer Science</td>
+</tr>
+<tr>
+<th colspan="4" class="ddlabel" scope="row">Academic Standing:</th>
+<td colspan="7" class="dddefault">Good Standing</td>
+</tr>
+<tr>
+<th colspan="4" class="ddlabel" scope="row">Additional Standing:</th>
+<td colspan="7" class="dddefault">Dean's Honor List</td>
+</tr>
+<tr>
+<th class="ddheader" scope="col">Subject</th>
+<th class="ddheader" scope="col">Course</th>
+<th class="ddheader" scope="col">Level</th>
+<th colspan="5" class="ddheader" scope="col">Title</th>
+<th class="ddheader" scope="col">Grade</th>
+<th class="ddheader" scope="col">Credit Hours</th>
+<th class="ddheader" scope="col">Quality Points</th>
+<th class="ddheader" scope="col"><abbr title="Repeat Status">R</abbr></th>
+</tr>
+<tr>
+<td class="dddefault">CSCI</td>
+<td class="dddefault">2200</td>
+<td class="dddefault">UG</td>
+<td colspan="5" class="dddefault">FOUNDATIONS OF COMPUTER SCI</td>
+<td class="dddefault">A</td>
+<td class="dddefault"><p class="rightaligntext">        4.000</p></td>
+<td class="dddefault"><p class="rightaligntext">             16.00</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddead">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">CSCI</td>
+<td class="dddefault">2500</td>
+<td class="dddefault">UG</td>
+<td colspan="5" class="dddefault">COMPUTER ORGANIZATION</td>
+<td class="dddefault">A</td>
+<td class="dddefault"><p class="rightaligntext">        4.000</p></td>
+<td class="dddefault"><p class="rightaligntext">             16.00</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddead">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">ECON</td>
+<td class="dddefault">2020</td>
+<td class="dddefault">UG</td>
+<td colspan="5" class="dddefault">INTERMEDIATE MACROECON THEORY</td>
+<td class="dddefault">A</td>
+<td class="dddefault"><p class="rightaligntext">        4.000</p></td>
+<td class="dddefault"><p class="rightaligntext">             16.00</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddead">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">ITWS</td>
+<td class="dddefault">1100</td>
+<td class="dddefault">UG</td>
+<td colspan="5" class="dddefault">INTRO TO IT &amp; WEB SCIENCE</td>
+<td class="dddefault">A</td>
+<td class="dddefault"><p class="rightaligntext">        4.000</p></td>
+<td class="dddefault"><p class="rightaligntext">             16.00</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddead">&nbsp;</td>
+</tr>
+<tr>
+<td class="dddefault">ITWS</td>
+<td class="dddefault">1220</td>
+<td class="dddefault">UG</td>
+<td colspan="5" class="dddefault">IT AND SOCIETY</td>
+<td class="dddefault">P</td>
+<td class="dddefault"><p class="rightaligntext">        4.000</p></td>
+<td class="dddefault"><p class="rightaligntext">              0.00</p></td>
+<td class="dddefault">&nbsp;</td>
+<td class="dddead">&nbsp;</td>
+</tr>
+<tr>
+<th colspan="12" class="ddtitle" scope="colgroup">Term Totals (Undergraduate)</th>
+</tr>
+<tr>
+<td colspan="5" class="dddead">&nbsp;</td>
+<th class="ddheader" scope="col">Attempt Hours</th>
+<th class="ddheader" scope="col">Passed Hours</th>
+<th class="ddheader" scope="col">Earned Hours</th>
+<th class="ddheader" scope="col">GPA Hours</th>
+<th class="ddheader" scope="col">Quality Points</th>
+<th colspan="2" class="ddheader" scope="col">GPA</th>
+</tr>
+<tr>
+<th colspan="5" class="ddlabel" scope="row">Current Term:</th>
+<td class="dddefault"><p class="rightaligntext">       20.000</p></td>
+<td class="dddefault"><p class="rightaligntext">       20.000</p></td>
+<td class="dddefault"><p class="rightaligntext">       20.000</p></td>
+<td class="dddefault"><p class="rightaligntext">       16.000</p></td>
+<td class="dddefault"><p class="rightaligntext">             64.00</p></td>
+<td colspan="2" class="dddefault"><p class="rightaligntext">                     4.00</p></td>
+</tr>
+<tr>
+<th colspan="5" class="ddlabel" scope="row">Cumulative:</th>
+<td class="dddefault"><p class="rightaligntext">       36.000</p></td>
+<td class="dddefault"><p class="rightaligntext">       36.000</p></td>
+<td class="dddefault"><p class="rightaligntext">       36.000</p></td>
+<td class="dddefault"><p class="rightaligntext">       32.000</p></td>
+<td class="dddefault"><p class="rightaligntext">            128.00</p></td>
+<td colspan="2" class="dddefault"><p class="rightaligntext">                     4.00</p></td>
+</tr>
+<tr>
+<td colspan="11" class="ddseparator">&nbsp;</td>
+</tr>
+<tr>
+<td colspan="4" class="ddseparator"><div class="infotextdiv"><table class="infotexttable" summary="This layout table contains information that may be helpful in understanding the content and functionality of this page.  It could be a brief set of instructions, a description of error messages, or other special information."><tbody><tr><td class="indefault"><span class="infotext"> Unofficial Transcript</span></td></tr></tbody></table><p></p></div></td>
+</tr>
+<tr>
+<th colspan="11" class="ddtitle" scope="colgroup">TRANSCRIPT TOTALS (UNDERGRADUATE)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://sis.rpi.edu/rss/bwskotrn.P_ViewTran#top" alt="TOP">-Top-</a><a name="trans_totals"></a></th>
+</tr>
+<tr>
+<td colspan="4" class="dddead">&nbsp;</td>
+<th class="ddheader" scope="col">Attempt Hours</th>
+<th class="ddheader" scope="col">Passed Hours</th>
+<th class="ddheader" scope="col">Earned Hours</th>
+<th class="ddheader" scope="col">GPA Hours</th>
+<th class="ddheader" scope="col">Quality Points</th>
+<th colspan="2" class="ddheader" scope="col">GPA</th>
+</tr>
+<tr>
+<th colspan="4" class="ddlabel" scope="row">Total Institution:</th>
+<td class="dddefault"><p class="rightaligntext">       36.000</p></td>
+<td class="dddefault"><p class="rightaligntext">       36.000</p></td>
+<td class="dddefault"><p class="rightaligntext">       36.000</p></td>
+<td class="dddefault"><p class="rightaligntext">       32.000</p></td>
+<td class="dddefault"><p class="rightaligntext">            128.00</p></td>
+<td colspan="2" class="dddefault"><p class="rightaligntext">                     4.00</p></td>
+</tr>
+<tr>
+<th colspan="4" class="ddlabel" scope="row">Total Transfer:</th>
+<td class="dddefault"><p class="rightaligntext">        0.000</p></td>
+<td class="dddefault"><p class="rightaligntext">       44.000</p></td>
+<td class="dddefault"><p class="rightaligntext">       44.000</p></td>
+<td class="dddefault"><p class="rightaligntext">        0.000</p></td>
+<td class="dddefault"><p class="rightaligntext">              0.00</p></td>
+<td colspan="2" class="dddefault"><p class="rightaligntext">                     0.00</p></td>
+</tr>
+<tr>
+<th colspan="4" class="ddlabel" scope="row">Overall:</th>
+<td class="dddefault"><p class="rightaligntext">       36.000</p></td>
+<td class="dddefault"><p class="rightaligntext">       80.000</p></td>
+<td class="dddefault"><p class="rightaligntext">       80.000</p></td>
+<td class="dddefault"><p class="rightaligntext">             32.000</p></td>
+<td class="dddefault"><p class="rightaligntext">            128.00</p></td>
+<td colspan="2" class="dddefault"><p class="rightaligntext">                     4.00</p></td>
+</tr>
+<tr>
+<td colspan="11" class="ddseparator">&nbsp;</td>
+</tr>
+<tr>
+<td colspan="4" class="ddseparator"><div class="infotextdiv"><table class="infotexttable" summary="This layout table contains information that may be helpful in understanding the content and functionality of this page.  It could be a brief set of instructions, a description of error messages, or other special information."><tbody><tr><td class="indefault"><span class="infotext"> Unofficial Transcript</span></td></tr></tbody></table><p></p></div></td>
+</tr>
+<tr>
+<th colspan="11" class="ddtitle" scope="colgroup">COURSES IN PROGRESS   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://sis.rpi.edu/rss/bwskotrn.P_ViewTran#top" alt="TOP">-Top-</a><a name="crses_progress"></a></th>
+</tr>
+<tr>
+<th colspan="11" class="ddlabel" scope="row"><span class="fieldOrangetextbold">Term: Fall 2020</span></th>
+</tr>
+<tr>
+<th colspan="4" class="ddlabel" scope="row">Major:</th>
+<td colspan="7" class="dddefault">Computer Science</td>
+</tr>
+<tr>
+<th class="ddheader" scope="col">Subject</th>
+<th class="ddheader" scope="col">Course</th>
+<th class="ddheader" scope="col">Level</th>
+<th colspan="6" class="ddheader" scope="col">Title</th>
+<th colspan="2" class="ddheader" scope="col">Credit Hours</th>
+</tr>
+<tr>
+<td class="dddefault">COMM</td>
+<td class="dddefault">4420</td>
+<td class="dddefault">UG</td>
+<td colspan="6" class="dddefault">FOUNDATIONS OF HCI USABILITY</td>
+<td colspan="2" class="dddefault"><p class="rightaligntext">    4.000</p></td>
+</tr>
+<tr>
+<td class="dddefault">CSCI</td>
+<td class="dddefault">2300</td>
+<td class="dddefault">UG</td>
+<td colspan="6" class="dddefault">INTRODUCTION TO ALGORITHMS</td>
+<td colspan="2" class="dddefault"><p class="rightaligntext">    4.000</p></td>
+</tr>
+<tr>
+<td class="dddefault">ECON</td>
+<td class="dddefault">4130</td>
+<td class="dddefault">UG</td>
+<td colspan="6" class="dddefault">MONEY &amp; BANKING</td>
+<td colspan="2" class="dddefault"><p class="rightaligntext">    4.000</p></td>
+</tr>
+<tr>
+<td class="dddefault">ITWS</td>
+<td class="dddefault">2110</td>
+<td class="dddefault">UG</td>
+<td colspan="6" class="dddefault">WEB SYSTEMS DEVELOPMENT</td>
+<td colspan="2" class="dddefault"><p class="rightaligntext">    4.000</p></td>
+</tr>
+<tr>
+<td class="dddefault">MATH</td>
+<td class="dddefault">4100</td>
+<td class="dddefault">UG</td>
+<td colspan="6" class="dddefault">LINEAR ALGEBRA</td>
+<td colspan="2" class="dddefault"><p class="rightaligntext">    4.000</p></td>
+</tr>
+<tr>
+<td colspan="11" class="ddseparator">&nbsp;</td>
+</tr>
+<tr>
+<td colspan="4" class="ddseparator"><div class="infotextdiv"><table class="infotexttable" summary="This layout table contains information that may be helpful in understanding the content and functionality of this page.  It could be a brief set of instructions, a description of error messages, or other special information."><tbody><tr><td class="indefault"><span class="infotext"> Unofficial Transcript</span></td></tr></tbody></table><p></p></div></td>
+</tr>
+<tr>
+<th colspan="11" class="ddlabel" scope="row"><span class="fieldOrangetextbold">Term: Spring 2021</span></th>
+</tr>
+<tr>
+<th colspan="4" class="ddlabel" scope="row">Major:</th>
+<td colspan="7" class="dddefault">Computer Science</td>
+</tr>
+<tr>
+<th class="ddheader" scope="col">Subject</th>
+<th class="ddheader" scope="col">Course</th>
+<th class="ddheader" scope="col">Level</th>
+<th colspan="6" class="ddheader" scope="col">Title</th>
+<th colspan="2" class="ddheader" scope="col">Credit Hours</th>
+</tr>
+<tr>
+<td class="dddefault">CSCI</td>
+<td class="dddefault">2600</td>
+<td class="dddefault">UG</td>
+<td colspan="6" class="dddefault">PRINCIPLES OF SOFTWARE</td>
+<td colspan="2" class="dddefault"><p class="rightaligntext">    4.000</p></td>
+</tr>
+<tr>
+<td class="dddefault">CSCI</td>
+<td class="dddefault">4100</td>
+<td class="dddefault">UG</td>
+<td colspan="6" class="dddefault">MACHINE LEARNING FROM DATA</td>
+<td colspan="2" class="dddefault"><p class="rightaligntext">    4.000</p></td>
+</tr>
+<tr>
+<td class="dddefault">CSCI</td>
+<td class="dddefault">4210</td>
+<td class="dddefault">UG</td>
+<td colspan="6" class="dddefault">OPERATING SYSTEMS</td>
+<td colspan="2" class="dddefault"><p class="rightaligntext">    4.000</p></td>
+</tr>
+<tr>
+<td class="dddefault">ITWS</td>
+<td class="dddefault">4310</td>
+<td class="dddefault">UG</td>
+<td colspan="6" class="dddefault">MANAGING IT RESOURCES</td>
+<td colspan="2" class="dddefault"><p class="rightaligntext">    4.000</p></td>
+</tr>
+<tr>
+<td class="dddefault">ITWS</td>
+<td class="dddefault">4500</td>
+<td class="dddefault">UG</td>
+<td colspan="6" class="dddefault">WEB SCIENCE SYSTEMS DEV</td>
+<td colspan="2" class="dddefault"><p class="rightaligntext">    4.000</p></td>
+</tr>
+<tr>
+<td colspan="11" class="ddseparator">&nbsp;</td>
+</tr>
+<tr>
+<td colspan="4" class="ddseparator"><div class="infotextdiv"><table class="infotexttable" summary="This layout table contains information that may be helpful in understanding the content and functionality of this page.  It could be a brief set of instructions, a description of error messages, or other special information."><tbody><tr><td class="indefault"><span class="infotext"> Unofficial Transcript</span></td></tr></tbody></table><p></p></div></td>
+</tr>
+</tbody></table>
+
+<!--  ** START OF twbkwbis.P_CloseDoc **  -->
+<table class="plaintable" summary="This is table displays line separator at end of the page." width="100%" cellspacing="0" cellpadding="0" border="0"><tbody><tr><td class="bgtabon" width="100%" colspan="2"><img src="./Academic Transcipt_GenericFirstName_files/web_transparent.gif" alt="Transparent Image" class="headerImg" title="Transparent Image" name="web_transparent" hspace="0" vspace="0" border="0" height="3" width="10"></td></tr></tbody></table>
+<a href="https://sis.rpi.edu/rss/bwskotrn.P_ViewTran#top" onmouseover="window.status=&#39;Skip to top of page&#39;; return true" onmouseout="window.status=&#39;&#39;; return true" onfocus="window.status=&#39;Skip to top of page&#39;; return true" onblur="window.status=&#39;&#39;; return true" class="skiplinks">Skip to top of page</a>
+</div>
+<div class="footerbeforediv">
+
+</div>
+<div class="footerlinksdiv">
+<span class="pagefooterlinks">
+<map name="Academic_Transcipt_Links_F" title="Academic Transcipt Links">
+<p>
+<a href="https://sis.rpi.edu/rss/bwskotrn.P_ViewTran#skip_Academic_Transcipt_Links_F" onmouseover="window.status=&#39;Skip Academic Transcipt Links&#39;; return true" onmouseout="window.status=&#39;&#39;; return true" onfocus="window.status=&#39;Skip Academic Transcipt Links&#39;; return true" onblur="window.status=&#39;&#39;; return true" class="skiplinks">Skip Academic Transcipt Links</a>
+</p><p>[ <a href="https://sis.rpi.edu/rss/bwrksumm.P_DispSumm" onmouseover="window.status=&#39;Overall Financial Aid Status&#39;; return true" onmouseout="window.status=&#39;&#39;; return true" onfocus="window.status=&#39;Overall Financial Aid Status&#39;; return true" onblur="window.status=&#39;&#39;; return true">Overall Financial Aid Status</a>
+ | <a href="https://sis.rpi.edu/rss/twbkwbis.P_GenMenu?name=bmenu.P_FACostMnu" onmouseover="window.status=&#39;Financial Aid Eligibility Menu&#39;; return true" onmouseout="window.status=&#39;&#39;; return true" onfocus="window.status=&#39;Financial Aid Eligibility Menu&#39;; return true" onblur="window.status=&#39;&#39;; return true">Financial Aid Eligibility Menu</a>
+ | <a href="https://sis.rpi.edu/rss/bwskwtrr.p_disp_transcript_address">Request Printed/Official Transcript</a>
+ | <a href="https://sis.rpi.edu/rss/bwskwtrr.p_disp_order_requests">View Status of Transcript Requests</a>
+ ]
+
+
+<a name="skip_Academic_Transcipt_Links_F"></a>
+</p></map></span></div>
+<div class="footerlinksdiv">
+<span class="pagefooterlinks">
+<map name="Registration_Links_F" title="Registration Links">
+<p>
+<a href="https://sis.rpi.edu/rss/bwskotrn.P_ViewTran#skip_Registration_Links_F" onmouseover="window.status=&#39;Skip Registration Links&#39;; return true" onmouseout="window.status=&#39;&#39;; return true" onfocus="window.status=&#39;Skip Registration Links&#39;; return true" onblur="window.status=&#39;&#39;; return true" class="skiplinks">Skip Registration Links</a>
+</p><p>[ <a href="http://srfs.rpi.edu/setup.do" onmouseover="window.status=&#39;Office of the Registrar&#39;; return true" onmouseout="window.status=&#39;&#39;; return true" onfocus="window.status=&#39;Office of the Registrar&#39;; return true" onblur="window.status=&#39;&#39;; return true">Office of the Registrar</a>
+ | <a href="http://www.rpi.edu/academics/catalog/" onmouseover="window.status=&#39;Catalog&#39;; return true" onmouseout="window.status=&#39;&#39;; return true" onfocus="window.status=&#39;Catalog&#39;; return true" onblur="window.status=&#39;&#39;; return true">Catalog</a>
+ | <a href="http://alac.rpi.edu/" onmouseover="window.status=&#39;Advising &amp; Learning Assistance Center&#39;; return true" onmouseout="window.status=&#39;&#39;; return true" onfocus="window.status=&#39;Advising &amp; Learning Assistance Center&#39;; return true" onblur="window.status=&#39;&#39;; return true">Advising &amp; Learning Assistance Center</a>
+ | <a href="http://sis.rpi.edu/update.htm" onmouseover="window.status=&#39;System Availability&#39;; return true" onmouseout="window.status=&#39;&#39;; return true" onfocus="window.status=&#39;System Availability&#39;; return true" onblur="window.status=&#39;&#39;; return true">System Availability</a>
+ | <a href="https://sis.rpi.edu/reg/z_reg_info_main.htm" onmouseover="window.status=&#39;Troubleshooting&#39;; return true" onmouseout="window.status=&#39;&#39;; return true" onfocus="window.status=&#39;Troubleshooting&#39;; return true" onblur="window.status=&#39;&#39;; return true">Troubleshooting</a>
+ | <a href="mailto:finaid@rpi.edu" onmouseover="window.status=&#39;Email Financial Aid&#39;; return true" onmouseout="window.status=&#39;&#39;; return true" onfocus="window.status=&#39;Email Financial Aid&#39;; return true" onblur="window.status=&#39;&#39;; return true">Email Financial Aid</a>
+ | <a href="mailto:bursar@rpi.edu" onmouseover="window.status=&#39;Email Bursar&#39;; return true" onmouseout="window.status=&#39;&#39;; return true" onfocus="window.status=&#39;Email Bursar&#39;; return true" onblur="window.status=&#39;&#39;; return true">Email Bursar</a>
+ | <a href="mailto:registrar@rpi.edu" onmouseover="window.status=&#39;Email Registrar&#39;; return true" onmouseout="window.status=&#39;&#39;; return true" onfocus="window.status=&#39;Email Registrar&#39;; return true" onblur="window.status=&#39;&#39;; return true">Email Registrar</a>
+ ]
+
+
+<a name="skip_Registration_Links_F"></a>
+</p></map></span></div>
+<div class="footerafterdiv">
+
+</div>
+<div class="globalafterdiv">
+
+</div>
+<div class="globalfooterdiv">
+
+</div>
+<div class="pagefooterdiv">
+<span class="releasetext">Release: 8.7.1</span>
+</div>
+<div class="poweredbydiv">
+</div>
+<div class="div1"></div>
+<div class="div2"></div>
+<div class="div3"></div>
+<div class="div4"></div>
+<div class="div5"></div>
+<div class="div6"></div>
+<div class="banner_copyright"> <br><h5>© 2020 Ellucian Company L.P. and its affiliates.<br></h5></div>
+
+
+</body></html>
