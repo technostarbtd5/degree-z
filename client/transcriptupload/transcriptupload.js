@@ -103,11 +103,11 @@ class Course {
 		}
 	}
 
-	setCourseInfo(subject, course_num, level, name, grade, credits, status) {
+	setCourseInfo(subject, course_num, name, level, grade, credits, status) {
 		this.subject = subject;
 		this.course_num = course_num;
-		this.level = level;
 		this.name = name;
+		this.level = level;
 		this.grade = grade;
 		this.credits = credits;
 		this.status = status;
