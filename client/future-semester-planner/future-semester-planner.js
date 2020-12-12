@@ -796,6 +796,7 @@ class MajorNavbarComponent {
       const id = `fsp-major-button-${index}`;
       parentElement.append(`<div class="fsp-major-button ${major == selectedMajor ? "fsp-major-button-selected" : ""}" id="${id}">${major}</div>`);
       $(`#${id}`).click(() => {
+        console.log(`Major click on ${major} in navbar`);
         planner.selectedMajor = major;
         planner.renderPlanner();
       });
@@ -1546,7 +1547,7 @@ class Planner {
     $(`#fsp-course-drag`).html("");
     this.potentialToSemesters = new Set();
     this.semesterRows = [];
-    this.selectedMajor = this.schedule.majors.length > 0 ? this.schedule.majors[0] : "Electives";
+    this.selectedMajor = this.schedule.majors.length > 0 ? ((new Set((this.schedule.majors || []).concat(["Electives", "Repeat Courses"]))).has(this.selectedMajor) ? this.selectedMajor: this.schedule.majors[0]) : "Electives";
   }
 
 

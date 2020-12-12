@@ -336,6 +336,30 @@ export const COURSES_EXAMPLE_JSON = {
         {"subject": "CSCI", "course": "2200"},
       ],
     },
+    "2961": {
+      "title": "Rensselaer Center for Open Source",
+      "shorthand": "RCOS",
+      "credits": 4,
+      "offered": ["Fall", "Spring", "Summer"],
+    },
+    "4020": {
+      "title": "Design and Analysis of Algorithms",
+      "shorthand": "Algo Design",
+      "credits": 4,
+      "offered": ["Spring"],
+      "prerequisites": [
+        {"subject": "CSCI", "course": "2300"},
+      ],
+    },
+    "4030": {
+      "title": "Randomized Algorithms",
+      "shorthand": "Algo Design",
+      "credits": 4,
+      "offered": ["Fall"],
+      "prerequisites": [
+        {"subject": "CSCI", "course": "4020"},
+      ],
+    },
     "4100": {
       "title": "Machine Learning from Data",
       "shorthand": "ML from Data",
@@ -373,6 +397,63 @@ export const COURSES_EXAMPLE_JSON = {
         {"subject": "CSCI", "course": "4210"},
       ],
     },
+    "4230": {
+      "title": "Cryptograph and Network Security I",
+      "shorthand": "Crypto I",
+      "credits": 4,
+      "offered": ["Fall"],
+      "prerequisites": [
+        {"subject": "CSCI", "course": "2300"},
+      ],
+    },
+    "4260": {
+      "title": "Graph Theory",
+      "shorthand": "Graph Theory",
+      "credits": 4,
+      "offered": ["Spring"],
+      "prerequisites": [
+        {"subject": "CSCI", "course": "1100"},
+        {"subject": "CSCI", "course": "2200"},
+      ],
+    },
+    "4270": {
+      "title": "Computational Vision",
+      "shorthand": "Comp. Vision",
+      "credits": 4,
+      "offered": ["Fall"],
+      "prerequisites": [
+        {"subject": "CSCI", "course": "2300"},
+        {"subject": "MATH", "course": "2010"},
+      ],
+    },
+    "4320": {
+      "title": "Parallel Programming",
+      "shorthand": "Parallel Prog",
+      "credits": 4,
+      "offered": ["Spring"],
+      "prerequisites": [
+        {"subject": "CSCI", "course": "2300"},
+        {"subject": "CSCI", "course": "2500"},
+      ],
+    },
+    "4340": {
+      "title": "Ontologies",
+      "shorthand": "Ontologies",
+      "credits": 4,
+      "offered": ["Spring"],
+      "prerequisites": [
+        {"subject": "CSCI", "course": "2300"},
+      ],
+    },
+    "4350": {
+      "title": "Data Science",
+      "shorthand": "Data Science",
+      "credits": 4,
+      "offered": ["Fall"],
+      "prerequisites": [
+        {"subject": "CSCI", "course": "1200"},
+      ],
+    },
     "4380": {
       "title": "Database Systems",
       "shorthand": "Database",
@@ -382,11 +463,48 @@ export const COURSES_EXAMPLE_JSON = {
         {"subject": "CSCI", "course": "2300"},
       ],
     },
+    "4390": {
+      "title": "Data Mining",
+      "shorthand": "Data Mining",
+      "credits": 4,
+      "offered": ["Fall"],
+      "prerequisites": [
+        {"subject": "CSCI", "course": "2300"},
+      ],
+    },
     "4430": {
       "title": "Programming Languages",
       "shorthand": "ProgLang",
       "credits": 4,
       "offered": ["Fall"],
+      "prerequisites": [
+        {"subject": "CSCI", "course": "2300"},
+        {"subject": "CSCI", "course": "2600"},
+      ],
+    },
+    "4440": {
+      "title": "Software Design and Documentation",
+      "shorthand": "Software Doc",
+      "credits": 4,
+      "offered": ["Fall", "Spring"],
+      "prerequisites": [
+        {"subject": "CSCI", "course": "2300"},
+      ],
+    },
+    "4460": {
+      "title": "Large-Scale Programming and Testing",
+      "shorthand": "Large-Scale Prog.",
+      "credits": 4,
+      "offered": ["Fall"],
+      "prerequisites": [
+        {"subject": "CSCI", "course": "2600"},
+      ],
+    },
+    "4470": {
+      "title": "Open Source Software",
+      "shorthand": "Open Source",
+      "credits": 4,
+      "offered": ["Spring", "Summer"],
       "prerequisites": [
         {"subject": "CSCI", "course": "2300"},
         {"subject": "CSCI", "course": "2600"},
@@ -511,6 +629,15 @@ export const COURSES_EXAMPLE_JSON = {
     "2010": {
       "title": "Multivariable Calculus and Matrix Algebra",
       "shorthand": "Multivar", 
+      "credits": 4,
+      "offered": ["Fall", "Spring"],
+      "prerequisites": [
+        {"subject": "MATH", "course": "1020"},
+      ],
+    },
+    "2400": {
+      "title": "Introduction to Differential Equations",
+      "shorthand": "DiffEq",
       "credits": 4,
       "offered": ["Fall", "Spring"],
       "prerequisites": [
