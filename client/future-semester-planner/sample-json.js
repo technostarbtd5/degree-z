@@ -353,7 +353,7 @@ export const COURSES_EXAMPLE_JSON = {
     },
     "4030": {
       "title": "Randomized Algorithms",
-      "shorthand": "Algo Design",
+      "shorthand": "Random Algos",
       "credits": 4,
       "offered": ["Fall"],
       "prerequisites": [
@@ -508,6 +508,34 @@ export const COURSES_EXAMPLE_JSON = {
       "prerequisites": [
         {"subject": "CSCI", "course": "2300"},
         {"subject": "CSCI", "course": "2600"},
+      ],
+    },
+    "4480": {
+      "title": "Robotics I",
+      "shorthand": "Robotics I",
+      "credits": 3,
+      "offered": ["Fall"],
+      "prerequisites": [
+        {"subject": "MATH", "course": "2400"},
+      ],
+    },
+    "4500": {
+      "title": "Distributed Computing Over The Internet",
+      "shorthand": "DistComp",
+      "credits": 4,
+      "offered": ["Spring"],
+      "prerequisites": [
+        {"subject": "CSCI", "course": "4430"},
+        {"subject": "CSCI", "course": "4210"},
+      ],
+    },
+    "4510": {
+      "title": "Distributed Systems and Algorithms",
+      "shorthand": "Dist Sys & Algo",
+      "credits": 4,
+      "offered": ["Fall"],
+      "prerequisites": [
+        {"subject": "CSCI", "course": "4210"},
       ],
     },
   },

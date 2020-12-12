@@ -172,13 +172,18 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  min-width: 120px;
-  max-width: 120px;
+  min-width: 150px;
+  max-width: 150px;
   padding: 0 10px;
+}
+
+.fsp-semester-credits {
+  font-size: small;
 }
 
 .fsp-name-container {
   display: flex;
+  /* flex-wrap: wrap; */
   align-items: center;
   justify-content: space-between;
 }
