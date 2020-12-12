@@ -140,7 +140,6 @@ if (isset($_POST["storeData"]) && is_array($_POST["storeData"])) {
 
 	$insert_student = "";
 	if (mysqli_num_rows($result) != 0) {
-		echo "here";
 		$insert_student = "UPDATE `students` SET `name` = ?, `college` = ?, `major` = ?, `department` = ?, `minor` = ?, `credits_taken` = ?, `credits_received` = ?, `gpa` = ? WHERE `username` = ?";
 		$statement = $mysqli->prepare($insert_student);
 		$statement->bind_param("sssssiids", $_POST["storeData"]["name"], $_POST["storeData"]["college"], $major, $dept, $minor, $_POST["storeData"]["taken"], $_POST["storeData"]["received"], $_POST["storeData"]["gpa"], $user);

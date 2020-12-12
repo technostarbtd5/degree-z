@@ -1,0 +1,71 @@
+#progress_section {
+	padding-left: 5px;
+	padding-right: 5px;
+}
+
+table,
+th,
+td {
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+
+th,
+td {
+    padding: 5px;
+    text-align: left;
+}
+
+.header {
+    width: 100%;
+}
+
+.left {
+    text-align: left;
+}
+
+.right {
+    text-align: right;
+}
+
+.center {
+    text-align: center;
+}
+
+#progress_head {
+	display: flex;
+	justify-content: space-between;
+	padding-left: 5px;
+	padding-right: 5px;
+}
+
+.half-line {
+    flex: 0 1 49%;
+    margin-left: 0.5%;
+    margin-right: 0.5%;
+}
+
+#transcript_link {
+	text-decoration: underline;
+	color: black;
+	font-weight: bold;
+}
+
+#transcript_link:hover {
+    color: #999;
+}
+
+.course_section {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	align-content: space-between;
+	padding-left: 5px;
+	padding-right: 5px;
+}
+
+.course_table {
+	margin-bottom: 5px;
+}
