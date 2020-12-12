@@ -353,7 +353,7 @@ export const COURSES_EXAMPLE_JSON = {
     },
     "4030": {
       "title": "Randomized Algorithms",
-      "shorthand": "Algo Design",
+      "shorthand": "Random Algos",
       "credits": 4,
       "offered": ["Fall"],
       "prerequisites": [
