@@ -126,9 +126,14 @@ function setSchedule() {
 
       // Clear existing entries
       if ($scheduleIDActive) {
-        $query = 'DELETE FROM `plan_courses` WHERE `plan_id`=?; DELETE FROM `plan_majors` WHERE `plan_id`=?;';
+        $query = 'DELETE FROM `plan_courses` WHERE `plan_id`=?;';
         $statement = $db->prepare($query);
-        $statement->bind_param("ii", $scheduleID, $scheduleID);
+        $statement->bind_param("i", $scheduleID);
+        $statement->execute();
+
+        $query = 'DELETE FROM `plan_majors` WHERE `plan_id`=?;';
+        $statement = $db->prepare($query);
+        $statement->bind_param("i", $scheduleID);
         $statement->execute();
       } else {
         // OR create a new schedule!
@@ -204,11 +209,33 @@ function deleteSchedule() {
   $statement->execute();
   $res = $statement->get_result();
   $schedule = $res->fetch_assoc();
+  var_dump($schedule);
+  echo $scheduleID;
   if ($schedule) {
-    $query = 'DELETE FROM `plans` WHERE `id`=?; DELETE FROM `plan_courses` WHERE `plan_id`=?; DELETE FROM `plan_majors` WHERE `plan_id`=?;';
+    // $query = 'DELETE FROM `plans` WHERE `id`=?; DELETE FROM `plan_courses` WHERE `plan_id`=?; DELETE FROM `plan_majors` WHERE `plan_id`=?;';
+    // $statement2 = $db->prepare($query);
+    // if ($statement2) {
+    //   $statement2->bind_param("iii", $scheduleID, $scheduleID, $scheduleID);
+    //   $statement2->execute();
+    //   echo "delete successful";
+    // } else {
+    //   echo $db->error;
+    // }
+    $query = 'DELETE FROM `plan_courses` WHERE `plan_id`=?;';
     $statement = $db->prepare($query);
-    $statement->bind_param("iii", $scheduleID, $scheduleID, $scheduleID);
+    $statement->bind_param("i", $scheduleID);
     $statement->execute();
+    $query = 'DELETE FROM `plan_majors` WHERE `plan_id`=?;';
+    $statement = $db->prepare($query);
+    $statement->bind_param("i", $scheduleID);
+    $statement->execute();
+    $query = 'DELETE FROM `plans` WHERE `id`=?;';
+    $statement = $db->prepare($query);
+    $statement->bind_param("i", $scheduleID);
+    $statement->execute();
+    echo "delete successful";
+  } else {
+    echo "delete unsuccessful";
   }
 }
 
@@ -222,6 +249,10 @@ if (isset($_POST["request"])) {
     break;
     case 'setSchedule':
       setSchedule();
+      
+    break;
+    case 'deleteSchedule':
+      deleteSchedule();
     break;
   }
 }

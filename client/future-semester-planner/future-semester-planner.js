@@ -1301,6 +1301,8 @@ class PlannerHeaderComponent {
   }
 
   render(planner, parentElement) {
+
+    /*
     parentElement.append(`<div id="get-schedules-debug">Get Schedules Debug</div><div id="get-schedules-debug-result"></div>`);
     $(`#get-schedules-debug`).click(() => {
       console.log("click");
@@ -1323,7 +1325,7 @@ class PlannerHeaderComponent {
 
     parentElement.append(`<div id="delete-schedule-debug">delete Schedule Debug</div><div id="delete-schedule-debug-result"></div>`);
     $(`#delete-schedule-debug`).click(() => {
-      console.log("click");
+      console.log("delete click");
       $.post("/api/planner", {request: "deleteSchedule", scheduleID: planner.activeScheduleID}, (response, status) => {
         console.log("response:");
         console.log(response);
@@ -1363,6 +1365,7 @@ class PlannerHeaderComponent {
         planner.renderPlanner();
       });
     });
+    */
 
 
 
@@ -1669,6 +1672,19 @@ class Planner {
     // this.canvasComponent
     this.renderMinorChanges();
     $(window).on('resize', () => {this.renderMinorChanges()});
+  }
+
+  fetchSchedules() {
+    $.post("/api/planner", {request: "getSchedules"}, (response, status) => {
+      // console.log("response:");
+      // console.log(response);
+      // $(`#get-schedules-debug-result`).html(response);
+      
+      JSON.parse(response).forEach(schedule => {
+        const {name, id} = schedule;
+        $(`#fsp-schedule-select`).append(`<option id="fsp-schedule-select-option-${id}" value="${id}" ${id == planner.activeScheduleID ? "selected" : ""}>${name}</option>`);
+      });
+    });
   }
   
   /**
