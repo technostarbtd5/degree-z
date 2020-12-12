@@ -103,11 +103,11 @@ class Course {
 		}
 	}
 
-	setCourseInfo(subject, course_num, level, name, grade, credits, status) {
+	setCourseInfo(subject, course_num, name, level, grade, credits, status) {
 		this.subject = subject;
 		this.course_num = course_num;
-		this.level = level;
 		this.name = name;
+		this.level = level;
 		this.grade = grade;
 		this.credits = credits;
 		this.status = status;
@@ -578,7 +578,8 @@ class Transcript {
 		sendData["name"] = this.studentData.name;
 		sendData["college"] = this.studentData.college;
 		sendData["majors"] = this.studentData.majors;
-		sendData["minors"] = this.studentData.minors;
+		sendData["departments"] = this.studentData.departments;
+		sendData["minors"] = this.studentData.minors.length > 0 ? this.studentData.minors : "";
 		sendData["taken"] = this.totalData.attempted;
 		sendData["received"] = this.totalData.passed;
 		sendData["gpa"] = this.totalData.gpa;

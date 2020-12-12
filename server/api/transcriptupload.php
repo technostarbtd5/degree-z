@@ -19,19 +19,29 @@ if (isset($_POST["getUser"]) && $_POST["getUser"] == 1) {
 		}
 		array_push($majors, substr($student["major"], $offset));
 		$offset = 0;
-		$minors = array();
-		while (stripos($student["minor"], ',', $offset) !== false) {
-			$next_offset = stripos($student["minor"], ',', $offset);
-			array_push($minors, substr($student["minor"], $offset, $next_offset - $offset));
+		$departments = array();
+		while (stripos($student["department"], ',', $offset) !== false) {
+			$next_offset = stripos($student["department"], ',', $offset);
+			array_push($departments, substr($student["department"], $offset, $next_offset - $offset));
 			$offset = $next_offset + 1;
 		}
-		array_push($minors, substr($student["minor"], $offset));
+		array_push($departments, substr($student["department"], $offset));
+		$offset = 0;
+		$minors = array();
+		if ($student["minor"] != "") {
+			while (stripos($student["minor"], ',', $offset) !== false) {
+				$next_offset = stripos($student["minor"], ',', $offset);
+				array_push($minors, substr($student["minor"], $offset, $next_offset - $offset));
+				$offset = $next_offset + 1;
+			}
+			array_push($minors, substr($student["minor"], $offset));
+		}
 
 		$studentData = array(
 			"name" => $student["name"],
 			"college" => $student["college"],
 			"majors" => $majors,
-			"departments" => $majors,				// Fix this by sending department data
+			"departments" => $departments,
 			"minors" => $minors,
 		);
 
@@ -108,23 +118,43 @@ if (isset($_POST["getUser"]) && $_POST["getUser"] == 1) {
 
 // Storing the transcript
 if (isset($_POST["storeData"]) && is_array($_POST["storeData"])) {
+	// Get student id
+	$get_student = "SELECT * FROM `students` WHERE students.username = \"" . $user . "\";";
+	$result = $mysqli->query($get_student);
+
 	// Store student and total data
-	$insert_student = "REPLACE INTO `students` (`name`, `username`, `college`, `major`, `minor`, `credits_taken`, `credits_received`, `gpa`) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 	$major = "";
 	foreach ($_POST["storeData"]["majors"] as $temp_major) {
 		$major = $major . $temp_major . ($temp_major == $_POST["storeData"]["majors"][count($_POST["storeData"]["majors"])-1] ? "" : ", ");
 	}
-	$minor = "";
-	foreach ($_POST["storeData"]["minors"] as $temp_minor) {
-		$minor = $minor . $temp_minor . ($temp_minor == $_POST["storeData"]["minors"][count($_POST["storeData"]["minors"])-1] ? "" : ", ");
+	$dept = "";
+	foreach ($_POST["storeData"]["departments"] as $temp_dept) {
+		$dept = $dept . $temp_dept . ($temp_dept == $_POST["storeData"]["departments"][count($_POST["storeData"]["departments"])-1] ? "" : ", ");
 	}
-	$statement = $mysqli->prepare($insert_student);
-	$statement->bind_param("ssssssiid", $_POST["storeData"]["name"], $user, $_POST["storeData"]["program"], $_POST["storeData"]["college"], $major, $minor, $_POST["storeData"]["taken"], $_POST["storeData"]["received"], $_POST["storeData"]["gpa"]);
-	$statement->execute();
+	$minor = "";
+	if ($_POST["storeData"]["minors"] != "") {
+		foreach ($_POST["storeData"]["minors"] as $temp_minor) {
+			$minor = $minor . $temp_minor . ($temp_minor == $_POST["storeData"]["minors"][count($_POST["storeData"]["minors"])-1] ? "" : ", ");
+		}
+	}
 
-	// Get student id
-	$get_student = "SELECT * FROM `students` WHERE students.username = \"" . $user . "\";";
-	$result = $mysqli->query($get_student);
+	$insert_student = "";
+	if (mysqli_num_rows($result) != 0) {
+		echo "here";
+		$insert_student = "UPDATE `students` SET `name` = ?, `college` = ?, `major` = ?, `department` = ?, `minor` = ?, `credits_taken` = ?, `credits_received` = ?, `gpa` = ? WHERE `username` = ?";
+		$statement = $mysqli->prepare($insert_student);
+		$statement->bind_param("sssssiids", $_POST["storeData"]["name"], $_POST["storeData"]["college"], $major, $dept, $minor, $_POST["storeData"]["taken"], $_POST["storeData"]["received"], $_POST["storeData"]["gpa"], $user);
+		$statement->execute();
+
+		$get_student = "SELECT * FROM `students` WHERE students.username = \"" . $user . "\";";
+		$result = $mysqli->query($get_student);
+	}
+	else {
+		$insert_student = "INSERT INTO `students` (`name`, `username`, `college`, `major`, `department`, `minor`, `credits_taken`, `credits_received`, `gpa`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+		$statement = $mysqli->prepare($insert_student);
+		$statement->bind_param("ssssssiid", $_POST["storeData"]["name"], $user, $_POST["storeData"]["college"], $major, $dept, $minor, $_POST["storeData"]["taken"], $_POST["storeData"]["received"], $_POST["storeData"]["gpa"]);
+		$statement->execute();
+	}
 	$student_id = $result->fetch_assoc()["id"];
 
 	// Clear existing data according to student id
