@@ -101,8 +101,8 @@ function setSchedule() {
     $canEditSchedule = true;
     $scheduleIDActive = false;
     $scheduleID = -1;
-    if (isset($_POST["scheduleID"]) && is_integer($_POST["scheduleID"])) {
-      $scheduleID = $_POST["scheduleID"];
+    if (isset($_POST["scheduleID"])) {
+      $scheduleID = intval($_POST["scheduleID"]);
       $query = 'SELECT * FROM `plans` WHERE `id`=?';
       $statement = $db->prepare($query);
       $statement->bind_param("i", $scheduleID);
@@ -117,6 +117,10 @@ function setSchedule() {
       if ($row != null && $canEditSchedule) {
         $scheduleIDActive = true;
       }
+    }
+
+    if (isset($_POST["scheduleID"])) {
+      var_dump($_POST["scheduleID"]);
     }
 
     echo "Can edit schedule " . htmlspecialchars($scheduleID) . "? " . ($canEditSchedule ? "true" : "false") . "; does schedule exist? " . ($scheduleIDActive ? "true" : "false"); 
@@ -245,6 +249,10 @@ function deleteSchedule() {
   } else {
     echo "delete unsuccessful";
   }
+}
+
+function getStarterSchedule() {
+
 }
 
 if (isset($_POST["request"])) {
