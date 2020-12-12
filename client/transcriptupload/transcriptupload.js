@@ -579,7 +579,7 @@ class Transcript {
 		sendData["college"] = this.studentData.college;
 		sendData["majors"] = this.studentData.majors;
 		sendData["departments"] = this.studentData.departments;
-		sendData["minors"] = this.studentData.minors;
+		sendData["minors"] = this.studentData.minors.length > 0 ? this.studentData.minors : "";
 		sendData["taken"] = this.totalData.attempted;
 		sendData["received"] = this.totalData.passed;
 		sendData["gpa"] = this.totalData.gpa;
