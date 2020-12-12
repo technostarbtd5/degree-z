@@ -38,28 +38,18 @@ if ($mysqli->select_db($nameDB) === false) {
   $planner_sql = "CREATE TABLE `plans` (
     `id` int AUTO_INCREMENT,
     `name` varchar(255) NOT NULL,
-    `RCSID` varchar(11),
+    `RIN` bigint(11),
     PRIMARY KEY (`id`)
   );";
 
   $mysqli->query($planner_sql);
 
-  $planner_majors_sql = "CREATE TABLE `plan_majors` (
-    `id` int AUTO_INCREMENT,
-    `name` varchar(255) NOT NULL,
-    `type` varchar(11) NOT NULL,
-    `plan_id` int,
-    PRIMARY KEY (`id`),
-    FOREIGN KEY (`plan_id`) REFERENCES `plans` (`id`)
-  );";
-
-  $mysqli->query($planner_majors_sql);
-
   $planner_courses_sql = "CREATE TABLE `plan_courses` (
     `id` int AUTO_INCREMENT,
     `course_department` varchar(4) NOT NULL,
-    `course_number` varchar(4) NOT NULL,
+    `course_number` int(4) NOT NULL,
     `semester` varchar(20) NOT NULL,
+    `RIN` bigint(11),
     `plan_id` int,
     PRIMARY KEY (`id`),
     FOREIGN KEY (`plan_id`) REFERENCES `plans` (`id`)

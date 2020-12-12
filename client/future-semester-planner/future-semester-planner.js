@@ -78,446 +78,6 @@ function getSemesterRange(semesters) {
   return semesterRange;
 }
 
-/**
- * Ford-Fulkerson algorithm for solving network flows
- * @param {Array} graph Graph in format of [{targetID: capacity, targetID: capacity,}, {targetID: capacity, targetID: capacity,},] where each index of the array represents a node, each targetID represents an edge from the array index to the targetID, and capacity is the capacity of that edge. Graph shouldn't be directed.
- * @param {Number} source 
- */
-function networkFlow(graph, source, sink) {
-  source = `${source}`;
-  sink = `${sink}`;
-  const flowGraph = Array(graph.length).fill([]).map(() => Array(graph.length).fill(0));
-  // First, locate a valid path from source to sink with DFS
-
-  // DFS; returns path from source to sink and the amount of flow that can be sent down it
-  const dfs = (source, target) => {
-    const visited = new Set();
-    const dfsLoop = (node) => {
-      visited.add(node);
-      // console.log(JSON.stringify([...visited]));
-      if (target == node) {
-        const resultObject = {path: [node], flow: Number.MAX_SAFE_INTEGER};
-        // console.log(JSON.stringify(resultObject));
-        return resultObject;
-      }
-      for (const [destination, capacity] of Object.entries(graph[node])) {
-        const edgeFlow = flowGraph[node][destination];
-        if (!visited.has(destination) && capacity > edgeFlow) {
-          const dfsResult = dfsLoop(destination);
-          if (dfsResult) {
-            dfsResult.path.push(node);
-            const resultObject = {path: dfsResult.path, flow: Math.min(dfsResult.flow, capacity - edgeFlow)};
-            // console.log(JSON.stringify(resultObject));
-            return resultObject;
-          }
-        }
-      }
-      return false;
-    }
-    const loopResult = dfsLoop(source);
-    const {path, flow} = loopResult;
-    // Flip path
-    return loopResult ? {path: path.map((ignore, index) => path[path.length - index - 1]), flow} : false;
-  }
-
-  // Test DFS
-  // console.log(dfs(3, 2));
-
-  let dfsResult;
-  while (dfsResult = dfs(source, sink)) {
-    // console.log(JSON.stringify(dfsResult));
-    const {path, flow} = dfsResult;
-    for (let index = 0; index < path.length - 1; index++) {
-      flowGraph[path[index]][path[index + 1]] += flow;
-      flowGraph[path[index + 1]][path[index]] -= flow;
-    }
-  }
-
-  return flowGraph;
-
-}
-
-console.log("Network flow test:");
-console.log(networkFlow([
-  {1: 3, 2: 1},
-  {3: 2, 4: 1, 0: 3},
-  {4: 1, 0: 1},
-  {5: 8, 1: 2},
-  {5: 1, 1: 1, 2: 1},
-  {4: 8, 5: 1},
-], 0, 5));
-
-/**
- * Determine whether two courses match. This can be refactored to account for cross-listed courses.
- * @param {Object} courseA courseObject
- * @param {Object} courseB courseObject
- */
-function doCoursesMatch(courseA, courseB) {
-  return courseA.subject == courseB.subject && courseA.course == courseB.course;
-}
-
-
-/**
- * 
- * @param {Array} coursesTaken Array of courseObjects representing all courses taken
- * @param {Object} majorRequirements JSON object representing major requirements
- */
-function getFulfilledRequirements(coursesTaken, majorRequirements) {
-  // First, preprocess requirements! All requirements should be in the format of "n of".
-  // console.log(JSON.stringify(coursesTaken));
-  const preprocessRequirement = requirement => {
-    if (requirement.optional) return false; // Don't include optional items!
-    if ("subject" in requirement && "course" in requirement) {
-      return requirement;
-    } else if ("subject" in requirement && "minLevel" in requirement) {
-      return {"n of": Object.keys(COURSES_EXAMPLE_JSON[requirement.subject])
-          .filter(course => course >= requirement.minLevel)
-          .map(course => ({subject: requirement.subject, course})),
-        "amount": 1};
-    } else if ("n of" in requirement || "one of" in requirement || "all of" in requirement) {
-      const subRequirements = requirement["n of"] || requirement["one of"] || requirement["all of"];
-      // console.log(subRequirements);
-      const preprocessedSubRequirements = subRequirements.map((subreq, index) => {
-        const preprocessed = preprocessRequirement(subreq);
-        if (preprocessed) preprocessed.index = index;
-        return preprocessed;
-      }).filter(subreq => subreq).sort((a, b) => {
-        const aAmt = a.amount || 1;
-        const bAmt = b.amount || 1;
-        return aAmt - bAmt;
-      }).map((subreq, fulfillmentIndex) => {
-        subreq.fulfillmentIndex = fulfillmentIndex;
-        return subreq;
-      });
-
-
-      let amount = 1;
-      if ("n of" in requirement && requirement.amount) amount = requirement.amount;
-      if ("all of" in requirement) amount = preprocessedSubRequirements.length;
-      return {"n of": preprocessedSubRequirements, amount, "category name": requirement["category name"], index: 0, fulfillmentIndex: 0};
-    }
-    return false;
-  }
-
-  const preprocessedRequirements = preprocessRequirement({"all of": majorRequirements});
-  // console.log(preprocessedRequirements);
-
-  // Now, convert requirements to graph form and scan recursively!
-  const requirementToGraph = (requirement, courses) => {
-    // console.log(courses);
-    const graph = [];
-    const addNode = () => {
-      graph.push({});
-      return graph.length - 1;
-    }
-    const addEdge = (nodeA, nodeB, capacity) => {
-      graph[nodeA][nodeB] = capacity;
-      graph[nodeB][nodeA] = capacity;
-    }
-
-    // Add source and sink nodes
-    const source = addNode();
-    const sink = addNode();
-
-    // Add all courses taken to graph
-    const coursesTakenNodes = courses.reduce((accumulator, course) => {
-      const courseNode = addNode();
-      addEdge(courseNode, source, 1);
-      accumulator[`${course.subject} ${course.course}`] = courseNode;
-      return accumulator;
-    }, {});
-
-    // Add requirements to graph
-    const topRequirementChildrenNodes = [];
-    const addRequirementToGraph = (requirement, firstCall = false) => {
-      if ("subject" in requirement && "course" in requirement) {
-        requirement.graphNode = coursesTakenNodes[`${requirement.subject} ${requirement.course}`];
-        return coursesTakenNodes[`${requirement.subject} ${requirement.course}`];
-      } else if ("n of" in requirement && "amount" in requirement) {
-        const reqNode = addNode();
-        requirement.graphNode = reqNode;
-        addEdge(reqNode, sink, requirement.amount - 1);
-        const subRequirements = requirement["n of"];
-        subRequirements.forEach(subreq => {
-          const subreqNode = addRequirementToGraph(subreq);
-          if (firstCall) topRequirementChildrenNodes.push(subreqNode);
-          if (subreqNode !== undefined) {
-            addEdge(reqNode, subreqNode, 1);
-          }
-        });
-        return reqNode;
-      } 
-      return undefined;
-    }
-
-    const topRequirementNode = addRequirementToGraph(requirement, true);
-    addEdge(topRequirementNode, sink, requirement.amount);
-
-    return {graph, coursesTakenNodes, topRequirementNode, topRequirementChildrenNodes};
-  }
-
-  // console.log(requirementToGraph(preprocessedRequirements, coursesTaken));
-  // console.log(networkFlow(requirementToGraph(preprocessedRequirements, coursesTaken).graph, 0, 1));
-  
-  // Trim sub-requirements that can't possibly be fulfilled.
-  const pruneRequirement = (requirement, coursesTakenSet) => {
-    // const coursesTakenSet = new Set(courses.map(course => `${course.subject} ${course.course}`));
-    if ("subject" in requirement && "course" in requirement) {
-      // If a course has been taken, it is a filled requirement
-      const output = coursesTakenSet.has(`${requirement.subject} ${requirement.course}`) ? {requirement, complete: true, prunedRequirement: requirement} : {requirement, complete: false, prunedRequirement: requirement};
-      // coursesTakenSet.delete(`${requirement.subject} ${requirement.course}`);
-      return output;
-    } else if ("n of" in requirement && "amount" in requirement) {
-      const newRequirement = {
-        "n of": requirement["n of"].map(subreq => pruneRequirement(subreq, coursesTakenSet)).filter(subreq => subreq.complete).map(subreq => subreq.requirement),
-        "amount": requirement.amount,
-        "category name": requirement["category name"],
-        index: requirement.index,
-        fulfillmentIndex: requirement.fulfillmentIndex,
-      }
-      const {graph, topRequirementNode, topRequirementChildrenNodes, coursesTakenNodes} = requirementToGraph(newRequirement, [...coursesTakenSet].map(courseString => {
-        const [subject, course] = courseString.split(" ");
-        return {subject, course};
-      }));
-      const flow = networkFlow(graph, 0, 1);
-      // Prune prereqs that aren't actually used to fill requirement
-      // newRequirement["n of"] = newRequirement["n of"].filter((subreq, index) => {
-      //   const childNode = topRequirementChildrenNodes[index];
-      //   const isFlowing = flow[topRequirementNode][childNode] < 0; // Assert that this node feeds into topRequirementNode to confirm that prereq is used
-        
-      //   return isFlowing;
-      // });
-      const prunedRequirement = {
-        "n of": newRequirement["n of"].map(subreq => pruneRequirement(subreq, coursesTakenSet)).filter((subreq, index) => {
-          const childNode = topRequirementChildrenNodes[index];
-          return flow[topRequirementNode][childNode] < 0; // Assert that this node feeds into topRequirementNode to confirm that prereq is used
-        }).map(subreq => subreq.prunedRequirement),
-        "amount": requirement.amount,
-        "category name": requirement["category name"],
-        index: requirement.index,
-        fulfillmentIndex: requirement.fulfillmentIndex,
-      }
-      const complete =  flow[topRequirementNode][1] >= requirement.amount;
-      // console.log(complete);
-      // if (!complete) {
-        // console.log(requirement);
-        // console.log(flow);
-        // console.log(graph);
-        // console.log(topRequirementNode);
-        // console.log(topRequirementChildrenNodes);
-        // console.log(coursesTakenNodes);
-      // }
-
-      // Evaluate course utilization
-      const addFulfillments = req => {
-        if ("n of" in req) {
-          
-        }
-      }
-      return {requirement: newRequirement, complete, flow, prunedRequirement};
-
-
-
-
-      // const reqNode = addNode();
-      // addEdge(reqNode, sink, requirement.amount - 1);
-      // const subRequirements = requirement["n of"];
-      // subRequirements.forEach(subreq => {
-      //   const subreqNode = addRequirementToGraph(subreq);
-      //   if (subreqNode !== undefined) {
-      //     addEdge(reqNode, subreqNode, 1);
-      //   }
-      // });
-      // return reqNode;
-    } 
-  }
-
-  // console.log(pruneRequirement(preprocessedRequirements, new Set(coursesTaken.map(course => `${course.subject} ${course.course}`))));
-
-  const unusedCourses = coursesTaken.reduce((accumulator, course) => {
-    accumulator[`${course.subject} ${course.course}`] = course;
-    return accumulator;
-  }, {});
-  const getFulfillingCourses = requirement => {
-    // If requirement is a simple course, return the course if the course is marked as unused!
-
-    if ("subject" in requirement && "course" in requirement) {
-      const courseString = `${requirement.subject} ${requirement.course}`;
-      if (courseString in unusedCourses) {
-        delete unusedCourses[courseString];
-        return {"fulfilling courses": [requirement], "complete": true, index: requirement.index};
-      } else {
-        return {"fulfilling courses": [], "complete": false, index: requirement.index};
-      }
-    } else if ("n of" in requirement && "amount" in requirement) {
-      // Otherwise, examine subreqs.
-      const prunedRequirement = pruneRequirement(requirement, new Set(Object.values(unusedCourses).map(course => `${course.subject} ${course.course}`)));
-      // console.log(prunedRequirement);
-      const subRequirements = requirement["n of"];
-      const subRequirementsByFulfillmentIndex = subRequirements.reduce((accumulator, subreq) => {
-        accumulator[subreq.fulfillmentIndex] = subreq;
-        return accumulator;
-      }, {});
-
-      // Prioritize complete requirement trees!
-      // if (prunedRequirement.complete) {
-      //   prunedRequirement.requirement["n of"].forEach(subreq => {
-      //     const fulfillingCourses = getFulfillingCourses(subreq);
-      //     subreqFulfillments.push(fulfillingCourses);
-      //     delete subRequirementsByFulfillmentIndex[subreq.fulfillmentIndex];
-      //   });
-      // }
-
-      // Otherwise, prioritize completed subreqs.
-      const subreqFulfillments = [];
-      // console.log(prunedRequirement.prunedRequirement);
-      prunedRequirement.requirement["n of"].forEach(subreq => {
-        const fulfillingCourses = getFulfillingCourses(subreq);
-        subreqFulfillments.push(fulfillingCourses);
-        delete subRequirementsByFulfillmentIndex[subreq.fulfillmentIndex];
-
-      });
-
-      // Then, loop through all remaining trees.
-      Object.values(subRequirementsByFulfillmentIndex).forEach(subreq => {
-        const fulfillingCourses = getFulfillingCourses(subreq);
-        subreqFulfillments.push(fulfillingCourses);
-      });
-      return {"fulfilling courses": subreqFulfillments, complete: prunedRequirement.complete, index: requirement.index};
-    }
-  }
-
-  const fulfillingCoursesList = getFulfillingCourses(preprocessedRequirements);
-
-  console.log(fulfillingCoursesList);
-
-  return fulfillingCoursesList;
-
-
-
-
-
-
-}
-
-console.log("Incomplete reqs");
-getFulfilledRequirements([
-  {"subject": "BIOL", "course": "1010"},
-  {"subject": "BIOL", "course": "1015"},
-  {"subject": "CSCI", "course": "1200"},
-  {"subject": "IHSS", "course": "1200"},
-  {"subject": "MATH", "course": "2010"},
-  {"subject": "CSCI", "course": "2200"},
-  {"subject": "CSCI", "course": "2500"},
-  {"subject": "ECON", "course": "2020"},
-  {"subject": "ITWS", "course": "1100"},
-  {"subject": "ITWS", "course": "1220"},
-  {"subject": "CSCI", "course": "2300"},
-  {"subject": "MATH", "course": "4100"},
-  {"subject": "COMM", "course": "4420"},
-  {"subject": "ECON", "course": "4130"},
-  {"subject": "ITWS", "course": "2110"},
-], MAJORS_EXAMPLE_JSON["ITWS"].requirements);
-
-console.log("Complete reqs");
-getFulfilledRequirements([
-  {"subject": "CHEM", "course": "1100"},
-  {"subject": "CHEM", "course": "1200"},
-  {"subject": "CSCI", "course": "1100"},
-  {"subject": "MATH", "course": "1010"},
-  {"subject": "MATH", "course": "1020"},
-  {"subject": "MGMT", "course": "2100"},
-  {"subject": "PHYS", "course": "1100"},
-  {"subject": "STSH", "course": "1000"},
-  {"subject": "STSS", "course": "1000"},
-  {"subject": "STSS", "course": "1000"},
-  {"subject": "WRIT", "course": "1000"},
-
-  {"subject": "BIOL", "course": "1010"},
-  {"subject": "BIOL", "course": "1015"},
-  {"subject": "CSCI", "course": "1200"},
-  {"subject": "IHSS", "course": "1200"},
-  {"subject": "MATH", "course": "2010"},
-
-  {"subject": "CSCI", "course": "2200"},
-  {"subject": "CSCI", "course": "2500"},
-  {"subject": "ECON", "course": "2020"},
-  {"subject": "ITWS", "course": "1100"},
-  {"subject": "ITWS", "course": "1220"},
-
-  {"subject": "CSCI", "course": "2300"},
-  {"subject": "MATH", "course": "4100"},
-  {"subject": "COMM", "course": "4420"},
-  {"subject": "ECON", "course": "4130"},
-  {"subject": "ITWS", "course": "2110"},
-
-  {"subject": "CSCI", "course": "2600"},
-  {"subject": "CSCI", "course": "4210"},
-  {"subject": "ITWS", "course": "2210"},
-  {"subject": "ITWS", "course": "4310"},
-  {"subject": "ITWS", "course": "4500"},
-
-  {"subject": "CSCI", "course": "4100"},
-  {"subject": "CSCI", "course": "4220"},
-  {"subject": "CSCI", "course": "4430"},
-  {"subject": "ITWS", "course": "4100"},
-  {"subject": "ECON", "course": "2010"},
-
-  {"subject": "CSCI", "course": "4150"},
-  {"subject": "CSCI", "course": "4380"},
-], MAJORS_EXAMPLE_JSON["ITWS"].requirements);
-
-console.log("Test CS");
-getFulfilledRequirements([
-  {"subject": "CHEM", "course": "1100"},
-  {"subject": "CHEM", "course": "1200"},
-  {"subject": "CSCI", "course": "1100"},
-  {"subject": "MATH", "course": "1010"},
-  {"subject": "MATH", "course": "1020"},
-  {"subject": "MGMT", "course": "2100"},
-  {"subject": "PHYS", "course": "1100"},
-  {"subject": "STSH", "course": "1000"},
-  {"subject": "STSS", "course": "1000"},
-  {"subject": "STSS", "course": "1000"},
-  {"subject": "WRIT", "course": "1000"},
-
-  {"subject": "BIOL", "course": "1010"},
-  {"subject": "BIOL", "course": "1015"},
-  {"subject": "CSCI", "course": "1200"},
-  {"subject": "IHSS", "course": "1200"},
-  {"subject": "MATH", "course": "2010"},
-
-  {"subject": "CSCI", "course": "2200"},
-  {"subject": "CSCI", "course": "2500"},
-  {"subject": "ECON", "course": "2020"},
-  {"subject": "ITWS", "course": "1100"},
-  {"subject": "ITWS", "course": "1220"},
-
-  {"subject": "CSCI", "course": "2300"},
-  {"subject": "MATH", "course": "4100"},
-  {"subject": "COMM", "course": "4420"},
-  {"subject": "ECON", "course": "4130"},
-  {"subject": "ITWS", "course": "2110"},
-
-  {"subject": "CSCI", "course": "2600"},
-  {"subject": "CSCI", "course": "4210"},
-  {"subject": "ITWS", "course": "2210"},
-  {"subject": "ITWS", "course": "4310"},
-  {"subject": "ITWS", "course": "4500"},
-
-  {"subject": "CSCI", "course": "4100"},
-  {"subject": "CSCI", "course": "4220"},
-  {"subject": "CSCI", "course": "4430"},
-  {"subject": "ITWS", "course": "4100"},
-  {"subject": "ECON", "course": "2010"},
-
-  {"subject": "CSCI", "course": "4150"},
-  {"subject": "CSCI", "course": "4380"},
-], MAJORS_EXAMPLE_JSON["Computer Science"].requirements);
-
-
-
-
 function getCourseObject(subject, course) {
   return COURSES_EXAMPLE_JSON[subject][course];
 }
@@ -537,8 +97,8 @@ function getCoursesInMajor(major) {
         return Object.keys(COURSES_EXAMPLE_JSON[courseElement.subject])
             .filter(course => course >= courseElement.minLevel)
             .map(course => `${courseElement.subject} ${course}`);
-      } else if ("n of" in courseElement || "one of" in courseElement || "all of" in courseElement) {
-        return getCoursesInArray(courseElement["n of"] || courseElement["one of"] || courseElement["all of"]);
+      } else if ("n of" in courseElement || "one of" in courseElement) {
+        return getCoursesInArray(courseElement["n of"] || courseElement["one of"]);
       }
     }).flat();
   }
@@ -554,7 +114,6 @@ function getCourseHTML(subject, course, tileID) {
   return `<div class="fsp-course-container" id="${tileID}-container">
     <div class="fsp-course" id="${tileID}">
       <div class="fsp-course-code">${subject} ${course} <div class="fsp-direction-indicator">&#x25b6;</div></div>
-      <div class="fsp-shorthand" id="shorthand-${tileID}">${courseObject.shorthand ?  courseObject.shorthand : ""}</div>
       <div class="fsp-course-details">
         <div class="fsp-course-title">${courseObject.title}</div>
         ${"credits" in courseObject ? `<div class="fsp-course-details-credits">Credits: ${courseObject.credits}</div>` : ""}
@@ -588,7 +147,6 @@ class CourseComponent {
   }
 
   render(planner, parentElement) {
-    // console.log(`Rendering ${this.subject} ${this.course}`);
     parentElement.append(getCourseHTML(this.subject, this.course, this.tileID));
 
     const {tileID, subject, course} = this;
@@ -631,12 +189,10 @@ class CourseComponent {
       $(`.fsp-direction-indicator`).html("&#x25b6;");
       if (isVisible) {
         $(`#${tileID} .fsp-course-details`).hide(0);
-        $(`#shorthand-${tileID}`).show(0);
         $(`#${tileID} .fsp-course-code .fsp-direction-indicator`).html("&#x25b6;");
       } else {
         $(`#${tileID}-container`).css({"max-height": $(`#${tileID}-container`).outerHeight()});
         $(`#${tileID} .fsp-course-details`).show(0);
-        $(`#shorthand-${tileID}`).hide(0);
         $(`#${tileID}`).css({"z-index": 3});
         $(`#${tileID} .fsp-course-code .fsp-direction-indicator`).html("&#x25bc;");
       }
@@ -649,7 +205,7 @@ class CourseComponent {
 
   addPrereqWarning(unfilledPrereqs) {
     const {subject, course, semester} = this;
-    // console.log(new Set(getCourseObject(subject, course).offered));
+    console.log(new Set(getCourseObject(subject, course).offered));
     // console.log((new Set(...(getCourseObject(subject, course).offered || []))));
     if (unfilledPrereqs.length > 0 || !((new Set(getCourseObject(subject, course).offered || [])).has(semester.split(" ")[0]) || semester == "transfer")) {
       this.prereqWarning = true;
@@ -792,38 +348,22 @@ class MajorNavbarComponent {
 
 class MajorRequirementComponent {
   static numComponents = 0;
-  constructor (requirementName, requirements, validCourses, fulfilledRequirements = false) {
+  constructor (requirementName, requirements, validCourses) {
     this.id = MajorRequirementComponent.numComponents++;
     this.requirementName = requirementName;
     this.requirements = requirements;
     this.validCourses = validCourses;
-    this.fulfilledRequirements = fulfilledRequirements;
     this.render.bind(this);
   }
 
   render(planner, parentElement) {
-    const {id, requirementName, requirements, validCourses, fulfilledRequirements} = this;
-    // console.log(fulfilledRequirements);
-    // console.log(fulfilledRequirements["fulfilling courses"]);
-    const fulfilledRequirementsByIndex = fulfilledRequirements && fulfilledRequirements["fulfilling courses"] && fulfilledRequirements["fulfilling courses"].reduce(
-      (accumulator, fulfilledRequirementsInIndex) => {
-        // console.log(fulfilledRequirementsInIndex);
-        accumulator[fulfilledRequirementsInIndex.index] = fulfilledRequirementsInIndex;
-        return accumulator;
-      }, {}
-    );
-
-    console.log(fulfilledRequirementsByIndex);
+    const {id, requirementName, requirements, validCourses} = this;
     const titleID = `fsp-list-title-${id}`
     const segmentID = `fsp-list-segment-${id}`
-    parentElement.append(`<div class="fsp-list-title" id="${titleID}">${requirementName}<div class="fsp-direction-indicator">&#x25bc;</div>${fulfilledRequirements && fulfilledRequirements.complete ? `<img src="/client/future-semester-planner/check_circle_outline-24px.svg" class="fsp-list-completed">`: ""}</div>
-    <div class="fsp-list-segment" id="${segmentID}">
-      <div id="segment-fulfilled-${segmentID}" class="fsp-segment-fulfilled"></div>
-    </div>`);
+    parentElement.append(`<div class="fsp-list-title" id="${titleID}">${requirementName}<div class="fsp-direction-indicator">&#x25bc;</div></div>
+    <div class="fsp-list-segment" id="${segmentID}"></div>`);
     console.log(requirements);
-    requirements.forEach((requirement, index) => {
-      const fulfilledRequirementsInIndex = fulfilledRequirementsByIndex && fulfilledRequirementsByIndex[index];
-      // console.log(fulfilledRequirementsInIndex);
+    requirements.forEach(requirement => {
       if ("subject" in requirement && "course" in requirement) {
         // return `${requirement.subject} ${requirement.course}`
         const {subject, course} = requirement;
@@ -834,44 +374,25 @@ class MajorRequirementComponent {
           // $(`#${segmentID}`).append(`<div class="requirement-course-container" id="course-container-${containerID}"></div>`);
           (new CourseComponent(requirement.subject, requirement.course)).render(planner, $(`#${segmentID}`));
         }
-
-        // Add "fulfilled by" indicator
-        if (
-          fulfilledRequirementsInIndex &&
-          fulfilledRequirementsInIndex.complete && 
-          fulfilledRequirementsInIndex["fulfilling courses"] && 
-          fulfilledRequirementsInIndex["fulfilling courses"].length > 0 && 
-          "subject" in fulfilledRequirementsInIndex["fulfilling courses"][0] && 
-          "course" in fulfilledRequirementsInIndex["fulfilling courses"][0]
-        ) {
-          $(`#segment-fulfilled-${segmentID}`).append(`<div class="fsp-fulfilled-course">${fulfilledRequirementsInIndex["fulfilling courses"][0].subject} ${fulfilledRequirementsInIndex["fulfilling courses"][0].course}</div>`)
-        }
       } else if ("subject" in requirement && "minLevel" in requirement) {
         console.log(Object.keys(COURSES_EXAMPLE_JSON[requirement.subject]).filter(course => course >= requirement.minLevel));
         const newRequirements = Object.keys(COURSES_EXAMPLE_JSON[requirement.subject])
             .filter(course => course >= requirement.minLevel)
             .map(course => ({subject: requirement.subject, course}));
         console.log(newRequirements);
-        // const fulfilledRequirementsInIndex = fulfilledRequirementsByIndex && fulfilledRequirementsByIndex[index];
-        (new MajorRequirementComponent(`${requirement.subject} course above level ${requirement.minLevel}:`, newRequirements, validCourses, fulfilledRequirementsInIndex))
+        (new MajorRequirementComponent(`${requirement.subject} course above level ${requirement.minLevel}:`, newRequirements, validCourses))
             .render(planner, $(`#${segmentID}`));
         // return Object.keys(COURSES_EXAMPLE_JSON[requirement.subject])
         //     .filter(course => course >= requirement.minLevel)
         //     .map(course => `${requirement.subject} ${course}`);
-      } else if ("n of" in requirement || "one of" in requirement || "all of" in requirement) {
+      } else if ("n of" in requirement || "one of" in requirement) {
         // return getCoursesInArray(requirement["n of"] || requirement["one of"]);
-        const newRequirements = requirement["n of"] || requirement["one of"] || requirement["all of"];
-        const newRequirementName = `${"category name" in requirement ? `${requirement["category name"]} - ` : ""}${"n of" in requirement ? `${requirement.amount} of:` : `${"one of" in requirement ? "One" : "All"} of:`}`;
-        (new MajorRequirementComponent(newRequirementName, newRequirements, validCourses, fulfilledRequirementsInIndex))
+        const newRequirements = requirement["n of"] || requirement["one of"];
+        const newRequirementName = "n of" in requirement ? `${requirement.amount} of:` : "One of:";
+        (new MajorRequirementComponent(newRequirementName, newRequirements, validCourses))
             .render(planner, $(`#${segmentID}`));
       }
     });
-    if ($(`#segment-fulfilled-${segmentID}`).html()) {
-      $(`#segment-fulfilled-${segmentID}`).prepend("<div>Fulfilled by:</div>");
-    }
-
-    
-
     
     // Add visibility toggle
     $(`#${titleID}`).click(() => {
@@ -901,10 +422,6 @@ class MajorListComponent {
   }
 
   render (planner, parentElement) {
-
-
-
-
     parentElement.append(`<div id="fsp-requirements-list"></div>`);
     if (this.selectedMajor == "Electives") {
       // unscheduledCoursesTileIDs.forEach(course => {
@@ -927,19 +444,8 @@ class MajorListComponent {
       (new MajorRequirementComponent("Repeat Courses:", repeatOptions, this.existingCourses))
           .render(planner, $("#fsp-requirements-list"));
     } else {
-
-        // Calculate requirement fulfillments
-        const coursesTaken = [...this.existingCourses].map(courseString => {
-          const [subject, course] = courseString.split(" ");
-          return {subject, course};
-        });
-
-        const fulfilledRequirements = MAJORS_EXAMPLE_JSON[this.selectedMajor] ? getFulfilledRequirements(coursesTaken, MAJORS_EXAMPLE_JSON[this.selectedMajor].requirements) : false;
-
-        console.log(fulfilledRequirements);  
-    
       
-      (new MajorRequirementComponent("Requirements:", MAJORS_EXAMPLE_JSON[this.selectedMajor] ? MAJORS_EXAMPLE_JSON[this.selectedMajor].requirements : [], this.unscheduledCourses, fulfilledRequirements))
+      (new MajorRequirementComponent("Requirements:", MAJORS_EXAMPLE_JSON[this.selectedMajor] ? MAJORS_EXAMPLE_JSON[this.selectedMajor].requirements : [], this.unscheduledCourses))
           .render(planner, $("#fsp-requirements-list"));
       // const appendCourses = (requirements, parentID) => {
       //   requirements.forEach(courseElement => {
@@ -957,7 +463,7 @@ class MajorListComponent {
       // }
     }
 
-    $(`#fsp-classes-list`).droppable({ 
+    $(`#fsp-classes-list`).droppable({
       tolerance: "pointer",
       over: () => {
         $(`#fsp-requirements-list`).addClass("fsp-row-active");
@@ -1000,11 +506,8 @@ class AddSemeseterComponent {
   }
 }
 
-const LINE_OFFSET_VERTICAL = 40;
-const RAW_COURSE_HEIGHT = 28;
 class CanvasComponent {
   connectionVerticalOffsets = {};
-  pathsToRedraw = [];
 
   constructor (semesterRows, canvas) {
     this.semesterRows = semesterRows;
@@ -1017,15 +520,12 @@ class CanvasComponent {
     this.drawCoursePath.bind(this);
     this.getMinRowHeight.bind(this);
     this.getConnectionVerticalOffset.bind(this);
-    this.setConnectionVerticalOffsets.bind(this);
   } 
 
   draw (planner) {
     this.canvas.canvas.width = $(`#fsp-content`).outerWidth();
     this.canvas.canvas.height = $(`#fsp-content`).outerHeight();
     const paths = this.getPaths();
-    this.setConnectionVerticalOffsets(Object.values(paths).flat());
-    this.pathsToRedraw = [];
     this.semesterRows.forEach(semesterRow => {
       semesterRow.courseComponents.forEach(courseComponent => {
         const {tileID} = courseComponent;
@@ -1033,7 +533,6 @@ class CanvasComponent {
         pathsFromCourse.forEach(path => this.drawCoursePath(path));
       });
     });
-    this.pathsToRedraw.forEach(path => this.drawCoursePath(path));
   }
 
   getPaths () {
@@ -1102,28 +601,18 @@ class CanvasComponent {
   drawCoursePath(pathObject) {
     const {from, to, fromSemester, toSemester, fromComponent, toComponent} = pathObject;
     // console.log(`Drawing path ${JSON.stringify({from, to})}`);
-    let triangleSize = 8;
     if($(`#${toComponent.tileID}`).is(":hover") || ($(`#${fromComponent.tileID}`).is(":hover") && fromSemester == toSemester)) {
-      // console.log("Stroke coloring");
       if (toComponent.prereqWarning) {
         this.canvas.strokeStyle = '#990000';
-        this.canvas.fillStyle = '#990000';
       } else {
         this.canvas.strokeStyle = '#009900';
-        this.canvas.fillStyle = '#009900';
       }
-      this.canvas.lineWidth = 3;
-      this.pathsToRedraw.push(pathObject);
+      this.canvas.lineWidth = 2;
     } else if ($(`#${fromComponent.tileID}`).is(":hover")) {
-      // console.log("Stroke coloring");
       this.canvas.strokeStyle = '#007799';
-      this.canvas.fillStyle = '#007799';
-      this.canvas.lineWidth = 3;
-      this.pathsToRedraw.push(pathObject);
+      this.canvas.lineWidth = 2;
     } else {
       this.canvas.strokeStyle = '#999999';
-      this.canvas.fillStyle = '#999999';
-      triangleSize = 5;
       this.canvas.lineWidth = 1;
     }
     // this.drawCanvasLine(from, to);
@@ -1138,13 +627,6 @@ class CanvasComponent {
       if (Math.abs(from.left - to.left) < 10) {
         canvas.lineTo(from.left, to.top);
         canvas.stroke();
-        if (from.top < to.top) {
-          canvas.beginPath();
-          canvas.moveTo(to.left, to.top - RAW_COURSE_HEIGHT);
-          canvas.lineTo(to.left - triangleSize, to.top - RAW_COURSE_HEIGHT - triangleSize);
-          canvas.lineTo(to.left + triangleSize, to.top - RAW_COURSE_HEIGHT - triangleSize);
-          canvas.fill();
-        }
       } else {
         const horizontalLineLocation = Math.min(this.getConnectionVerticalOffset(fromComponent.tileID, toSemester), to.top);
         if (from.top < horizontalLineLocation) {
@@ -1176,13 +658,6 @@ class CanvasComponent {
             canvas.moveTo(to.left, horizontalLineLocation + 5);
             canvas.lineTo(to.left, to.top);
             canvas.stroke();
-          }
-          if (horizontalLineLocation + RAW_COURSE_HEIGHT < to.top) {
-            canvas.beginPath();
-            canvas.moveTo(to.left, to.top - RAW_COURSE_HEIGHT);
-            canvas.lineTo(to.left - triangleSize, to.top - RAW_COURSE_HEIGHT - triangleSize);
-            canvas.lineTo(to.left + triangleSize, to.top - RAW_COURSE_HEIGHT - triangleSize);
-            canvas.fill();
           }
         } else {
           canvas.lineTo(from.left, horizontalLineLocation + 5);
@@ -1221,64 +696,17 @@ class CanvasComponent {
   }
 
   getConnectionVerticalOffset(tileID, toSemester) {
-    const minRowHeight = this.getMinRowHeight(toSemester);
-    const fromHeight = this.getCourseCanvasLocation(tileID).top;
     if (this.connectionVerticalOffsets[tileID] !== undefined && this.connectionVerticalOffsets[tileID][toSemester] !== undefined) {
-      return minRowHeight - LINE_OFFSET_VERTICAL - this.connectionVerticalOffsets[tileID][toSemester];
+      return this.connectionVerticalOffsets[tileID][toSemester];
     } else {
-
-      if (minRowHeight  - LINE_OFFSET_VERTICAL < fromHeight) {
+      const minRowHeight = this.getMinRowHeight(toSemester);
+      const fromHeight = this.getCourseCanvasLocation(tileID).top;
+      if (minRowHeight  - 35 < fromHeight) {
         return minRowHeight;
       } else {
-        return minRowHeight - LINE_OFFSET_VERTICAL;
+        return minRowHeight - 35;
       }
     }
-  }
-
-  setConnectionVerticalOffsets(paths) {
-    const OFFSET_AMOUNT = 7;
-    const rowsBySemester = {};
-    paths.forEach(pathObject => {
-      const {from, to, fromSemester, toSemester, fromComponent, toComponent} = pathObject;
-      const minRowHeight = this.getMinRowHeight(toSemester);
-      const fromHeight = this.getCourseCanvasLocation(fromComponent.tileID).top;
-      if (Math.abs(from.left, to.left >= 10) && minRowHeight - LINE_OFFSET_VERTICAL >= fromHeight) {
-        if (!rowsBySemester[toSemester]) rowsBySemester[toSemester] = [];
-        rowsBySemester[toSemester].push({from: Math.min(from.left, to.left), to: Math.max(from.left, to.left), tileID: fromComponent.tileID});
-      }
-    });
-    Object.entries(rowsBySemester).forEach(([toSemester, row]) => {
-      // Calculate vertical offset per item
-      // console.log(`Semester ${toSemester} row: ${JSON.stringify(row)}`);
-      const rowByTileID = {};
-      row.forEach(line => {
-        const {from, to, tileID} = line;
-        if (tileID in rowByTileID) {
-          rowByTileID[tileID] = {
-            from: Math.min(from, rowByTileID[tileID].from),
-            to: Math.max(to, rowByTileID[tileID].to),
-            tileID
-          };
-        } else {
-          rowByTileID[tileID] = line;
-        }
-      })
-      const timeInstances = Object.values(rowByTileID).map(line => {
-        return [{time: line.from, offset: OFFSET_AMOUNT, tileID: line.tileID}, {time: line.to, offset: -OFFSET_AMOUNT}];
-      }).flat().sort((a, b) => (a.time - b.time || a.offset - b.offset));
-
-      // console.log(`Semester ${toSemester} timeInstances: ${JSON.stringify(timeInstances)}`);
-      let offset = 0;
-      timeInstances.forEach(timeEvent => {
-        if (timeEvent.tileID) {
-          if (!this.connectionVerticalOffsets[timeEvent.tileID]) this.connectionVerticalOffsets[timeEvent.tileID] = {};
-          this.connectionVerticalOffsets[timeEvent.tileID][toSemester] = offset;
-        }
-        offset += timeEvent.offset;
-      })
-      // row.sort((a, b) => a.from - b.from);
-      // row.forEach()
-    });
   }
 
   drawCanvasLine(from, to) {
@@ -1294,81 +722,11 @@ class CanvasComponent {
   }
 }
 
-class PlannerHeaderComponent {
-  constructor(scheduleID) {
+class PlannerHeader {
+  constructor(rin, scheduleID) {
+    this.rin = rin;
     this.scheduleID = scheduleID;
-    this.render.bind(this);
   }
-
-  render(planner, parentElement) {
-    parentElement.append(`<div id="get-schedules-debug">Get Schedules Debug</div><div id="get-schedules-debug-result"></div>`);
-    $(`#get-schedules-debug`).click(() => {
-      console.log("click");
-      $.post("/api/planner", {request: "getSchedules"}, (response, status) => {
-        console.log("response:");
-        console.log(response);
-        $(`#get-schedules-debug-result`).html(response);
-      });
-    });
-
-    parentElement.append(`<div id="set-schedule-debug">Set Schedule Debug</div><div id="set-schedule-debug-result"></div>`);
-    $(`#set-schedule-debug`).click(() => {
-      console.log("click");
-      $.post("/api/planner", {request: "setSchedule", schedule: planner.schedule}, (response, status) => {
-        console.log("response:");
-        console.log(response);
-        $(`#set-schedule-debug-result`).html(response);
-      });
-    });
-
-    parentElement.append(`<div id="delete-schedule-debug">delete Schedule Debug</div><div id="delete-schedule-debug-result"></div>`);
-    $(`#delete-schedule-debug`).click(() => {
-      console.log("click");
-      $.post("/api/planner", {request: "deleteSchedule", scheduleID: planner.activeScheduleID}, (response, status) => {
-        console.log("response:");
-        console.log(response);
-        $(`#delete-schedule-debug-result`).html(response);
-      });
-    });
-
-    parentElement.append(`<div id="fsp-schedule-selector">
-      <select name="Schedule" id="fsp-schedule-select"></select>
-      <div id="fsp-schedule-selected"></div>
-    </div>`);
-    $.post("/api/planner", {request: "getSchedules"}, (response, status) => {
-      // console.log("response:");
-      // console.log(response);
-      // $(`#get-schedules-debug-result`).html(response);
-      
-      JSON.parse(response).forEach(schedule => {
-        const {name, id} = schedule;
-        $(`#fsp-schedule-select`).append(`<option id="fsp-schedule-select-option-${id}" value="${id}" ${id == planner.activeScheduleID ? "selected" : ""}>${name}</option>`);
-      });
-    });
-
-    console.log(planner.activeScheduleID);
-
-    // $(`#fsp-schedule-select`).val(`${planner.activeScheduleID}`).attr("selected", true);
-    // console.log(`Schedule selected: ${$(`#fsp-schedule-select`).val()}`);
-    // $(`#fsp-schedule-select-option-${planner.activeScheduleID}`).attr("selected", true);
-    
-    $(`#fsp-schedule-select`).change(function() {
-      const id = $(this).val();
-      $.post("/api/planner", {request: "getSchedule", scheduleID: id}, (response, status) => {
-        const schedule = JSON.parse(response);
-        schedule["starting semester"] = "Fall 2019";
-        console.log(schedule);
-        planner.schedule = schedule;
-        planner.activeScheduleID = id;
-        planner.renderPlanner();
-      });
-    });
-
-
-
-  }
-
-
 
   
 }
@@ -1456,9 +814,6 @@ class Planner {
     const majorList = (new MajorListComponent(this.selectedMajor, allCourses, existingCourses, unscheduledCourses)).render(this, $("#fsp-classes-list"));
 
 
-    // Render header
-    $("#fsp-header").html("");
-    const header = (new PlannerHeaderComponent(undefined)).render(this, $("#fsp-header"));
 
     // this.potentialToSemesters = new Set();
 
