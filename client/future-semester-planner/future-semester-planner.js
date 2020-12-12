@@ -1378,6 +1378,7 @@ class PlannerHeaderComponent {
 
 class Planner {
   activeScheduleID = "New Schedule";
+  schedules = [];
   schedule = JSON.parse(JSON.stringify(SCHEDULE_EXAMPLE_JSON));
   potentialToSemesters = new Set();
   selectedMajor = this.schedule.majors.length > 0 ? this.schedule.majors[0] : "Electives";
@@ -1385,8 +1386,7 @@ class Planner {
   // mouse = {x: 0, y: 0};
   // isDragging = false;
   constructor() {
-    console.log(this.schedule);
-    this.renderPlanner();
+
     // $(document).mousemove(e => {
     //   this.mouse.x = e.pageX;
     //   this.mouse.y = e.pageY;
@@ -1400,12 +1400,21 @@ class Planner {
     this.getCourseCanvasLocation.bind(this);
     this.drawCanvasLine.bind(this);
     this.dropSemester.bind(this);
+    this.fetchSchedules.bind(this);
+    this.fetchActiveSchedule.bind(this);
+
+
+    console.log(this.schedule);
+    this.fetchSchedules(true);
+
+    this.renderPlanner();
   }
 
   /**
    * Reset all relevant items on re-render
    */
   resetPlanner() {
+    this.fetchSchedules();
     CourseComponent.resetItems();
     SemesterRowComponent.resetItems();
     MajorRequirementComponent.resetItems();
@@ -1674,16 +1683,37 @@ class Planner {
     $(window).on('resize', () => {this.renderMinorChanges()});
   }
 
-  fetchSchedules() {
+  fetchSchedules(firstFetch = false) {
     $.post("/api/planner", {request: "getSchedules"}, (response, status) => {
       // console.log("response:");
       // console.log(response);
       // $(`#get-schedules-debug-result`).html(response);
       
       JSON.parse(response).forEach(schedule => {
-        const {name, id} = schedule;
-        $(`#fsp-schedule-select`).append(`<option id="fsp-schedule-select-option-${id}" value="${id}" ${id == planner.activeScheduleID ? "selected" : ""}>${name}</option>`);
+        this.schedules.push(schedule);
+        // const {name, id} = schedule;
+        // $(`#fsp-schedule-select`).append(`<option id="fsp-schedule-select-option-${id}" value="${id}" ${id == planner.activeScheduleID ? "selected" : ""}>${name}</option>`);
       });
+
+      if (firstFetch) {
+        console.log(this.schedules);
+        if (this.schedules.length > 0) {
+          this.activeScheduleID = this.schedules[0].id;
+          this.fetchActiveSchedule();
+        } 
+      }
+    });
+  }
+
+  fetchActiveSchedule() {
+    $.post("/api/planner", {request: "getSchedule", scheduleID: this.activeScheduleID}, (response, status) => {
+      console.log(response);
+      const schedule = JSON.parse(response);
+      schedule["starting semester"] = "Fall 2019";
+      console.log(schedule);
+      this.schedule = schedule;
+      // planner.activeScheduleID = id;
+      this.renderPlanner();
     });
   }
   
